@@ -1,8 +1,8 @@
 ﻿# Replace with your Workspace ID
-$CustomerId = "cc40b1bb-37e1-4a23-9978-9bc5aa8ae3e3"  
+$CustomerId = "insert"  
 
 # Replace with your Primary Key
-$SharedKey = "R/JEnzMUN6J+P0XogFI3uoTyvfq98iTkPem530f2M88dvea4rCJVgJdMcJ1Ck1yGM4WnYBkBoudkRDU2zokcDQ=="
+$SharedKey = "insert"
 
 # Specify the name of the record type that you'll be creating
 $LogName = "TestUpload4"  # this will be searchable as MyCustomLogs_CL
