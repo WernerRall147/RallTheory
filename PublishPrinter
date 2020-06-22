@@ -1,0 +1,120 @@
+Function PublishPrinter {
+
+#Import Required Module
+Import-Module PublishCloudPrinter
+
+#Variables
+
+$PrinterName = Write-Host "Please enter the Printer Name"  
+$PrinterMan = Read-Host -Prompt "Please enter the Printer Manufacturer"
+$PrinterMod = Read-Host -Prompt "Please enter the Printer Model"
+$Country = Read-Host -Prompt "Please enter the Country this Printer will be avilable in"
+$Org = Read-Host -Prompt "Please enter Company this Printer belongs to eg. CCBA"
+$Site = Read-Host -Prompt "Please enter Site/Physical Office this Printer is located in eg. Johannesburg"
+$Building = Read-Host -Prompt "Please enter the Building Number this Printer is available in eg. Head Office"
+$All = @"
+'{"attrs" : [{"category" : "country", "vs":"$country", "depth":0}), {"category" : "organization", "vs":"$org", "depth":1}, {"category": "site", "vs":"$site", "depth":2}, {"category" : "building", "vs":"$building", "depth":3}]}'
+"@
+$PrintSDDL = Read-Host -Prompt "Please enter the Printer SDDL. You get this from running '(Get-Printer <PrinterName> -full).PermissionSDDL' on the Print SERVER" 
+$FullSDDL = $("O:BA" + "$GetPrintSDL")
+##$GetPrintSDL = (Get-Printer $PrinterName -full).PermissionSDDL
+
+
+Publish-CloudPrinter -Printer $PrinterName `
+-Manufacturer $PrinterMan -Model $PrinterMod `
+-OrgLocation $All `
+-Sddl "$FullSDDL" `
+-DiscoveryEndpoint "https://mopriadiscoveryservice-xxxxxxx.msappproxy.net/mcs/" `
+-PrintServerEndpoint "https://enterprisecloudprint-xxxxxxx.msappproxy.net/ecp/" `
+-AzureClientId "" `
+-AzureTenantGuid "" `
+-DiscoveryResourceId "https://mopriadiscoveryservice-ccbagroup.msappproxy.net/mcs/"
+
+}
+
+#query a Printer and verify its published
+
+#Import Required Module
+Import-Module PublishCloudPrinter
+
+Function QueryPrinter {
+
+Publish-CloudPrinter -Query `
+-DiscoveryEndpoint "https://mopriadiscoveryservice-xxxxxxx.msappproxy.net/mcs/" `
+-AzureClientId "" `
+-AzureTenantGuid "" `
+-DiscoveryResourceId "https://mopriadiscoveryservice-xxxxxxx.msappproxy.net/mcs/"
+
+}
+
+#Unpublish the Printer
+
+Function UnpublishPrinter {
+
+#Import Required Module
+Import-Module PublishCloudPrinter
+
+#Variables
+$PrinterName = Write-Host "Please enter the Printer Name"  
+$PrinterMan = Read-Host -Prompt "Please enter the Printer Manufacturer"
+$PrinterMod = Read-Host -Prompt "Please enter the Printer Model"
+$Country = Read-Host -Prompt "Please enter the Country this Printer will be avilable in"
+$Org = Read-Host -Prompt "Please enter Company this Printer belongs to eg. CCBA"
+$Site = Read-Host -Prompt "Please enter Site/Physical Office this Printer is located in eg. Johannesburg"
+$Building = Read-Host -Prompt "Please enter the Building Number this Printer is available in eg. Head Office"
+$All = @"
+'{"attrs" : [{"category" : "country", "vs":"$country", "depth":0}), {"category" : "organization", "vs":"$org", "depth":1}, {"category": "site", "vs":"$site", "depth":2}, {"category" : "building", "vs":"$building", "depth":3}]}'
+"@
+$PrintSDDL = Read-Host -Prompt "Please enter the Printer SDDL. You get this from running '(Get-Printer <PrinterName> -full).PermissionSDDL' on the Print SERVER" 
+$FullSDDL = $("O:BA" + "$GetPrintSDL")
+##$GetPrintSDL = (Get-Printer $PrinterName -full).PermissionSDDL
+
+Publish-CloudPrinter -Unpublish -Printer $PrinterName `
+-Manufacturer $PrinterMan -Model $PrinterMod `
+-OrgLocation $All `
+-Sddl "$FullSDDL" `
+-DiscoveryEndpoint "https://mopriadiscoveryservice-xxxxxxxxx.msappproxy.net/mcs/" `
+-PrintServerEndpoint "https://enterprisecloudprint-xxxxxxxxx.msappproxy.net/ecp/" `
+-AzureClientId "" `
+-AzureTenantGuid "" `
+-DiscoveryResourceId "https://mopriadiscoveryservice-xxxxxxxx.msappproxy.net/mcs/"
+
+}
+
+function Show-Menu
+{
+     param (
+           [string]$Title = 'Hybrid Cloud Print Options'
+     )
+     cls
+     Write-Host "================ $Title ================"
+    
+     Write-Host "1: Press '1' to Publish a New Cloud Printer."
+     Write-Host "2: Press '2' to Query All Cloud Printers."
+     Write-Host "3: Press '3' to Remove a Cloud Printer."
+     Write-Host "Q: Press 'Ctrl-C' to quit."
+}
+
+Function Main()
+{
+     Show-Menu
+     $input = Read-Host "Please make a selection"
+     switch ($input)
+     {
+           '1' {
+                cls
+                PublishPrinter
+           } '2' {
+                cls
+                QueryPrinter
+           } '3' {
+                cls
+                UnpublishPrinter
+           } 'q' {
+                return
+           }
+     }
+     pause
+}
+
+Main
