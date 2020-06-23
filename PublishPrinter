@@ -1,3 +1,96 @@
+#.
+
+
+Function Azure {
+# Sign in to Azure Subscription
+    while ((Get-AzureRmContext -ErrorAction SilentlyContinue).Account.Id -ne $AzureAccountName)
+    {
+        Write-Host "`r`nYou are not currently signed into Azure with the account name that you provided. Sign in with the appropriate account in order to continue." -ForegroundColor Green
+        pause
+        Login-AzureRmAccount | Out-Null
+    }
+
+    $azTenantGuid = Get-AzureRmTenant
+
+        if (($azTenantGuid.Count -gt 1) -and ($Directory.Length -gt 0))
+    {
+        Set-AzureRmContext -Tenant $azTenantGuid
+    }
+    else
+    {
+     if ($azTenantGuid.Count -gt 1)
+        {
+            Write-Host "`r`nYou have multiple Tenants associated with your Azure account. Which one would you like to use?"
+            for ($i = 1; $i -le $azTenantGuid.Count; $i++)
+            {
+                Write-Host "$i)" -NoNewline -ForegroundColor Green
+                Write-Host " $($azTenantGuid[$($i-1)].Id) - " -NoNewline -ForegroundColor White
+                Write-Host $azTenantGuid[$i-1].Directory -ForegroundColor Cyan
+            }
+            Write-Host "Enter a Number [1 - $($azTenantGuid.Count)]: " -ForegroundColor Green -NoNewline
+            $sel = Read-Host
+            $azTenantGuid[$sel - 1] | Set-AzureRmContext | Out-Null
+        }
+     }
+     
+     $CurrentContext = Get-AzureRmContext
+     $DirID = $CurrentContext.Tenant.Id
+
+
+#Query the MCS App
+$azAppsMCS = Get-AzureADApplication -Top 100 #| Select DisplayName, Homepage
+
+if ($azAppsMCS.Count -gt 1)
+        {
+            Write-Host "`r`nYou need to select your DiscoveryEndpoint(normally ends in /mcs). Which one would you like to use?"
+            for ($i = 1; $i -le $azAppsMCS.Count; $i++)
+            {
+                Write-Host "$i)" -NoNewline -ForegroundColor Green
+                Write-Host " $($azAppsMCS[$($i-1)].DisplayName) - " -NoNewline -ForegroundColor White
+                Write-Host $azAppsMCS[$i-1].Homepage -ForegroundColor Cyan
+            }
+            Write-Host "Enter a Number [1 - $($azAppsMCS.Count)]: " -ForegroundColor Green -NoNewline
+            $sel = Read-Host
+            $azSelAppMCS = $azAppsMCS[$sel - 1] 
+            $azSelAppMCSURL = $azSelAppMCS.Homepage
+        }
+     
+#Query the ECP App
+if ($azAppsMCS.Count -gt 1)
+        {
+            Write-Host "`r`nYou need to select your EnterpriseCloudPrint(normally ends in /ecp). Which one would you like to use?"
+            for ($i = 1; $i -le $azAppsECP.Count; $i++)
+            {
+                Write-Host "$i)" -NoNewline -ForegroundColor Green
+                Write-Host " $($azAppsMCS[$($i-1)].DisplayName) - " -NoNewline -ForegroundColor White
+                Write-Host $azAppsMCS[$i-1].Homepage -ForegroundColor Cyan
+            }
+            Write-Host "Enter a Number [1 - $($azAppsMCS.Count)]: " -ForegroundColor Green -NoNewline
+            $sel2 = Read-Host
+            $azSelAppECP = $azAppsMCS[$sel2 - 1] 
+            $azSelAppECPURL = $azSelAppECP.Homepage
+        }  
+ 
+ #Query the Native App
+ if ($azAppsMCS.Count -gt 1)
+        {
+            Write-Host "`r`nYou need to select your Native App. Which one would you like to use?"
+            for ($i = 1; $i -le $azAppsECP.Count; $i++)
+            {
+                Write-Host "$i)" -NoNewline -ForegroundColor Green
+                Write-Host " $($azAppsMCS[$($i-1)].DisplayName) - " -NoNewline -ForegroundColor White
+                Write-Host $azAppsMCS[$i-1].Homepage -ForegroundColor Cyan
+            }
+            Write-Host "Enter a Number [1 - $($azAppsMCS.Count)]: " -ForegroundColor Green -NoNewline
+            $sel3 = Read-Host
+            $azSelAppNAT = $azAppsMCS[$sel3 - 1] 
+            $azSelAppNATID = $azSelAppNAT.AppID
+        }      
+     
+     
+     }
+
+
 Function PublishPrinter {
 
 #Import Required Module
@@ -24,11 +117,11 @@ Publish-CloudPrinter -Printer $PrinterName `
 -Manufacturer $PrinterMan -Model $PrinterMod `
 -OrgLocation $All `
 -Sddl "$FullSDDL" `
--DiscoveryEndpoint "https://mopriadiscoveryservice-xxxxxxx.msappproxy.net/mcs/" `
--PrintServerEndpoint "https://enterprisecloudprint-xxxxxxx.msappproxy.net/ecp/" `
--AzureClientId "" `
--AzureTenantGuid "" `
--DiscoveryResourceId "https://mopriadiscoveryservice-ccbagroup.msappproxy.net/mcs/"
+-DiscoveryEndpoint "$azSelAppMCSURL" `
+-PrintServerEndpoint "$azSelAppECPURL" `
+-AzureClientId "$azSelAppNATID" `
+-AzureTenantGuid "$DirID" `
+-DiscoveryResourceId "$azSelAppMCSURL"
 
 }
 
@@ -40,10 +133,10 @@ Import-Module PublishCloudPrinter
 Function QueryPrinter {
 
 Publish-CloudPrinter -Query `
--DiscoveryEndpoint "https://mopriadiscoveryservice-xxxxxxx.msappproxy.net/mcs/" `
--AzureClientId "" `
--AzureTenantGuid "" `
--DiscoveryResourceId "https://mopriadiscoveryservice-xxxxxxx.msappproxy.net/mcs/"
+-DiscoveryEndpoint "$azSelAppMCSURL" `
+-AzureClientId "$azSelAppNATID" `
+-AzureTenantGuid "$DirID" `
+-DiscoveryResourceId "$azSelAppMCSURL"
 
 }
 
@@ -73,11 +166,11 @@ Publish-CloudPrinter -Unpublish -Printer $PrinterName `
 -Manufacturer $PrinterMan -Model $PrinterMod `
 -OrgLocation $All `
 -Sddl "$FullSDDL" `
--DiscoveryEndpoint "https://mopriadiscoveryservice-xxxxxxxxx.msappproxy.net/mcs/" `
--PrintServerEndpoint "https://enterprisecloudprint-xxxxxxxxx.msappproxy.net/ecp/" `
--AzureClientId "" `
--AzureTenantGuid "" `
--DiscoveryResourceId "https://mopriadiscoveryservice-xxxxxxxx.msappproxy.net/mcs/"
+-DiscoveryEndpoint "$azSelAppMCSURL" `
+-PrintServerEndpoint "$azSelAppECPURL" `
+-AzureClientId "$azSelAppNATID" `
+-AzureTenantGuid "$DirID" `
+-DiscoveryResourceId "$azSelAppMCSURL"
 
 }
 
@@ -117,4 +210,5 @@ Function Main()
      pause
 }
 
+Azure
 Main
