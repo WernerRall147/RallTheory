@@ -12,12 +12,12 @@
 #Import-Module Az.KeyVault -verbose -Force
 #
 #Parameters
-#Param(
-#    [parameter(mandatory)] [string] $originSubscriptionId
-#)
+Param(
+[parameter(mandatory)] [string] $originSubscriptionId
+)
 #
 #Use Connect AzAccount to connect to your azure environment or use a Connect-AzAccount -ServicePrincipal 
-#Connect-AzAccount
+Connect-AzAccount
 $Csv = New-Item KeyVaultExport.csv
 Write-Host "KeyVaultExport File Location is in $csv" -ForegroundColor Green
 
