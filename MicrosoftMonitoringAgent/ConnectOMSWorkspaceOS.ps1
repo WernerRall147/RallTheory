@@ -2,7 +2,8 @@
     ("workspaceid", "key"))
 $mma = New-Object -ComObject 'AgentConfigManager.MgmtSvcCfg'
 $mma.AddCloudWorkspace($UCworkspaces[0],$UCworkspaces[1])
-$mma.ReloadConfiguration()#>
+$mma.ReloadConfiguration()
+#>
 
 $workspaceId = "<Your workspace Id>"
 $workspaceKey = "<Your workspace Key>"
