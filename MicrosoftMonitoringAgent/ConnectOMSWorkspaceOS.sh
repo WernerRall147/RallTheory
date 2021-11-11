@@ -1,2 +1,2 @@
-sudo /opt/microsoft/omsagent/bin/omsadmin.sh -w 69860496-a11d-4692-8c79-fa89789c406e -s OVJ1W5DGckCjZfYeLm4Msz3NaqauD5vPcCheHMxh4eWHw3N6ScpNQk84EsGplNbxOc6wLF6Y1iHwYPL3qrOyDg== -v
+sudo /opt/microsoft/omsagent/bin/omsadmin.sh -w <workspace> -s <keys> -v
 sudo /opt/microsoft/omsagent/bin/service_control restart
