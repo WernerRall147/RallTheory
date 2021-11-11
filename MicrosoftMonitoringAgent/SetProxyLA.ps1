@@ -1,11 +1,11 @@
-param($ProxyDomainName="https://proxy.contoso.com:30443", $cred=(Get-Credential))
+$workspaceId = "<WS ID>"
+$workspaceKey = "<WS KEy>"
+$mma = New-Object -ComObject 'AgentConfigManager.MgmtSvcCfg'
+$mma.AddCloudWorkspace($workspaceId, $workspaceKey)
 
-# First we get the Health Service configuration object. We need to determine if we
-#have the right update rollup with the API we need. If not, no need to run the rest of the script.
-$healthServiceSettings = New-Object -ComObject 'AgentConfigManager.MgmtSvcCfg'
+param($ProxyDomainName="https://proxy.contoso.com:30443")
 
-$proxyMethod = $healthServiceSettings | Get-Member -Name 'SetProxyInfo'
-
+$proxyMethod = $mma | Get-Member -Name 'SetProxyUrl'
 if (!$proxyMethod)
 {
     Write-Output 'Health Service proxy API not present, will not update settings.'
@@ -13,9 +13,8 @@ if (!$proxyMethod)
 }
 
 Write-Output "Clearing proxy settings."
-$healthServiceSettings.SetProxyInfo('', '', '')
+$mma.SetProxyUrl('')
 
-$ProxyUserName = $cred.username
-
-Write-Output "Setting proxy to $ProxyDomainName with proxy username $ProxyUserName."
-$healthServiceSettings.SetProxyInfo($ProxyDomainName, $ProxyUserName, $cred.GetNetworkCredential().password)
+Write-Output "Setting proxy to $ProxyDomainName"
+$mma.SetProxyUrl($ProxyDomainName)
+$mma.ReloadConfiguration()
