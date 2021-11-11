@@ -6,6 +6,10 @@ Start-Transcript -Path ".\StartScriptResults.txt"
 #Connect-azAccount
 Connect-AzAccount
 
+#Set AzContext
+$SubID = Read-Host "Enter your Subscription ID"
+Set-AzContext -SubscriptionId $SubID
+
 #Use AzResourceGraph to get a list of All Machines
 #Install-Module -Name Az.ResourceGraph
 $myAzureVMs = Search-AzGraph -Query '
