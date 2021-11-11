@@ -1,3 +1,5 @@
+#Requires -Modules Az
+
 #Start a TRanscript of this
 Start-Transcript -Path ".\StartScriptResults.txt"
 
