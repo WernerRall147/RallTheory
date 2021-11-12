@@ -1,0 +1,34 @@
+Heartbeat
+| where TimeGenerated > ago(3d)
+| summarize LastHeartbeat = max(TimeGenerated) by Computer
+| extend State = iff(LastHeartbeat < ago(30m), 'Unhealthy', 'Healthy')
+| extend TimeFromNow = now() - LastHeartbeat
+| extend ["TimeAgo"] = strcat(case(TimeFromNow < 2m, strcat(toint(TimeFromNow / 1m), ' seconds'), TimeFromNow < 2h, strcat(toint(TimeFromNow / 1m), ' minutes'), TimeFromNow < 2d, strcat(toint(TimeFromNow / 1h), ' hours'), strcat(toint(TimeFromNow / 1d), ' days')), ' ago')
+| join (
+Heartbeat
+| where TimeGenerated > ago(3d)
+| extend Packed = pack_all()
+)
+on Computer
+| where TimeGenerated == LastHeartbeat
+| join (
+Heartbeat
+| where TimeGenerated > ago(3d)
+| make-series InternalTrend=iff(count() > 0, 1, 0) default = 0 on TimeGenerated from ago(3d) to now() step 30m by Computer
+| extend Trend=array_slice(InternalTrend, array_length(InternalTrend) - 30, array_length(InternalTrend) - 1)
+| extend (s_min, s_minId, s_max, s_maxId, s_avg, s_var, s_stdev) = series_stats(Trend)
+| project Computer, Trend, s_avg
+)
+on Computer
+| order by State, s_avg asc, TimeAgo
+| project
+["_ComputerName_"] = Computer,
+["Computer"]=strcat('🖥️ ', Computer),
+State,
+["Environment"] = iff(ComputerEnvironment == "Azure", ComputerEnvironment, Category),
+["OS"]=iff(isempty(OSName), OSType, OSName),
+["Azure Resource"]=ResourceId,
+Version,
+["Time"]=strcat('🕒 ', TimeAgo),
+["Heartbeat Trend"]=Trend,
+["Details"]=Packed
