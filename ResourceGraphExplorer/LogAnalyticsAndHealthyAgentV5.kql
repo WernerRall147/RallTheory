@@ -1,0 +1,27 @@
+// LogAnalyticsandHealthyAgentv4
+// Linux and Windows Agents
+// Click the "Run query" command above to execute the query and see results.
+// This query will show machines that are currently running
+// This query will show machines that have an azure guest agent in the "Ready" state
+// This query will show the extensions that relates to MicrosoftMonitoringAgent','AzureMonitorWindowsAgent'and 'OMSAgentForLinux'
+
+resources
+| where type == 'microsoft.compute/virtualmachines'
+| where properties.extended.instanceView.powerState.displayStatus=="VM running" and properties.osProfile.windowsConfiguration.provisionVMAgent=="true" or properties.extended.instanceView.powerState.displayStatus=="VM running" and properties.osProfile.linuxConfiguration.provisionVMAgent=="true"
+| extend
+    JoinID = toupper(id),
+    OSName = tostring(name),
+    OSType = tostring(properties.storageProfile.osDisk.osType),
+    RSG = tostring(resourceGroup),
+    SUB = tostring(subscriptionId),
+    LOC = tostring(location)
+| join kind=leftouter(
+resources
+| where type == 'microsoft.compute/virtualmachines/extensions' and name == 'MicrosoftMonitoringAgent' or name == 'AzureMonitorWindowsAgent' or name == 'OMSAgentForLinux'
+// | where properties.provisioningState == 'Succeeded'
+|extend 
+    VMId = toupper(substring(id, 0, indexof(id, '/extensions'))),
+    props = tostring(properties.settings),
+    prvstatus = tostring(properties)
+)on $left.JoinID == $right.VMId
+| summarize Extensions = make_list(props) by id, OSName, OSType, RSG, SUB, LOC, prvstatus
