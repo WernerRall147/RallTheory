@@ -17,7 +17,7 @@ $addAccountParams = @{
 $null = Add-AzAccount @addAccountParams
 $null = Select-AZSubscription -SubscriptionId $servicePrincipalConnection.SubscriptionID
 #Only Used when Patching Azure Servers, modify Line 42
-$ComputerResID = Get-AzResource -Name $ComputerFQDN | select ResourceId
+$ComputerResID = (Get-AzResource -Name $ComputerFQDN).ResourceId
 #Build the SoftwareUpdateConfigurationName
 
 IF ($SoftwareUpdateConfigurationName) {
