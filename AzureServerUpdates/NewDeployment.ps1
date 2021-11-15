@@ -16,7 +16,8 @@ $addAccountParams = @{
 }
 $null = Add-AzAccount @addAccountParams
 $null = Select-AZSubscription -SubscriptionId $servicePrincipalConnection.SubscriptionID
-
+#Only Used when Patching Azure Servers, modify Line 42
+$ComputerResID = Get-AzResource -Name $ComputerFQDN | select ResourceId
 #Build the SoftwareUpdateConfigurationName
 
 IF ($SoftwareUpdateConfigurationName) {
@@ -38,7 +39,7 @@ $Schedule = New-AzAutomationSchedule -AutomationAccountName $AutomationAccount -
 #Build the SUC deployment:
 $duration = New-TimeSpan -Minutes 360
 
-$null = New-AzAutomationSoftwareUpdateConfiguration -ResourceGroupName $AutomationResourceGroup -AutomationAccountName $AutomationAccount -Schedule $schedule -Windows -NonAzureComputer $ComputerFQDN -IncludedUpdateClassification UpdateRollup, Critical, Security, Updates -Duration $duration
+$null = New-AzAutomationSoftwareUpdateConfiguration -ResourceGroupName $AutomationResourceGroup -AutomationAccountName $AutomationAccount -Schedule $schedule -Windows -AzureVMResourceId $ComputerResID -IncludedUpdateClassification UpdateRollup, Critical, Security, Updates -Duration $duration
 
 $EndTime = $(Get-Date).AddMinutes(20)
 $i = 1
