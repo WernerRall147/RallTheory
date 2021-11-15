@@ -3,6 +3,7 @@ Param(
     [Parameter(Mandatory = $true)][string]$ComputerFQDN
     , [Parameter(Mandatory = $true)][int]$RunID
     , [Parameter(Mandatory = $False)][String]$SoftwareUpdateConfigurationName
+    , [Parameter(Mandatory = $true)][DateTime]$date
 )
 
 # Connect to Azure with RunAs account
@@ -31,7 +32,7 @@ $AutomationResourceGroup = "<Resource Group>"
 $AutomationAccount = "<Automation Account>"
 
 #Build the Schedule Object
-$StartTime = (Get-Date).AddMinutes(7)
+$StartTime = ($Date).AddMinutes(7)
 
 $TimeZone = ([System.TimeZoneInfo]::Local).Id
 $Schedule = New-AzAutomationSchedule -AutomationAccountName $AutomationAccount -Name $UpdateDeploymentName -StartTime $StartTime -OneTime -ResourceGroupName $AutomationResourceGroup -TimeZone $TimeZone
@@ -41,7 +42,7 @@ $duration = New-TimeSpan -Minutes 360
 
 $null = New-AzAutomationSoftwareUpdateConfiguration -ResourceGroupName $AutomationResourceGroup -AutomationAccountName $AutomationAccount -Schedule $schedule -Windows -AzureVMResourceId $ComputerResID -IncludedUpdateClassification UpdateRollup, Critical, Security, Updates -Duration $duration
 
-$EndTime = $(Get-Date).AddMinutes(20)
+$EndTime = $($StartTime).AddMinutes(20)
 $i = 1
 
 #Get the Deployment Run to return a RunID
