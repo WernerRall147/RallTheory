@@ -1,0 +1,1 @@
+Get-azvm | get-azvmextension
