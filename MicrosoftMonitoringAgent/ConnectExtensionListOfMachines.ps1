@@ -9,7 +9,7 @@ Connect-AzAccount -Tenant $TenantID | Out-Null
 
 #Login-AzAccount
 $WsSubID = Read-Host "Enter the subscription where your Log Analytics Workspace is"
-$WsLAID = Read-Host "Enter your Log Analytics Workspace ID"
+$WsLAID = Read-Host "Enter your Log Analytics Workspace Name"
 Select-AzSubscription -SubscriptionId "$WsSubID"
 $workspaceName = "$WsLAID"
 
@@ -33,7 +33,6 @@ Write-Host "$v.OSNAME Windows VM has been updated"
 }
 else
 {
- For Linux VM uncomment the following line
 Select-AzSubscription -SubscriptionId "$v.sub"
 Set-AzVMExtension -ResourceGroupName $v.RSG -VMName $v.OSNAME -Name 'OmsAgentForLinux' -Publisher 'Microsoft.EnterpriseCloud.Monitoring' -ExtensionType 'MicrosoftMonitoringAgent' -TypeHandlerVersion '1.0' -Location $vm.Loc -SettingString "{'workspaceId':  '$workspaceId'}" -ProtectedSettingString "{'workspaceKey': '$workspaceKey' }"
 Write-Host "$v.OSNAME Linux VM has been updated"
