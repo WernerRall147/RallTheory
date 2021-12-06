@@ -1,0 +1,6 @@
+// Find all unattached Disks
+// Click the "Run query" command above to execute the query and see results.
+resources
+| where type == 'microsoft.compute/disks'
+| where properties.diskState=="Unattached"
+
