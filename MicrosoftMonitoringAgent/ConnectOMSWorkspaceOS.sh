@@ -5,10 +5,6 @@ else
 echo "nope" 
 fi
 
-WS_ASGN="([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})"
-var=$(grep WORKSPACE_ID /etc/opt/microsoft/omsagent/conf/omsadmin.conf)
-result=$(echo $var | grep -E -o $WS_ASGN)
-echo $?
 
 DIR="/opt/microsoft/omsconfig/"
 WSID="69860496-a11d-4692-8c79-fa89789c406e"
@@ -16,12 +12,13 @@ SK="<enter SK>"
 if [ -d "$DIR" ]; then
   ### Take action if $DIR exists ### if RedHat change line 7 to Python3 ###
   echo "DIR Found, checking the install"
-  sudo su omsagent -c WSID="69860496-a11d-4692-8c79-fa89789c406e"
   WS_ASGN="([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})"
-  var=$(grep WORKSPACE_ID /etc/opt/microsoft/omsagent/conf/omsadmin.conf)
+  cd /etc/opt/microsoft/omsagent
+  var=dir
+  result=$($var | grep -E -o $WS_ASGN)
   if [ "$result" = "$WSID" ]; then 
   echo "Correct Workspace is added already"
-  sudo /opt/microsoft/omsagent/bin/service_control restart 
+  sudo /opt/microsoft/omsagent/bin/service_control restart
   else 
   echo "Adding Correct Workspace"
   sudo /opt/microsoft/omsagent/bin/omsadmin.sh -w $WSID -s $SK
