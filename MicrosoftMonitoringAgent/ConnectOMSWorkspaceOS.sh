@@ -2,7 +2,7 @@ sudo su omsagent
 if [ "$result" = "$WSID" ]; then 
 echo "Strings are equal" 
 else 
-echo "fekeefff" 
+echo "nope" 
 fi
 
 WS_ASGN="([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})"
