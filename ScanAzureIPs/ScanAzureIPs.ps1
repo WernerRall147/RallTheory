@@ -1,5 +1,5 @@
 Write-Output "Login into the Azure Account"
-az login
+az login 
 #Variables
 $ipListFileInput = "C:\" + $subscriptionName + "_ipList.txt"
 $ipListFileOutput = "C:\" + $subscriptionName + "_ipListoutput.txt"
@@ -28,5 +28,5 @@ foreach ($subscription in $allsubscriptions) {
    Write-Output "Write to file"
    [System.IO.File]::WriteAllLines($ipListFileInput, $OutputArray)
    Write-Output "Execute the scan"
-   nmap -v -p 1-65535 -sV -O -sS -T5 -iL $ipListFileInput | Out-File $ipListFileOutput
+   #nmap -v -p 1-65535 -sV -O -sS -T5 -iL $ipListFileInput | Out-File $ipListFileOutput
 }
