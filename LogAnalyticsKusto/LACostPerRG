@@ -1,0 +1,11 @@
+let rgName = " "
+let excludedTables = dynamic(['Usage', 'myOtherTable']);
+union withsource=table *
+| where TimeGenerated > ago(31d)
+| where table !in (excludedTables)
+| where _ResourceId has rgName or ResourceId has rgName
+| where _IsBillable == True
+| summarize recNum = count(), Gbytes=((sum(_BilledSize))/1000/1000/1000)
+| extend costInEuro = (Gbytes*2.522)
+| extend costInDollar = (Gbytes*2.99)
+| project TimeGenerated=now(), recNum, Gbytes, costInEuro, costInDollar, seperator = "Decimal according to you regional settings for the Azure Portal"
