@@ -1,1 +1,601 @@
-\\ Placeholder
+{
+    "version": "Notebook/1.0",
+    "items": [
+      {
+        "type": 1,
+        "content": {
+          "json": "# Azure Sstorage Account Cost Overview\n\n![alt text](https://www.msp360.com/resources/wp-content/uploads/2017/10/1-01.png)\n\n"
+        },
+        "name": "text - 2"
+      },
+      {
+        "type": 11,
+        "content": {
+          "version": "LinkItem/1.0",
+          "style": "tabs",
+          "links": [
+            {
+              "id": "91f28c75-54d4-4ec5-b465-459a4b3291f4",
+              "cellValue": "SelectedTab",
+              "linkTarget": "parameter",
+              "linkLabel": "Storage",
+              "subTarget": "Storage",
+              "style": "link"
+            },
+            {
+              "id": "aaf6a0ab-2d1a-4956-8422-371b44c5e85e",
+              "cellValue": "SelectedTab",
+              "linkTarget": "parameter",
+              "linkLabel": "Cost Information",
+              "subTarget": "Cost",
+              "style": "link"
+            }
+          ]
+        },
+        "name": "links - 3"
+      },
+      {
+        "type": 9,
+        "content": {
+          "version": "KqlParameterItem/1.0",
+          "parameters": [
+            {
+              "id": "1f74ed9a-e3ed-498d-bd5b-f68f3836a117",
+              "version": "KqlParameterItem/1.0",
+              "name": "Subscription",
+              "label": "Subscriptions",
+              "type": 6,
+              "description": "All subscriptions with Storage accounts",
+              "isRequired": true,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "query": "where type =~ 'microsoft.storage/storageaccounts'\r\n| summarize Count = count() by subscriptionId\r\n| order by Count desc\r\n| extend Rank = row_number()\r\n| project value = subscriptionId, label = subscriptionId, selected = Rank == 1",
+              "crossComponentResources": [
+                "value::selected"
+              ],
+              "typeSettings": {
+                "additionalResourceOptions": [],
+                "showDefault": false
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "value": [
+                "/subscriptions/212f9889-769e-45ae-ab43-6da33674bd26"
+              ]
+            },
+            {
+              "id": "e94aafa3-c5d9-4523-89f0-4e87aa754511",
+              "version": "KqlParameterItem/1.0",
+              "name": "Resources",
+              "label": "Storage accounts",
+              "type": 5,
+              "isRequired": true,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "query": "where type =~ 'microsoft.storage/storageaccounts'\n| order by name asc\n| extend Rank = row_number()\n| project value = id, label = id, selected = Rank <= 5",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "typeSettings": {
+                "resourceTypeFilter": {
+                  "microsoft.storage/storageaccounts": true
+                },
+                "additionalResourceOptions": [
+                  "value::all"
+                ],
+                "showDefault": false
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "value": [
+                "/subscriptions/212f9889-769e-45ae-ab43-6da33674bd26/resourceGroups/securitydata/providers/Microsoft.Storage/storageAccounts/211795centralus",
+                "/subscriptions/212f9889-769e-45ae-ab43-6da33674bd26/resourceGroups/securitydata/providers/Microsoft.Storage/storageAccounts/211795eastus",
+                "/subscriptions/212f9889-769e-45ae-ab43-6da33674bd26/resourceGroups/securitydata/providers/Microsoft.Storage/storageAccounts/211795southcentralus",
+                "/subscriptions/212f9889-769e-45ae-ab43-6da33674bd26/resourceGroups/ADS-demo-rg/providers/Microsoft.Storage/storageAccounts/adsstorageaccount",
+                "/subscriptions/212f9889-769e-45ae-ab43-6da33674bd26/resourceGroups/anat_test_rg/providers/Microsoft.Storage/storageAccounts/anattestrgdiag"
+              ]
+            },
+            {
+              "id": "c4b69c01-2263-4ada-8d9c-43433b739ff3",
+              "version": "KqlParameterItem/1.0",
+              "name": "TimeRange",
+              "type": 4,
+              "isRequired": true,
+              "typeSettings": {
+                "selectableValues": [
+                  {
+                    "durationMs": 300000,
+                    "createdTime": "2018-08-06T23:52:38.870Z",
+                    "isInitialTime": false,
+                    "grain": 1,
+                    "useDashboardTimeRange": false
+                  },
+                  {
+                    "durationMs": 900000,
+                    "createdTime": "2018-08-06T23:52:38.871Z",
+                    "isInitialTime": false,
+                    "grain": 1,
+                    "useDashboardTimeRange": false
+                  },
+                  {
+                    "durationMs": 1800000,
+                    "createdTime": "2018-08-06T23:52:38.871Z",
+                    "isInitialTime": false,
+                    "grain": 1,
+                    "useDashboardTimeRange": false
+                  },
+                  {
+                    "durationMs": 3600000,
+                    "createdTime": "2018-08-06T23:52:38.871Z",
+                    "isInitialTime": false,
+                    "grain": 1,
+                    "useDashboardTimeRange": false
+                  },
+                  {
+                    "durationMs": 14400000,
+                    "createdTime": "2018-08-06T23:52:38.871Z",
+                    "isInitialTime": false,
+                    "grain": 1,
+                    "useDashboardTimeRange": false
+                  },
+                  {
+                    "durationMs": 43200000,
+                    "createdTime": "2018-08-06T23:52:38.871Z",
+                    "isInitialTime": false,
+                    "grain": 1,
+                    "useDashboardTimeRange": false
+                  },
+                  {
+                    "durationMs": 86400000,
+                    "createdTime": "2018-08-06T23:52:38.871Z",
+                    "isInitialTime": false,
+                    "grain": 1,
+                    "useDashboardTimeRange": false
+                  },
+                  {
+                    "durationMs": 172800000,
+                    "createdTime": "2018-08-06T23:52:38.871Z",
+                    "isInitialTime": false,
+                    "grain": 1,
+                    "useDashboardTimeRange": false
+                  },
+                  {
+                    "durationMs": 259200000,
+                    "createdTime": "2018-08-06T23:52:38.871Z",
+                    "isInitialTime": false,
+                    "grain": 1,
+                    "useDashboardTimeRange": false
+                  },
+                  {
+                    "durationMs": 604800000,
+                    "createdTime": "2018-08-06T23:52:38.871Z",
+                    "isInitialTime": false,
+                    "grain": 1,
+                    "useDashboardTimeRange": false
+                  }
+                ],
+                "allowCustom": true
+              },
+              "value": {
+                "durationMs": 14400000
+              },
+              "label": "Time Range"
+            },
+            {
+              "id": "9b48988f-dcd2-48cc-b233-5999ed32149f",
+              "version": "KqlParameterItem/1.0",
+              "name": "Message",
+              "type": 1,
+              "query": "where type == 'microsoft.storage/storageaccounts' \n| summarize Selected = countif(id in ({Resources:value})), Total = count()\n| extend Selected = iff(Selected > 200, 200, Selected)\n| project Message = strcat('# ', Selected, ' / ', Total)",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "isHiddenWhenLocked": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            },
+            {
+              "id": "070b2474-4e01-478d-a7fa-6c20ad8ea1ad",
+              "version": "KqlParameterItem/1.0",
+              "name": "ResourceName",
+              "type": 1,
+              "isRequired": true,
+              "isHiddenWhenLocked": true,
+              "criteriaData": [
+                {
+                  "condition": "else result = 'Storage account'",
+                  "criteriaContext": {
+                    "operator": "Default",
+                    "rightValType": "param",
+                    "resultValType": "static",
+                    "resultVal": "Storage account"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "c6c32b32-6eb4-44d5-9cad-156d5d50ec3e",
+              "version": "KqlParameterItem/1.0",
+              "name": "ResourceImageUrl",
+              "type": 1,
+              "description": "used as a parameter for No Subcriptions workbook template",
+              "isHiddenWhenLocked": true
+            }
+          ],
+          "style": "above",
+          "queryType": 0,
+          "resourceType": "microsoft.resourcegraph/queries"
+        },
+        "name": "parameters - 1",
+        "styleSettings": {
+          "margin": "15px 0 0 0"
+        }
+      },
+      {
+        "type": 12,
+        "content": {
+          "version": "NotebookGroup/1.0",
+          "groupType": "editable",
+          "items": [
+            {
+              "type": 9,
+              "content": {
+                "version": "KqlParameterItem/1.0",
+                "parameters": [
+                  {
+                    "id": "d7bdbcc1-f2d0-4b43-a2ab-771b5fad5eea",
+                    "version": "KqlParameterItem/1.0",
+                    "name": "Subscription",
+                    "type": 6,
+                    "isRequired": true,
+                    "value": "/subscriptions/ebb79bc0-aa86-44a7-8111-cabbe0c43993",
+                    "typeSettings": {
+                      "additionalResourceOptions": [],
+                      "includeAll": true
+                    },
+                    "timeContext": {
+                      "durationMs": 86400000
+                    },
+                    "label": "Choose Subscription"
+                  }
+                ],
+                "style": "pills",
+                "queryType": 0,
+                "resourceType": "microsoft.operationalinsights/workspaces"
+              },
+              "conditionalVisibility": {
+                "parameterName": "SelectedTab",
+                "comparison": "isEqualTo",
+                "value": "Cost"
+              },
+              "name": "parameters - Subscription"
+            },
+            {
+              "type": 1,
+              "content": {
+                "json": "# This Tab will show the cost for storage accounts per selected susbcription\r\n### *Billing reader permission as a minimum is needed to populate cost information"
+              },
+              "name": "text - 7"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":\"{\\r\\n    \\\"type\\\": \\\"Usage\\\",\\r\\n    \\\"timeframe\\\": \\\"TheLastMonth\\\",\\r\\n    \\\"dataset\\\": {\\r\\n      \\\"granularity\\\": \\\"None\\\",\\r\\n\\t  \\\"filter\\\":{\\r\\n\\t\\t  \\\"dimensions\\\" : {\\r\\n                      \\\"name\\\" : \\\"resourceType\\\",\\r\\n                      \\\"operator\\\" : \\\"In\\\",\\r\\n                      \\\"values\\\" : [\\r\\n                         \\\"Microsoft.Storage/StorageAccounts\\\"\\r\\n                      ]\\r\\n                  }\\r\\n\\t  },\\r\\n      \\\"aggregation\\\": {\\r\\n       \\\"totalCost\\\": {\\r\\n          \\\"name\\\": \\\"PreTaxCost\\\",\\r\\n          \\\"function\\\": \\\"Sum\\\"\\r\\n        }\\r\\n      },\\r\\n     \\\"grouping\\\": [\\r\\n        {\\r\\n         \\\"type\\\": \\\"Dimension\\\",\\r\\n          \\\"name\\\": \\\"ResourceId\\\"\\r\\n        }\\r\\n      ]\\r\\n    }\\r\\n  }\",\"headers\":[],\"method\":\"POST\",\"path\":\"/subscriptions/{Subscription:id}/providers/Microsoft.CostManagement/query?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2019-11-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.properties\",\"columns\":[]}}]}",
+                "size": 0,
+                "title": "Cost-GetAllStorageAccounts",
+                "showExportToExcel": true,
+                "queryType": 12
+              },
+              "conditionalVisibility": {
+                "parameterName": "Isvisible",
+                "comparison": "isEqualTo",
+                "value": "true"
+              },
+              "name": "query - GetAllStorageAccounts"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "resourcecontainers\r\n| where type =~ 'Microsoft.Resources/subscriptions'\r\n| extend SubscriptionName=name\r\n| join (resources\r\n| where type =~ 'Microsoft.Storage/StorageAccounts'\r\n| extend StorageAccountID=id, StorageAccountName=name, SAKind=kind, SKUName=tostring(parse_json(sku).name), SKUTier=tostring(parse_json(sku).tier), SARG=resourceGroup, Location=location\r\n| extend SubscriptionName=name\r\n) on subscriptionId\r\n| order by id asc\r\n| project StorageAccountID,StorageAccountName, SKUName, SKUTier, SAKind, SARG, Location",
+                "size": 0,
+                "title": "Storage Accounts",
+                "showExportToExcel": true,
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                  "{Subscription}"
+                ]
+              },
+              "conditionalVisibility": {
+                "parameterName": "IsVisible",
+                "comparison": "isEqualTo",
+                "value": "true"
+              },
+              "name": "query - All Storage Account Cost"
+            },
+            {
+              "type": 10,
+              "content": {
+                "chartId": "workbookdb19a8d8-91af-44ea-951d-5ffa133b2ebe",
+                "version": "MetricsItem/2.0",
+                "size": 3,
+                "chartType": 0,
+                "resourceType": "microsoft.storage/storageaccounts",
+                "metricScope": 0,
+                "resourceParameter": "Resources",
+                "resourceIds": [
+                  "{Resources}"
+                ],
+                "timeContextFromParameter": "TimeRange",
+                "timeContext": {
+                  "durationMs": 0
+                },
+                "metrics": [
+                  {
+                    "namespace": "microsoft.storage/storageaccounts",
+                    "metric": "microsoft.storage/storageaccounts-Capacity-UsedCapacity",
+                    "aggregation": 4
+                  },
+                  {
+                    "namespace": "microsoft.storage/storageaccounts/blobservices",
+                    "metric": "microsoft.storage/storageaccounts/blobservices-Capacity-BlobCapacity",
+                    "aggregation": 4
+                  },
+                  {
+                    "namespace": "microsoft.storage/storageaccounts/fileservices",
+                    "metric": "microsoft.storage/storageaccounts/fileservices-Capacity-FileCapacity",
+                    "aggregation": 4
+                  },
+                  {
+                    "namespace": "microsoft.storage/storageaccounts/queueservices",
+                    "metric": "microsoft.storage/storageaccounts/queueservices-Capacity-QueueCapacity",
+                    "aggregation": 4
+                  },
+                  {
+                    "namespace": "microsoft.storage/storageaccounts/tableservices",
+                    "metric": "microsoft.storage/storageaccounts/tableservices-Capacity-TableCapacity",
+                    "aggregation": 4
+                  }
+                ],
+                "gridSettings": {
+                  "formatters": [
+                    {
+                      "columnMatch": "$gen_group",
+                      "formatter": 13,
+                      "formatOptions": {
+                        "linkTarget": "Resource",
+                        "subTarget": "insights",
+                        "showIcon": true
+                      }
+                    },
+                    {
+                      "columnMatch": "Subscription",
+                      "formatter": 5,
+                      "formatOptions": {
+                        "showIcon": true
+                      }
+                    },
+                    {
+                      "columnMatch": "Name",
+                      "formatter": 5,
+                      "formatOptions": {
+                        "showIcon": true
+                      }
+                    },
+                    {
+                      "columnMatch": "microsoft.storage/storageaccounts-Capacity-UsedCapacity$|microsoft.storage/storageaccounts/blobservices-Capacity-BlobCapacity$|microsoft.storage/storageaccounts/fileservices-Capacity-FileCapacity$|microsoft.storage/storageaccounts/queueservices-Capacity-QueueCapacity$|microsoft.storage/storageaccounts/tableservices-Capacity-TableCapacity$",
+                      "formatter": 8,
+                      "formatOptions": {
+                        "min": 0,
+                        "palette": "blue",
+                        "linkTarget": "WorkbookTemplate",
+                        "showIcon": true,
+                        "workbookContext": {
+                          "componentIdSource": "column",
+                          "componentId": "Name",
+                          "resourceIdsSource": "column",
+                          "resourceIds": "Name",
+                          "templateIdSource": "static",
+                          "templateId": "Community-Workbooks/Individual Storage/Capacity",
+                          "typeSource": "static",
+                          "type": "workbook",
+                          "gallerySource": "static",
+                          "gallery": "microsoft.storage/storageaccounts"
+                        }
+                      },
+                      "numberFormat": {
+                        "unit": 2,
+                        "options": {
+                          "style": "decimal",
+                          "maximumFractionDigits": 1
+                        }
+                      }
+                    },
+                    {
+                      "columnMatch": "microsoft.storage/storageaccounts-Capacity-UsedCapacity Timeline$|Account used capacity Timeline$",
+                      "formatter": 21,
+                      "formatOptions": {
+                        "min": 0,
+                        "palette": "blue",
+                        "showIcon": true
+                      }
+                    },
+                    {
+                      "columnMatch": "microsoft.storage/storageaccounts/blobservices-Capacity-BlobCapacity Timeline$|Blob capacity Timeline$",
+                      "formatter": 5,
+                      "formatOptions": {
+                        "showIcon": true
+                      }
+                    },
+                    {
+                      "columnMatch": "microsoft.storage/storageaccounts/fileservices-Capacity-FileCapacity Timeline$|File capacity Timeline$",
+                      "formatter": 5,
+                      "formatOptions": {
+                        "showIcon": true
+                      }
+                    },
+                    {
+                      "columnMatch": "microsoft.storage/storageaccounts/queueservices-Capacity-QueueCapacity Timeline$|Queue capacity Timeline$",
+                      "formatter": 5,
+                      "formatOptions": {
+                        "showIcon": true
+                      }
+                    },
+                    {
+                      "columnMatch": "microsoft.storage/storageaccounts/tableservices-Capacity-TableCapacity Timeline$|Table capacity Timeline$",
+                      "formatter": 5,
+                      "formatOptions": {
+                        "showIcon": true
+                      }
+                    }
+                  ],
+                  "rowLimit": 10000,
+                  "filter": true,
+                  "hierarchySettings": {
+                    "treeType": 1,
+                    "groupBy": [
+                      "Subscription"
+                    ],
+                    "expandTopLevel": true,
+                    "finalBy": "Name"
+                  },
+                  "sortBy": [
+                    {
+                      "itemKey": "$gen_heatmap_microsoft.storage/storageaccounts-Capacity-UsedCapacity$|microsoft.storage/storageaccounts/blobservices-Capacity-BlobCapacity$|microsoft.storage/storageaccounts/fileservices-Capacity-FileCapacity$|microsoft.storage/storageaccounts/queueservices-Capacity-QueueCapacity$|microsoft.storage/storageaccounts/tableservices-Capacity-TableCapacity$_3",
+                      "sortOrder": 2
+                    }
+                  ],
+                  "labelSettings": [
+                    {
+                      "columnId": "Subscription",
+                      "label": "Subscription"
+                    },
+                    {
+                      "columnId": "microsoft.storage/storageaccounts-Capacity-UsedCapacity",
+                      "label": "Account used capacity"
+                    },
+                    {
+                      "columnId": "microsoft.storage/storageaccounts-Capacity-UsedCapacity Timeline",
+                      "label": "Account used capacity timeline"
+                    },
+                    {
+                      "columnId": "microsoft.storage/storageaccounts/blobservices-Capacity-BlobCapacity",
+                      "label": "Blob capacity"
+                    },
+                    {
+                      "columnId": "microsoft.storage/storageaccounts/blobservices-Capacity-BlobCapacity Timeline",
+                      "label": "Blob capacity Timeline"
+                    },
+                    {
+                      "columnId": "microsoft.storage/storageaccounts/fileservices-Capacity-FileCapacity",
+                      "label": "File capacity"
+                    },
+                    {
+                      "columnId": "microsoft.storage/storageaccounts/fileservices-Capacity-FileCapacity Timeline",
+                      "label": "File capacity Timeline"
+                    },
+                    {
+                      "columnId": "microsoft.storage/storageaccounts/queueservices-Capacity-QueueCapacity",
+                      "label": "Queue capacity"
+                    },
+                    {
+                      "columnId": "microsoft.storage/storageaccounts/queueservices-Capacity-QueueCapacity Timeline",
+                      "label": "Queue capacity Timeline"
+                    },
+                    {
+                      "columnId": "microsoft.storage/storageaccounts/tableservices-Capacity-TableCapacity",
+                      "label": "Table capacity"
+                    },
+                    {
+                      "columnId": "microsoft.storage/storageaccounts/tableservices-Capacity-TableCapacity Timeline",
+                      "label": "Table capacity Timeline"
+                    }
+                  ]
+                },
+                "sortBy": [
+                  {
+                    "itemKey": "$gen_heatmap_microsoft.storage/storageaccounts-Capacity-UsedCapacity$|microsoft.storage/storageaccounts/blobservices-Capacity-BlobCapacity$|microsoft.storage/storageaccounts/fileservices-Capacity-FileCapacity$|microsoft.storage/storageaccounts/queueservices-Capacity-QueueCapacity$|microsoft.storage/storageaccounts/tableservices-Capacity-TableCapacity$_3",
+                    "sortOrder": 2
+                  }
+                ],
+                "showExportToExcel": true
+              },
+              "showPin": true,
+              "name": "storage account capacity metrics",
+              "styleSettings": {
+                "margin": "0 10px 0 10px"
+              }
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"91082ef6-2c5a-4fb5-9bed-d7950929305e\",\"mergeType\":\"innerunique\",\"leftTable\":\"query - GetAllStorageAccounts\",\"rightTable\":\"query - All Storage Account Cost\",\"leftColumn\":\"ResourceId\",\"rightColumn\":\"StorageAccountID\"}],\"projectRename\":[{\"originalName\":\"[query - All Storage Account Cost].StorageAccountID\",\"mergedName\":\"StorageAccountID\",\"fromId\":\"91082ef6-2c5a-4fb5-9bed-d7950929305e\"},{\"originalName\":\"[query - GetAllStorageAccounts].PreTaxCost\",\"mergedName\":\"Last Month Cost\",\"fromId\":\"91082ef6-2c5a-4fb5-9bed-d7950929305e\"},{\"originalName\":\"[query - GetAllStorageAccounts].Currency\",\"mergedName\":\"Currency\",\"fromId\":\"91082ef6-2c5a-4fb5-9bed-d7950929305e\"},{\"originalName\":\"[query - All Storage Account Cost].SKU_name\",\"mergedName\":\"SKU_name\",\"fromId\":\"91082ef6-2c5a-4fb5-9bed-d7950929305e\"},{\"originalName\":\"[query - All Storage Account Cost].SKU_tier\",\"mergedName\":\"SKU_tier\",\"fromId\":\"91082ef6-2c5a-4fb5-9bed-d7950929305e\"},{\"originalName\":\"[query - All Storage Account Cost].SALocation\",\"mergedName\":\"SALocation\",\"fromId\":\"91082ef6-2c5a-4fb5-9bed-d7950929305e\"},{\"originalName\":\"[query - All Storage Account Cost].SubscriptionName\",\"mergedName\":\"SubscriptionName\",\"fromId\":\"91082ef6-2c5a-4fb5-9bed-d7950929305e\"},{\"originalName\":\"[query - All Storage Account Cost].SKUName\",\"mergedName\":\"SKUName\",\"fromId\":\"unknown\"},{\"originalName\":\"[query - All Storage Account Cost].SKUTier\",\"mergedName\":\"SKUTier\",\"fromId\":\"unknown\"},{\"originalName\":\"[query - All Storage Account Cost].SAKind\",\"mergedName\":\"SAKind\",\"fromId\":\"unknown\"},{\"originalName\":\"[query - All Storage Account Cost].SARG\",\"mergedName\":\"SARG\",\"fromId\":\"unknown\"},{\"originalName\":\"[query - All Storage Account Cost].Location\",\"mergedName\":\"Location\",\"fromId\":\"unknown\"},{\"originalName\":\"[query - GetAllStorageAccounts].ResourceId\"},{\"originalName\":\"[query - All Storage Account Cost].StorageAccountName\"}]}",
+                "size": 0,
+                "title": "All Storage Account Cost",
+                "showExportToExcel": true,
+                "queryType": 7
+              },
+              "showPin": false,
+              "name": "query - Storage Account Cost"
+            }
+          ]
+        },
+        "conditionalVisibility": {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Cost"
+        },
+        "name": "group - Cost Information"
+      },
+      {
+        "type": 12,
+        "content": {
+          "version": "NotebookGroup/1.0",
+          "groupType": "editable",
+          "items": [
+            {
+              "type": 1,
+              "content": {
+                "json": "## Storage Accounts Overview\r\n\r\n\r\nUse Azure monitor to review you Storage account metrics, capacity and operations."
+              },
+              "name": "text - 6"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "ResourceContainers | where type =~ 'Microsoft.Resources/subscriptions' | extend SubscriptionName=name | join \t(resources | where type =~ 'Microsoft.Storage/StorageAccounts' | extend storageaccount=id, StorageAccountName=name, SAKind=kind, SKUName=sku.name, SKUTier=sku.tier, SARG=resourceGroup, Location=location)on subscriptionId \r\n    | order by id asc\r\n    | project storageaccount,StorageAccountName, SKUName, SKUTier, SAKind, SARG, Location, SubscriptionName",
+                "size": 0,
+                "title": "List all Storage Accounts in selected Subscriptions",
+                "noDataMessage": "There are no storage in the subscription",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "all",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                  "{Subscription}"
+                ],
+                "visualization": "table"
+              },
+              "name": "query - 6"
+            }
+          ]
+        },
+        "conditionalVisibility": {
+          "parameterName": "SelectedTab",
+          "comparison": "isEqualTo",
+          "value": "Storage"
+        },
+        "name": "Group Storage"
+      }
+    ],
+    "fallbackResourceIds": [
+      "Azure Monitor"
+    ],
+    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+  }
