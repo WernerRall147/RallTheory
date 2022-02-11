@@ -1,0 +1,74 @@
+## Update Management Admin (Custom Original)
+
+
+{
+    "properties": {
+        "roleName": "Update Management Admin (Custom)",
+        "description": "Allows access to manage Azure Automation and its resources",
+        "assignableScopes": [
+            "/subscriptions/XXXXXXXXXXXXXXXXXX"
+        ],
+        "permissions": [
+            {
+                "actions": [
+                    "*/read",
+                    "Microsoft.Authorization/*/read",
+                    "Microsoft.ClassicCompute/virtualMachines/extensions/*",
+                    "Microsoft.ClassicStorage/storageAccounts/listKeys/action",
+                    "Microsoft.Compute/virtualMachines/extensions/*",
+                    "Microsoft.Compute/availabilitySets/*",
+                    "Microsoft.Compute/locations/*",
+                    "Microsoft.Compute/virtualMachines/*",
+                    "Microsoft.Compute/virtualMachineScaleSets/*",
+                    "Microsoft.Compute/cloudServices/*",
+                    "Microsoft.Compute/disks/write",
+                    "Microsoft.Compute/disks/read",
+                    "Microsoft.Compute/disks/delete",
+                    "Microsoft.DevTestLab/schedules/*",
+                    "Microsoft.HybridCompute/machines/extensions/write",
+                    "Microsoft.Insights/alertRules/*",
+                    "Microsoft.Insights/metrics/read",
+                    "Microsoft.Insights/diagnosticSettings/*",
+                    "Microsoft.Network/applicationGateways/backendAddressPools/join/action",
+                    "Microsoft.Network/loadBalancers/backendAddressPools/join/action",
+                    "Microsoft.Network/loadBalancers/inboundNatPools/join/action",
+                    "Microsoft.Network/loadBalancers/inboundNatRules/join/action",
+                    "Microsoft.Network/loadBalancers/probes/join/action",
+                    "Microsoft.Network/loadBalancers/read",
+                    "Microsoft.Network/locations/*",
+                    "Microsoft.Network/networkInterfaces/*",
+                    "Microsoft.Network/networkSecurityGroups/join/action",
+                    "Microsoft.Network/networkSecurityGroups/read",
+                    "Microsoft.Network/publicIPAddresses/join/action",
+                    "Microsoft.Network/publicIPAddresses/read",
+                    "Microsoft.Network/virtualNetworks/read",
+                    "Microsoft.Network/virtualNetworks/subnets/join/action",
+                    "Microsoft.OperationalInsights/*",
+                    "Microsoft.OperationsManagement/*",
+                    "Microsoft.RecoveryServices/locations/*",
+                    "Microsoft.RecoveryServices/Vaults/backupFabrics/backupProtectionIntent/write",
+                    "Microsoft.RecoveryServices/Vaults/backupFabrics/protectionContainers/protectedItems/*/read",
+                    "Microsoft.RecoveryServices/Vaults/backupFabrics/protectionContainers/protectedItems/read",
+                    "Microsoft.RecoveryServices/Vaults/backupFabrics/protectionContainers/protectedItems/write",
+                    "Microsoft.RecoveryServices/Vaults/backupPolicies/read",
+                    "Microsoft.RecoveryServices/Vaults/backupPolicies/write",
+                    "Microsoft.RecoveryServices/Vaults/read",
+                    "Microsoft.RecoveryServices/Vaults/usages/read",
+                    "Microsoft.RecoveryServices/Vaults/write",
+                    "Microsoft.Resources/deployments/*",
+                    "Microsoft.Resources/subscriptions/resourceGroups/read",
+                    "Microsoft.Resources/subscriptions/resourcegroups/deployments/*",
+                    "Microsoft.ResourceHealth/availabilityStatuses/read",
+                    "Microsoft.SerialConsole/serialPorts/connect/action",
+                    "Microsoft.SqlVirtualMachine/*",
+                    "Microsoft.Storage/storageAccounts/listKeys/action",
+                    "Microsoft.Storage/storageAccounts/read",
+                    "Microsoft.Support/*"
+                ],
+                "notActions": [],
+                "dataActions": [],
+                "notDataActions": []
+            }
+        ]
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "properties": {
+        "roleName": "Update Management Reader (Custom)\"",
+        "description": "Allows access to read Azure Automation and its resources",
+        "assignableScopes": [
+            "/subscriptions/XXXXXXXXXXXXXXXXXXXXXXXX"
+        ],
+        "permissions": [
+            {
+                "actions": [
+                    "Microsoft.Authorization/*/read",
+                    "Microsoft.ClassicCompute/virtualMachines/extensions/read",
+                    "Microsoft.Compute/virtualMachines/extensions/read",
+                    "Microsoft.Compute/availabilitySets/read",
+                    "Microsoft.Compute/virtualMachines/read",
+                    "Microsoft.Compute/virtualMachineScaleSets/read",
+                    "Microsoft.Compute/cloudServices/read",
+                    "Microsoft.Compute/disks/read",
+                    "Microsoft.DevTestLab/schedules/read",
+                    "Microsoft.HybridCompute/machines/extensions/read",
+                    "Microsoft.Insights/alertRules/read",
+                    "Microsoft.Insights/metrics/read",
+                    "Microsoft.Insights/diagnosticSettings/read",
+                    "Microsoft.OperationalInsights/*/read",
+                    "Microsoft.OperationsManagement/*/read",
+                    "Microsoft.Resources/deployments/read",
+                    "Microsoft.Resources/subscriptions/resourceGroups/read",
+                    "Microsoft.Resources/subscriptions/resourcegroups/deployments/read",
+                    "Microsoft.ResourceHealth/availabilityStatuses/read",
+                    "Microsoft.Support/*/read"   
+                ],
+                "notActions": [],
+                "dataActions": [],
+                "notDataActions": []
+            }
+        ]
+      }
+   }

@@ -1,0 +1,41 @@
+{
+ "properties": {
+     "roleName": "Update Management Admin (Custom)",
+     "description": "Allows access to manage Azure Automation and its resources",
+     "assignableScopes": [
+         "/subscriptions/XXXXXXXXXXXXXXXXXXXXXXXX"
+     ],
+     "permissions": [
+         {
+             "actions": [
+                 "Microsoft.Authorization/*/read",
+                 "Microsoft.ClassicCompute/virtualMachines/extensions/*",
+                 "Microsoft.Compute/virtualMachines/extensions/*",
+                 "Microsoft.Compute/availabilitySets/*",
+                 "Microsoft.Compute/locations/*",
+                 "Microsoft.Compute/virtualMachines/*",
+                 "Microsoft.Compute/virtualMachineScaleSets/*",
+                 "Microsoft.Compute/cloudServices/*",
+                 "Microsoft.Compute/disks/read",
+                 "Microsoft.Compute/disks/delete",
+                 "Microsoft.DevTestLab/schedules/*",
+                 "Microsoft.HybridCompute/machines/extensions/write",
+                 "Microsoft.Insights/alertRules/*",
+                 "Microsoft.Insights/metrics/read",
+                 "Microsoft.Insights/diagnosticSettings/read",
+                 "Microsoft.OperationalInsights/*",
+                 "Microsoft.OperationsManagement/*",
+                 "Microsoft.Resources/deployments/*",
+                 "Microsoft.Resources/subscriptions/resourceGroups/read",
+                 "Microsoft.Resources/subscriptions/resourcegroups/deployments/*",
+                 "Microsoft.ResourceHealth/availabilityStatuses/read",
+                 "Microsoft.SerialConsole/serialPorts/connect/action",
+                 "Microsoft.Support/*"   
+             ],
+             "notActions": [],
+             "dataActions": [],
+             "notDataActions": []
+         }
+     ]
+   }
+}
