@@ -3,31 +3,23 @@
         "roleName": "SQL Disk Management",
         "description": "Manages SQL VM Disks",
         "assignableScopes": [
-            "/subscriptions/XXXXXXX",
-            "/subscriptions/XXXXXXXXXXXXXXXXXXXXXXX/resourceGroups/SQL"
+            "/providers/Microsoft.Management/managementGroups/XXX"
         ],
         "permissions": [
             {
                 "actions": [
                     "Microsoft.Authorization/*/read",
-                    "Microsoft.Resources/changes/read",
-                    "Microsoft.Resources/deployments/operations/read",
-                    "Microsoft.Resources/deployments/validate/action",
                     "Microsoft.Resources/providers/read",
                     "Microsoft.Compute/disks/write",
                     "Microsoft.Resources/subscriptions/resourceGroups/read",
                     "Microsoft.Compute/virtualMachines/extensions/read",
+                    "Microsoft.Compute/virtualMachines/extensions/write",
                     "Microsoft.Compute/virtualMachines/read",
                     "Microsoft.Compute/virtualMachines/write",
-                    "Microsoft.Resources/deployments/write",
-                    "Microsoft.Resources/deployments/operationstatuses/read",
                     "Microsoft.Resources/resources/read",
-                    "Microsoft.Resources/subscriptions/resourcegroups/deployments/read",
-                    "Microsoft.Resources/subscriptions/resourcegroups/deployments/write",
-                    "Microsoft.Resources/subscriptions/resourcegroups/deployments/operations/read",
-                    "Microsoft.Resources/subscriptions/resourcegroups/deployments/operationstatuses/read",
                     "Microsoft.Resources/subscriptions/providers/read",
-                    "Microsoft.SqlVirtualMachine/sqlVirtualMachines/write"
+                    "Microsoft.SqlVirtualMachine/sqlVirtualMachines/*",
+                    "Microsoft.Resources/deployments/*"
                 ],
                 "notActions": [],
                 "dataActions": [],
