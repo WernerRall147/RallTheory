@@ -10,16 +10,14 @@
                 "actions": [
                     "Microsoft.Authorization/*/read",
                     "Microsoft.Compute/disks/write",
-                    "Microsoft.Compute/virtualMachines/extensions/read",
                     "Microsoft.Compute/virtualMachines/extensions/write",
-                    "Microsoft.Compute/virtualMachines/read",
+                    "Microsoft.Compute/virtualMachines/extensions/read",
                     "Microsoft.Compute/virtualMachines/write",
-                    "Microsoft.Resources/providers/read",
-                    "Microsoft.Resources/resources/read",
+                    "Microsoft.Compute/virtualMachines/read",
+                    "Microsoft.SqlVirtualMachine/sqlVirtualMachines/*",
                     "Microsoft.Resources/deployments/*",
-                    "Microsoft.Resources/subscriptions/providers/read",
-                    "Microsoft.Resources/subscriptions/resourceGroups/read",
-                    "Microsoft.SqlVirtualMachine/sqlVirtualMachines/*"
+                    "Microsoft.Resources/providers/read",
+                    "Microsoft.Resources/resources/read"
                 ],
                 "notActions": [],
                 "dataActions": [],
