@@ -1,6 +1,3 @@
-## Update Management Admin (Custom Original)
-
-
 {
     "properties": {
         "roleName": "Update Management Admin (Custom)",
@@ -63,7 +60,8 @@
                     "Microsoft.SqlVirtualMachine/*",
                     "Microsoft.Storage/storageAccounts/listKeys/action",
                     "Microsoft.Storage/storageAccounts/read",
-                    "Microsoft.Support/*"
+                    "Microsoft.Support/*",
+                    "Microsoft.Automation/automationAccounts/*"  
                 ],
                 "notActions": [],
                 "dataActions": [],

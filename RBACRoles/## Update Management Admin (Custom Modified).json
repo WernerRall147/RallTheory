@@ -3,7 +3,7 @@
      "roleName": "Update Management Admin (Custom)",
      "description": "Allows access to manage Azure Automation and its resources",
      "assignableScopes": [
-         "/subscriptions/XXXXXXXXXXXXXXXXXXXXXXXX"
+        "/subscriptions/xxxxxxxxxx"
      ],
      "permissions": [
          {
@@ -30,7 +30,8 @@
                  "Microsoft.Resources/subscriptions/resourcegroups/deployments/*",
                  "Microsoft.ResourceHealth/availabilityStatuses/read",
                  "Microsoft.SerialConsole/serialPorts/connect/action",
-                 "Microsoft.Support/*"   
+                 "Microsoft.Support/*",
+                 "Microsoft.Automation/automationAccounts/*"   
              ],
              "notActions": [],
              "dataActions": [],

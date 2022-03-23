@@ -1,9 +1,9 @@
 {
     "properties": {
-        "roleName": "Update Management Reader (Custom)\"",
+        "roleName": "Update Management Reader (Custom)",
         "description": "Allows access to read Azure Automation and its resources",
         "assignableScopes": [
-            "/subscriptions/XXXXXXXXXXXXXXXXXXXXXXXX"
+         "/subscriptions/xxxxxxxxxxxxxxxxxxxxxxxxx"
         ],
         "permissions": [
             {
@@ -27,7 +27,8 @@
                     "Microsoft.Resources/subscriptions/resourceGroups/read",
                     "Microsoft.Resources/subscriptions/resourcegroups/deployments/read",
                     "Microsoft.ResourceHealth/availabilityStatuses/read",
-                    "Microsoft.Support/*/read"   
+                    "Microsoft.Support/*/read",
+                    "Microsoft.Automation/automationAccounts/*/read"   
                 ],
                 "notActions": [],
                 "dataActions": [],
