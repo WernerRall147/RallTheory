@@ -1,14 +1,14 @@
 #Requires -Modules Az
+#Requires -Modules Az.ResourceGraph
 
 #Start a TRanscript of this
 Start-Transcript -Path ".\StartScriptResults.txt"
 
-#Connect-azAccount
-Connect-AzAccount
-
 #Set AzContext
 $SubID = Read-Host "Enter your Subscription ID"
-Set-AzContext -SubscriptionId $SubID
+
+#Connect-azAccount
+Connect-AzAccount -SubscriptionId $SubID
 
 #Use AzResourceGraph to get a list of All Machines
 #Install-Module -Name Az.ResourceGraph
@@ -33,9 +33,9 @@ resources
     prvstatus = tostring(properties)
 )on $left.JoinID == $right.VMId
 | summarize Extensions = make_list(props) by id, OSName, OSType, RSG, SUB, LOC, prvstatus
-'
+' -SubscriptionId $SubID
 
-#Run the scirpt again all VMs in parallel
+#Run the script again all VMs in parallel
 $myAzureVMs | ForEach-Object -Parallel {
     Set-AzContext -SubscriptionId $_.sub
     $out = Invoke-AzVMRunCommand `
@@ -44,7 +44,7 @@ $myAzureVMs | ForEach-Object -Parallel {
         -CommandId 'RunPowerShellScript' `
         -ScriptPath .\ConnectOMSWorkspaceOS.ps1 
     #Formating the Output with the VM name
-    $output = $_.Name + " " + $out.Value[0].Message
+    $output = $_.OSNAME + " " + $out.Value[0].Message
     $output   
 }
 
