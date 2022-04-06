@@ -1,7 +1,7 @@
 Connect-AzAccount
 
 $managementGroupName = Read-Host -prompt "What is your Management Group Name"
-$subscriptionsGraph = Search-AzGraph -Query "ResourceContainers | where type =~ 'microsoft.resources/subscriptions'" -ManagementGroup $managementGroupName
+$subscriptionsGraph = Search-AzGraph -Query 'ResourceContainers | where type =~ "microsoft.resources/subscriptions"' -ManagementGroup $managementGroupName
 Select-AzSubscription -subscriptionId $subscriptionsGraph.subscriptionId
 
 $workspaceId='Your workspace Id'
