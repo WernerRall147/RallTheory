@@ -8,6 +8,7 @@ $workspaceKey='Your workspace key'
 
 $secureKey=ConvertTo-SecureString -String $workspaceKey -AsPlainText -Force
 Foreach($s in $subscriptionsGraph){
+Set-AzContext -SubscriptionId $s.subscriptionId
 $extensionList = Get-AzVm | foreach {
     Get-AzVMExtension -ResourceGroupName $_.ResourceGroupName -VMName $_.Name -ExtensionName "MicrosoftMonitoringAgent"
 }
