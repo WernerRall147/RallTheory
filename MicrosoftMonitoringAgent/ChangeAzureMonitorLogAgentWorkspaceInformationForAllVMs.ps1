@@ -7,9 +7,11 @@ $workspaceId='Your workspace Id'
 $workspaceKey='Your workspace key'
 
 $secureKey=ConvertTo-SecureString -String $workspaceKey -AsPlainText -Force
+
+$extensionList=@()
 Foreach($s in $subscriptionsGraph){
 Set-AzContext -SubscriptionId $s.subscriptionId
-$extensionList = Get-AzVm | foreach {
+$extensionList += Get-AzVm | foreach {
     Get-AzVMExtension -ResourceGroupName $_.ResourceGroupName -VMName $_.Name -ExtensionName "MicrosoftMonitoringAgent"
 }
 }
@@ -17,6 +19,7 @@ $extensionList = Get-AzVm | foreach {
 $PublicSettings = @{"workspaceId" = $workspaceId}
 $ProtectedSettings = @{"workspaceKey" = $workspaceKey}
 
+Write-Host $extensionList.count 
 $jobs=@()
 $extensionList | foreach {
     $jobs += Set-AzVMExtension -ExtensionName $_.Name `
