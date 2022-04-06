@@ -7,8 +7,10 @@ $workspaceId='Your workspace Id'
 $workspaceKey='Your workspace key'
 
 $secureKey=ConvertTo-SecureString -String $workspaceKey -AsPlainText -Force
-$extensionList=Get-AzVm | foreach {
+Foreach($s in $subscriptionsGraph){
+$extensionList = Get-AzVm | foreach {
     Get-AzVMExtension -ResourceGroupName $_.ResourceGroupName -VMName $_.Name -ExtensionName "MicrosoftMonitoringAgent"
+}
 }
 
 $PublicSettings = @{"workspaceId" = $workspaceId}
