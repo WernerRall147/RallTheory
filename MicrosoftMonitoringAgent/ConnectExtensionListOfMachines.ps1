@@ -27,13 +27,14 @@ $workspaceKey = (Get-AzOperationalInsightsWorkspaceSharedKeys -ResourceGroupName
 foreach ($v in $csv)
 {
     If ($v.OSType -like "*Windows*"){
-        Set-AzContext -SubscriptionId "$v.SUBSCRIPTIONID"
+    Set-AzContext -SubscriptionId "$v.SUBSCRIPTIONID"
+    Remove-AzVMExtension -ResourceGroupName "$v.RSG" -Name "MicrosoftMonitoringAgent" -VMName "$v.OSNAME"
 Set-AzVMExtension -ResourceGroupName "$v.RSG" -VMName "$v.OSNAME" -Name 'MicrosoftMonitoringAgent' -Publisher 'Microsoft.EnterpriseCloud.Monitoring' -ExtensionType 'MicrosoftMonitoringAgent' -TypeHandlerVersion '1.0' -Location $v.Loc -SettingString "{'workspaceId':  '$workspaceId'}" -ProtectedSettingString "{'workspaceKey': '$workspaceKey' }"
 Write-Host "$v.OSNAME Windows VM has been updated"
 }
 else
-{
-    Set-AzContext -SubscriptionId "$v.SUBSCRIPTIONID"
+{ Set-AzContext -SubscriptionId "$v.SUBSCRIPTIONID"
+Remove-AzVMExtension -ResourceGroupName "$v.RSG" -Name "MicrosoftMonitoringAgent" -VMName "$v.OSNAME"
 Set-AzVMExtension -ResourceGroupName "$v.RSG" -VMName "$v.OSNAME" -Name 'OmsAgentForLinux' -Publisher 'Microsoft.EnterpriseCloud.Monitoring' -ExtensionType 'OmsAgentForLinux' -TypeHandlerVersion '1.0' -Location $v.Loc -SettingString "{'workspaceId':  '$workspaceId'}" -ProtectedSettingString "{'workspaceKey': '$workspaceKey' }"
 Write-Host "$v.OSNAME Linux VM has been updated"
 }
