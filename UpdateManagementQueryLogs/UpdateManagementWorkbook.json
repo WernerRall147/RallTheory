@@ -23,7 +23,7 @@
               "value::all"
             ],
             "value": [
-              "/subscriptions/72fe2a17-f575-42be-bd48-54f1476497c3/resourceGroups/DefaultResourceGroup-EUS/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-72fe2a17-f575-42be-bd48-54f1476497c3-EUS"
+              "value::1"
             ],
             "typeSettings": {
               "additionalResourceOptions": [
@@ -441,9 +441,7 @@
                   "multiSelect": true,
                   "quote": "'",
                   "delimiter": ",",
-                  "value": [
-                    "/subscriptions/72fe2a17-f575-42be-bd48-54f1476497c3"
-                  ],
+                  "value": [],
                   "typeSettings": {
                     "additionalResourceOptions": [],
                     "includeAll": true,
