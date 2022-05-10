@@ -23,7 +23,7 @@
               "value::all"
             ],
             "value": [
-              "value::1"
+              "/subscriptions/72fe2a17-f575-42be-bd48-54f1476497c3/resourceGroups/DefaultResourceGroup-EUS/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-72fe2a17-f575-42be-bd48-54f1476497c3-EUS"
             ],
             "typeSettings": {
               "additionalResourceOptions": [
@@ -441,7 +441,9 @@
                   "multiSelect": true,
                   "quote": "'",
                   "delimiter": ",",
-                  "value": [],
+                  "value": [
+                    "/subscriptions/72fe2a17-f575-42be-bd48-54f1476497c3"
+                  ],
                   "typeSettings": {
                     "additionalResourceOptions": [],
                     "includeAll": true,
@@ -460,7 +462,6 @@
                   "crossComponentResources": [
                     "{Subscription}"
                   ],
-                  "value": null,
                   "typeSettings": {
                     "additionalResourceOptions": [],
                     "showDefault": false
@@ -509,6 +510,8 @@
                   "splitBy": null
                 }
               ],
+              "showOpenInMe": true,
+              "timeBrushParameterName": "TimeBrush",
               "gridSettings": {
                 "rowLimit": 10000
               }
@@ -539,6 +542,8 @@
                   "splitBy": null
                 }
               ],
+              "showOpenInMe": true,
+              "timeBrushParameterName": "TimeBrush2",
               "gridSettings": {
                 "rowLimit": 10000
               }
