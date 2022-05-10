@@ -466,9 +466,9 @@
                   "resourceType": "microsoft.resourcegraph/resources"
                 },
                 {
-                  "id": "287b9331-69d6-4048-b527-ba18ce30e81c",
+                  "id": "98cce4f6-7095-4a2b-b29d-9a116f6eaaef",
                   "version": "KqlParameterItem/1.0",
-                  "name": "TimeRangePicker",
+                  "name": "TimePicker",
                   "type": 4,
                   "typeSettings": {
                     "selectableValues": [
@@ -520,8 +520,9 @@
               "resourceIds": [
                 "{AutomationAccount}"
               ],
+              "timeContextFromParameter": "TimePicker",
               "timeContext": {
-                "durationMs": 86400000
+                "durationMs": 0
               },
               "metrics": [
                 {
@@ -552,8 +553,9 @@
               "resourceIds": [
                 "{AutomationAccount}"
               ],
+              "timeContextFromParameter": "TimePicker",
               "timeContext": {
-                "durationMs": 3600000
+                "durationMs": 0
               },
               "metrics": [
                 {
@@ -582,7 +584,7 @@
     }
   ],
   "fallbackResourceIds": [
-    "Azure Monitor"
+    "azure monitor"
   ],
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
