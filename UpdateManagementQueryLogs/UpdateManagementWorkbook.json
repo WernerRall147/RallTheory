@@ -111,6 +111,7 @@
               "version": "KqlItem/1.0",
               "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| summarize UpdatesNeeded=count(Classification) by Classification",
               "size": 3,
+              "showExportToExcel": true,
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
               "crossComponentResources": [
@@ -381,7 +382,8 @@
               "resourceType": "microsoft.operationalinsights/workspaces",
               "crossComponentResources": [
                 "{Workspaces}"
-              ]
+              ],
+              "visualization": "table"
             },
             "name": "query - 7"
           },
@@ -430,6 +432,9 @@
               "crossComponentResources": [
                 "value::all"
               ],
+              "gridSettings": {
+                "rowLimit": 10000
+              },
               "graphSettings": {
                 "type": 0
               }
@@ -448,14 +453,16 @@
             "content": {
               "version": "KqlItem/1.0",
               "query": "//Find all possible OS information on Servers\r\nResources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'\r\n| extend\r\n    JoinID = toupper(id),\r\n    OSName = tostring(name),\r\n    OSType = tostring(properties.storageProfile.osDisk.osType),\r\n    OSExact = tostring(properties.storageProfile.imageReference.exactVersion),\r\n    OSSku = tostring(properties.storageProfile.imageReference.sku),\r\n    OSOffer = tostring(properties.storageProfile.imageReference.offer),\r\n    RSG = tostring(resourceGroup),\r\n    SUB = tostring(subscriptionId),\r\n    LOC = tostring(location),\r\n    TAGS = tostring(tags)\r\n| project JoinID, OSName, OSType, OSExact, OSSku, OSOffer, RSG, SUB, LOC, TAGS\r\n",
-              "showQuery": true,
               "size": 0,
               "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
                 "value::all"
-              ]
+              ],
+              "gridSettings": {
+                "rowLimit": 10000
+              }
             },
             "name": "query - 7"
           }
@@ -545,9 +552,6 @@
                         "durationMs": 7776000000
                       }
                     ]
-                  },
-                  "value": {
-                    "durationMs": 604800000
                   }
                 }
               ],
@@ -611,6 +615,9 @@
                 "{AutomationAccount}"
               ],
               "timeContextFromParameter": "TimePicker",
+              "timeContext": {
+                "durationMs": 0
+              },
               "metrics": [
                 {
                   "namespace": "microsoft.automation/automationaccounts",
