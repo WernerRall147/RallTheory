@@ -110,7 +110,7 @@
             "content": {
               "version": "KqlItem/1.0",
               "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| summarize UpdatesNeeded=count(Classification) by Classification",
-              "size": 2,
+              "size": 3,
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
               "crossComponentResources": [
@@ -174,7 +174,7 @@
             "content": {
               "version": "KqlItem/1.0",
               "query": "Update\r\n| where TimeGenerated>ago(5h) and OSType==\"Linux\"\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification) by Computer, SourceComputerId, Product, ProductArch\r\n| where UpdateState=~\"Needed\"\r\n| summarize by Product, ProductArch, Classification, Computer\r\n| summarize count(Classification) by Classification",
-              "size": 2,
+              "size": 3,
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
               "crossComponentResources": [
