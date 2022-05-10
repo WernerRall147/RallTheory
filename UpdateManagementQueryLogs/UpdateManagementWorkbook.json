@@ -620,6 +620,32 @@
               }
             },
             "name": "metric - 2"
+          },
+          {
+            "type": 10,
+            "content": {
+              "chartId": "de61fb56-20a2-49e3-b562-95fdae881f90",
+              "version": "MetricsItem/2.0",
+              "size": 0,
+              "chartType": 2,
+              "resourceType": "microsoft.automation/automationaccounts",
+              "metricScope": 0,
+              "timeContext": {
+                "durationMs": 604800000
+              },
+              "metrics": [
+                {
+                  "namespace": "microsoft.automation/automationaccounts",
+                  "metric": "microsoft.automation/automationaccounts--TotalUpdateDeploymentRuns",
+                  "aggregation": 1,
+                  "splitBy": null
+                }
+              ],
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "name": "metric - 5"
           }
         ]
       },
