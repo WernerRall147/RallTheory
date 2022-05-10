@@ -435,6 +435,29 @@
               }
             },
             "name": "query - 5"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "## All Operating Systems in Tenant"
+            },
+            "name": "text - 6"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "//Find all possible OS information on Servers\r\nResources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'\r\n| extend\r\n    JoinID = toupper(id),\r\n    OSName = tostring(name),\r\n    OSType = tostring(properties.storageProfile.osDisk.osType),\r\n    OSExact = tostring(properties.storageProfile.imageReference.exactVersion),\r\n    OSSku = tostring(properties.storageProfile.imageReference.sku),\r\n    OSOffer = tostring(properties.storageProfile.imageReference.offer),\r\n    RSG = tostring(resourceGroup),\r\n    SUB = tostring(subscriptionId),\r\n    LOC = tostring(location),\r\n    TAGS = tostring(tags)\r\n| project JoinID, OSName, OSType, OSExact, OSSku, OSOffer, RSG, SUB, LOC, TAGS\r\n",
+              "showQuery": true,
+              "size": 0,
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ]
+            },
+            "name": "query - 7"
           }
         ]
       },
@@ -552,9 +575,6 @@
                 "{AutomationAccount}"
               ],
               "timeContextFromParameter": "TimePicker",
-              "timeContext": {
-                "durationMs": 0
-              },
               "metrics": [
                 {
                   "namespace": "microsoft.automation/automationaccounts",
@@ -585,9 +605,6 @@
                 "{AutomationAccount}"
               ],
               "timeContextFromParameter": "TimePicker",
-              "timeContext": {
-                "durationMs": 0
-              },
               "metrics": [
                 {
                   "namespace": "microsoft.automation/automationaccounts",

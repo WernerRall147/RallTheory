@@ -1,0 +1,15 @@
+//Find all possible OS information on Servers
+Resources
+| where type =~ 'Microsoft.Compute/virtualMachines'
+| extend
+    JoinID = toupper(id),
+    OSName = tostring(name),
+    OSType = tostring(properties.storageProfile.osDisk.osType),
+    OSExact = tostring(properties.storageProfile.imageReference.exactVersion),
+    OSSku = tostring(properties.storageProfile.imageReference.sku),
+    OSOffer = tostring(properties.storageProfile.imageReference.offer),
+    RSG = tostring(resourceGroup),
+    SUB = tostring(subscriptionId),
+    LOC = tostring(location),
+    TAGS = tostring(tags)
+| project JoinID, OSName, OSType, OSExact, OSSku, OSOffer, RSG, SUB, LOC, TAGS
