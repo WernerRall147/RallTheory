@@ -49,4 +49,14 @@ When you click on any of the machines "Updates Needed by <unset>" can be seen at
 There are also other pages in the reports called Computers and Alerts
 
 
-## Diving into Alerts
+ ## Diving into Alerts
+ 
+ On the alerts page you can drill in to the Alerts section of Automation Management Account
+ 
+ ![image](https://user-images.githubusercontent.com/23274490/170035806-6440ce67-c962-4d7b-b650-92830ab00a1b.png)
+
+ and you can apply further splitting to get a view of the status of recent update cycles
+  
+ ![image](https://user-images.githubusercontent.com/23274490/170036289-e46072a4-2392-4fa9-84f8-3b8685d15f73.png)
+
+ 
