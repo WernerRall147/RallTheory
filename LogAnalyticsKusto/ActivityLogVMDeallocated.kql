@@ -1,0 +1,4 @@
+AzureActivity
+| where TimeGenerated > ago(15m)
+| where OperationNameValue == "MICROSOFT.COMPUTE/VIRTUALMACHINES/DEALLOCATE/ACTION"
+| project Properties
