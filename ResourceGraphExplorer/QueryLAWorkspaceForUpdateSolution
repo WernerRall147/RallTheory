@@ -1,0 +1,2 @@
+resources
+| where type =~ "microsoft.operationsmanagement/solutions" and name like 'Updates'
