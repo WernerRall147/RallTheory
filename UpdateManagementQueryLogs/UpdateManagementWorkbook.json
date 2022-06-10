@@ -92,6 +92,27 @@
           {
             "type": 1,
             "content": {
+              "json": "## Log Analytics Workspaces that have Update Management enabled and are linked to Automation Account"
+            },
+            "name": "text - 9"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type =~ \"microsoft.operationsmanagement/solutions\" and name like 'Updates'\r\n| project name",
+              "size": 0,
+              "queryType": 1,
+              "resourceType": "microsoft.resources/tenants",
+              "crossComponentResources": [
+                "value::tenant"
+              ]
+            },
+            "name": "query - 10"
+          },
+          {
+            "type": 1,
+            "content": {
               "json": "## Linux Updates Needed by Classification"
             },
             "customWidth": "50",
@@ -643,9 +664,6 @@
       },
       "name": "Alerts"
     }
-  ],
-  "fallbackResourceIds": [
-    "azure monitor"
   ],
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
