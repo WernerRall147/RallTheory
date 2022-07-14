@@ -1,0 +1,78 @@
+<#
+Created by: whall
+Date Created: 3/25/2020
+
+Product Area Tags: Connectivity
+
+Technology Tags: SSL TLS
+
+Use Case: 
+Shows which version(s) of TLS is supported for a URL
+
+Description: 
+When you run this, it checks each TLS type connection to see if it is supported.
+
+
+Parameters:
+-url this is the URL of the site you are testing against
+
+Keywords: sockets secure https
+
+Code Example Disclaimer:
+Sample Code is provided for the purpose of illustration only and is not intended to be used in a production environment. THIS SAMPLE CODE AND ANY RELATED INFORMATION ARE PROVIDED 'AS IS'
+-This is intended as a sample of how code might be written for a similar purpose and you will need to make changes to fit to your requirements. 
+-This code has not been tested.  This code is also not to be considered best practices or prescriptive guidance.  
+-No debugging or error handling has been implemented.
+-It is highly recommended that you FULLY understand what this code is doing  and use this code at your own risk.
+
+#>
+
+#TLS check
+param([Parameter(Mandatory=$true)][string]$url)
+
+function TLSAvailable([string]$url){
+
+
+    Write-Host =======================
+    Write-Host $url
+    Write-Host =======================
+    
+    [System.Net.ServicePointManager]::SecurityProtocol = "Tls"
+
+    try{
+    $resp1 = Invoke-WebRequest -uri $url -Method GET -DisableKeepAlive
+    if($resp1.StatusCode -eq 200){
+        Write-Host "TLS/SSL 1.0 supported" -ForegroundColor green
+    }
+    }catch {
+        Write-Host "TLS/SSL 1.0 not supported" -ForegroundColor Red
+        #$_.Exception
+    }
+
+    [System.Net.ServicePointManager]::SecurityProtocol = "Tls11"
+    try{
+    $resp2 = Invoke-WebRequest -uri $url -Method GET -DisableKeepAlive
+    if($resp2.StatusCode -eq 200){
+        Write-Host "TLS/SSL 1.1 supported" -ForegroundColor green
+    }
+    }catch {
+            Write-Host "TLS/SSL 1.1 not supported" -ForegroundColor Red
+            #$_.Exception
+    }
+
+    [System.Net.ServicePointManager]::SecurityProtocol = "Tls12"
+
+    try{
+    $resp3 = Invoke-WebRequest -uri $url -Method GET -DisableKeepAlive
+    if($resp3.StatusCode -eq 200){
+        Write-Host "TLS/SSL 1.2 supported" -ForegroundColor green
+    }
+    }catch{
+            Write-Host "TLS/SSL 1.2 not supported" -ForegroundColor Red
+            #$_.Exception
+    }
+    Write-Host =======================
+
+}
+
+TLSAvailable -url $url
