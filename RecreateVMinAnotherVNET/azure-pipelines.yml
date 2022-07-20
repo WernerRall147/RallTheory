@@ -1,0 +1,53 @@
+trigger:
+  - none
+
+pool:
+   vmImage: ubuntu-latest
+
+jobs:
+  - job: Validate
+    displayName: Terraform Validate
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - checkout: self
+    - task: TerraformInstaller@0
+      displayName: Install Terraform latest
+    - task: TerraformTaskV2@2
+      displayName: 'Terraform : Init'
+      inputs:
+        backendServiceArm: '<Service Connection Name>'
+        backendAzureRmResourceGroupName: <Resource Group Name>
+        backendAzureRmStorageAccountName: <Storage Account for TF State>
+        backendAzureRmContainerName: <Storage Container for TF State>
+        backendAzureRmKey: <TF State File>
+    - task: TerraformTaskV2@2
+      displayName: 'Terraform : Validate'
+      inputs:
+        command: validate
+  - job: Deploy
+    displayName: Terraform Deploy
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - checkout: self
+    - task: TerraformInstaller@0
+      displayName: Install Terraform latest
+    - task: TerraformTaskV2@2
+      displayName: 'Terraform : Init'
+      inputs:
+        backendServiceArm: '<Service Connection Name>'
+        backendAzureRmResourceGroupName: <Resource Group Name>
+        backendAzureRmStorageAccountName: <Storage Account for TF State>
+        backendAzureRmContainerName: <Storage Container for TF State>
+        backendAzureRmKey: <TF State File>
+    - task: TerraformTaskV2@2
+      displayName: 'Terraform : Plan'
+      inputs:
+        command: plan
+        environmentServiceNameAzureRM: '<Service Connection Name>'
+    - task: TerraformTaskV2@2
+      displayName: 'Terraform : Validate and apply'
+      inputs:
+        command: apply
+        environmentServiceNameAzureRM: '<Service Connection Name>'
