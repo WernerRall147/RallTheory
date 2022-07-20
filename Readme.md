@@ -1,4 +1,6 @@
-# RallTheory
+![RALL THEORY_basic-filegithub](https://user-images.githubusercontent.com/23274490/180041424-33df0906-625a-4c25-9190-ddbb38c98b01.png)
+
+
 # Technology is an extension of your creativity... What will you build?
 
 ## This is my attempt at creating "container" based solutions, where every folder is a solution to a question, problem or business need that I tried to solve. Feel free to contribute, ask questions and recommend changes.
