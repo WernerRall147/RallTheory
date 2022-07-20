@@ -1,0 +1,1052 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+
+  "parameters": {
+    "mitbcstorageType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    },
+    "AdminUserName": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "LabAdmin"
+    },
+    "AdminPassword": {
+      "type": "securestring"
+    },
+    "WindowsOSVersion": {
+      "type": "string",
+      "defaultValue": "2016-Datacenter",
+      "allowedValues": [
+        "2012-Datacenter",
+        "2012-R2-Datacenter",
+        "2016-Datacenter",
+        "2019-Datacenter",
+        "2022-Datacenter"
+      ]
+    },
+    "VMSize": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "Standard_D2_v3",
+      "allowedValues": [
+        "Standard_A1_v2",
+		"Standard_A2_v2",
+		"Standard_D2_v3",
+		"Standard_D4_v3",
+		"Standard_D8_v3"
+      ]
+    },
+    "Nonce": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "mitbclab"
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "defaultValue": "https://mitbcweral.blob.core.windows.net/labs"
+    }
+  },
+
+  "variables": {
+    "mitbc-onpremPrefix": "10.1.0.0/16",
+    "mitbc-onpremSubnet1Name": "Subnet-OnPrem",
+    "mitbc-onpremSubnet1Prefix": "10.1.0.0/24",
+    "mitbcstorageName": "[concat('mitbc', uniqueString(resourceGroup().id, parameters('Nonce')))]",
+    "OnPremSubnetRef": "[concat(variables('OnPremVnetID'), '/subnets/', variables('mitbc-onpremSubnet1Name'))]",
+    "OnPremVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
+    "DomainDNSName": "corp.litware.com",
+    "DomainNetBIOSName": "CORP",
+    "DomainDN": "dc=corp,dc=litware,dc=com",
+    "CompanyName": "LitWare",
+    "ConfigureScriptFolder": "mitbcfiles",
+
+    "AD-VMName": "AD",
+    "AD-NicName": "[concat(variables('AD-VMName'), 'NetworkInterface')]",
+    "AD-PrivateIP": "10.1.0.10",
+    "AD-PublicIPName": "AD-PublicIP",
+    "AD-ConfigScript": "ad-configure.ps1",
+	"AD-ConfigScriptZip": "[concat(variables('AD-ConfigScript'), '.zip')]",
+	"AD-ConfigScriptURL": "[concat(parameters('_artifactsLocation'),variables('AD-ConfigScriptZip'))]",
+
+    "FILE-VMName": "FILE",
+    "FILE-NicName": "[concat(variables('FILE-VMName'), 'NetworkInterface')]",
+    "FILE-PrivateIP": "10.1.0.11",
+    "FILE-PublicIPName": "FILE-PublicIP",
+    "FILE-ConfigScript": "file-configure.ps1",
+	"FILE-ConfigScriptZip": "[concat(variables('FILE-ConfigScript'), '.zip')]",
+	"FILE-ConfigScriptURL": "[concat(parameters('_artifactsLocation'),variables('FILE-ConfigScriptZip'))]",
+
+    "WEB-VMName": "WEB",
+    "WEB-NicName": "[concat(variables('WEB-VMName'), 'NetworkInterface')]",
+    "WEB-PrivateIP": "10.1.0.12",
+    "WEB-PublicIPName": "WEB-PublicIP",
+    "WEB-ConfigScript": "web-configure.ps1",
+	"WEB-ConfigScriptZip": "[concat(variables('WEB-ConfigScript'), '.zip')]",
+	"WEB-ConfigScriptURL": "[concat(parameters('_artifactsLocation'),variables('WEB-ConfigScriptZip'))]",
+
+    "AADC-VMName": "AADC",
+    "AADC-NicName": "[concat(variables('AADC-VMName'), 'NetworkInterface')]",
+    "AADC-PrivateIP": "10.1.0.13",
+    "AADC-PublicIPName": "AADC-PublicIP",
+    "AADC-ConfigScript": "aadc-configure.ps1",
+	"AADC-ConfigScriptZip": "[concat(variables('AADC-ConfigScript'), '.zip')]",
+	"AADC-ConfigScriptURL": "[concat(parameters('_artifactsLocation'),variables('AADC-ConfigScriptZip'))]",
+	
+	"HV-VMName": "HV",
+    "HV-NicName": "[concat(variables('HV-VMName'), 'NetworkInterface')]",
+    "HV-PrivateIP": "10.1.0.14",
+    "HV-PublicIPName": "HV-PublicIP",
+    "HV-ConfigScript": "hv-configure.ps1",
+	"HV-ConfigScriptZip": "[concat(variables('HV-ConfigScript'), '.zip')]",
+	"HV-ConfigScriptURL": "[concat(parameters('_artifactsLocation'),variables('HV-ConfigScriptZip'))]",
+	
+	"SCCM-VMName": "SCCM",
+    "SCCM-NicName": "[concat(variables('SCCM-VMName'), 'NetworkInterface')]",
+    "SCCM-PrivateIP": "10.1.0.15",
+    "SCCM-PublicIPName": "SCCM-PublicIP",
+    "SCCM-ConfigScript": "sccm-configure.ps1",
+	"SCCM-ConfigScriptZip": "[concat(variables('SCCM-ConfigScript'), '.zip')]",
+	"SCCM-ConfigScriptURL": "[concat(parameters('_artifactsLocation'),variables('SCCM-ConfigScriptZip'))]"
+  },
+
+  "resources": [
+
+    {
+      "name": "mitbc-onprem",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "mitbc-onprem"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('mitbc-onpremPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('mitbc-onpremSubnet1Name')]",
+            "properties": {
+              "addressPrefix": "[variables('mitbc-onpremSubnet1Prefix')]"
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "[variables('mitbcstorageName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "[parameters('mitbcstorageType')]"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "mitbcstorage"
+      },
+      "kind": "Storage"
+    },
+
+    {
+      "name": "[variables('AADC-NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('AADC-PublicIPName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+      ],
+      "tags": {
+        "displayName": "AADCNic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('AADC-PrivateIP')]",
+              "subnet": {
+                "id": "[variables('OnPremSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('AADC-PublicIPName'))]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [
+            "[variables('AD-PrivateIP')]"
+          ]
+        },
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+        }
+      }
+    },
+	
+	{
+      "name": "[variables('HV-NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('HV-PublicIPName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+      ],
+      "tags": {
+        "displayName": "HVNic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('HV-PrivateIP')]",
+              "subnet": {
+                "id": "[variables('OnPremSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('HV-PublicIPName'))]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [
+            "[variables('AD-PrivateIP')]"
+          ]
+        },
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+        }
+      }
+    },
+
+    {
+      "name": "[variables('AD-NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('AD-PublicIPName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+      ],
+      "tags": {
+        "displayName": "ADNic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('AD-PrivateIP')]",
+              "subnet": {
+                "id": "[variables('OnPremSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('AD-PublicIPName'))]"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+        }
+      }
+    },
+
+
+    {
+      "name": "[variables('FILE-NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('FILE-PublicIPName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+      ],
+      "tags": {
+        "displayName": "FILENic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('FILE-PrivateIP')]",
+              "subnet": {
+                "id": "[variables('OnPremSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('FILE-PublicIPName'))]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [
+            "[variables('AD-PrivateIP')]"
+          ]
+        },
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+        }
+      }
+    },
+
+    {
+      "name": "[variables('WEB-NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('WEB-PublicIPName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+      ],
+      "tags": {
+        "displayName": "WEBNic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('WEB-PrivateIP')]",
+              "subnet": {
+                "id": "[variables('OnPremSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('WEB-PublicIPName'))]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [
+            "[variables('AD-PrivateIP')]"
+          ]
+        },
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+        }
+      }
+    },
+	
+	{
+      "name": "[variables('SCCM-NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('SCCM-PublicIPName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+      ],
+      "tags": {
+        "displayName": "SCCMNic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('SCCM-PrivateIP')]",
+              "subnet": {
+                "id": "[variables('OnPremSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('SCCM-PublicIPName'))]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [
+            "[variables('AD-PrivateIP')]"
+          ]
+        },
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'OnPrem-NSG')]"
+        }
+      }
+    },
+
+    {
+      "name": "[variables('AADC-PublicIPName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "[concat(variables('AADC-VMName'), 'PublicIP')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(toLower(variables('AADC-VMName')), '-', uniqueString(subscription().subscriptionId, resourceGroup().id))]"
+        }
+      }
+    },
+
+	{
+      "name": "[variables('HV-PublicIPName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "[concat(variables('HV-VMName'), 'PublicIP')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(toLower(variables('HV-VMName')), '-', uniqueString(subscription().subscriptionId, resourceGroup().id))]"
+        }
+      }
+    },
+	
+		
+    {
+      "name": "[variables('AD-PublicIPName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "[concat(variables('AD-VMName'), 'PublicIP')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(toLower(variables('AD-VMName')), '-', uniqueString(subscription().subscriptionId, resourceGroup().id))]"
+        }
+      }
+    },
+
+    {
+      "name": "[variables('FILE-PublicIPName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "[concat(variables('FILE-VMName'), 'PublicIP')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(toLower(variables('FILE-VMName')), '-', uniqueString(subscription().subscriptionId, resourceGroup().id))]"
+        }
+      }
+    },
+
+    {
+      "name": "[variables('WEB-PublicIPName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "[concat(variables('WEB-VMName'), 'PublicIP')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(toLower(variables('WEB-VMName')), '-', uniqueString(subscription().subscriptionId, resourceGroup().id))]"
+        }
+      }
+    },
+	
+	{
+      "name": "[variables('SCCM-PublicIPName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "[concat(variables('SCCM-VMName'), 'PublicIP')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(toLower(variables('SCCM-VMName')), '-', uniqueString(subscription().subscriptionId, resourceGroup().id))]"
+        }
+      }
+    },
+
+    {
+      "apiVersion": "2017-03-01",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "OnPrem-NSG",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NSG - OnPrem"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "rdp-rule",
+            "properties": {
+              "description": "Allow RDP",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "[variables('WEB-VMName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-07-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('WEB-NicName'))]"
+      ],
+      "tags": {
+        "displayName": "[variables('WEB-VMName')]"
+      },
+      "properties": {
+        "licenseType": "Windows_Server",
+        "hardwareProfile": {
+          "vmSize": "[parameters('VMSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('WEB-VMName')]",
+          "adminUsername": "[parameters('AdminUsername')]",
+          "adminPassword": "[parameters('AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "[parameters('WindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('WEB-VMName'), 'OSDisk')]",
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('WEB-VMName'), 'OSDisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('WEB-NicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "WEB-DSC",
+          "type":"extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn":  [
+			"[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
+            "[concat('Microsoft.Compute/virtualMachines/', variables('WEB-VMName'))]"
+          ],
+          "tags": {
+            "displayName": "WEB-DSC"
+          },
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('WEB-ConfigScriptURL')]",
+                "script": "[variables('WEB-ConfigScript')]",
+                "function": "[variables('WEB-VMName')]"
+              },
+              "configurationArguments": {
+                "DomainCred": {
+                  "UserName": "[concat(variables('DomainNetBIOSName'), '\\', parameters('AdminUsername'))]",
+                  "Password": "[parameters('AdminPassword')]"
+                },
+                "DomainName": "[variables('DomainDNSName')]"
+              }
+            },
+            "protectedSettings": {}
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "[variables('AADC-VMName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-07-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('AADC-NicName'))]"
+      ],
+      "tags": {
+        "displayName": "[variables('AADC-VMName')]"
+      },
+      "properties": {
+        "licenseType": "Windows_Server",
+        "hardwareProfile": {
+          "vmSize": "[parameters('VMSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('AADC-VMName')]",
+          "adminUsername": "[parameters('AdminUsername')]",
+          "adminPassword": "[parameters('AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "[parameters('WindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('AADC-VMName'), 'OSDisk')]",
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('AADC-VMName'), 'OSDisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('AADC-NicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "AADC-DSC",
+          "type":"extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn":  [
+			"[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
+            "[concat('Microsoft.Compute/virtualMachines/', variables('AADC-VMName'))]"
+          ],
+          "tags": {
+            "displayName": "AADC-DSC"
+          },
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('AADC-ConfigScriptURL')]",
+                "script": "[variables('AADC-ConfigScript')]",
+                "function": "[variables('AADC-VMName')]"
+              },
+              "configurationArguments": {
+                "DomainCred": {
+                  "UserName": "[concat(variables('DomainNetBIOSName'), '\\', parameters('AdminUsername'))]",
+                  "Password": "[parameters('AdminPassword')]"
+                },
+                "DomainName": "[variables('DomainDNSName')]"
+              }
+            },
+            "protectedSettings": {}
+          }
+        }
+      ]
+    },
+
+	{
+      "name": "[variables('HV-VMName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-07-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('HV-NicName'))]"
+      ],
+      "tags": {
+        "displayName": "[variables('HV-VMName')]"
+      },
+      "properties": {
+        "licenseType": "Windows_Server",
+        "hardwareProfile": {
+          "vmSize": "Standard_D4_v3"
+        },
+        "osProfile": {
+          "computerName": "[variables('HV-VMName')]",
+          "adminUsername": "[parameters('AdminUsername')]",
+          "adminPassword": "[parameters('AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "[parameters('WindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('HV-VMName'), 'OSDisk')]",
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('HV-VMName'), 'OSDisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('HV-NicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "HV-DSC",
+          "type":"extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn":  [
+			"[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
+            "[concat('Microsoft.Compute/virtualMachines/', variables('HV-VMName'))]"
+          ],
+          "tags": {
+            "displayName": "HV-DSC"
+          },
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('HV-ConfigScriptURL')]",
+                "script": "[variables('HV-ConfigScript')]",
+                "function": "[variables('HV-VMName')]"
+              },
+              "configurationArguments": {
+                "DomainCred": {
+                  "UserName": "[concat(variables('DomainNetBIOSName'), '\\', parameters('AdminUsername'))]",
+                  "Password": "[parameters('AdminPassword')]"
+                },
+                "DomainName": "[variables('DomainDNSName')]"
+              }
+            },
+            "protectedSettings": {}
+          }
+        }
+      ]
+    },
+	
+    {
+      "name": "[variables('AD-VMName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-07-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('AD-NicName'))]"
+      ],
+      "tags": {
+        "displayName": "[variables('AD-VMName')]"
+      },
+      "properties": {
+        "licenseType": "Windows_Server",
+        "hardwareProfile": {
+          "vmSize": "[parameters('VMSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('AD-VMName')]",
+          "adminUsername": "[parameters('AdminUsername')]",
+          "adminPassword": "[parameters('AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "[parameters('WindowsOSVersion')]",
+            "version": "latest"
+          },
+          "dataDisks": [
+            {
+              "name": "[concat(variables('AD-VMName'), 'DataDisk')]",
+              "vhd": {
+                "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('AD-VMName'), 'DataDisk.vhd')]"
+              },
+              "diskSizeGB": "40",
+              "lun": 0,
+              "createOption": "Empty",
+              "caching": "ReadOnly"
+            }
+          ],
+          "osDisk": {
+            "name": "[concat(variables('AD-VMName'), 'OSDisk')]",
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('AD-VMName'), 'OSDisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('AD-NicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "AD-DSC",
+          "type":"extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn":  [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('AD-VMName'))]"
+          ],
+          "tags": {
+            "displayName": "AD-DSC"
+          },
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('AD-ConfigScriptURL')]",
+                "script": "[variables('AD-ConfigScript')]",
+                "function": "[variables('AD-VMName')]"
+              },
+              "configurationArguments": {
+                "DomainCred": {
+                  "UserName": "[parameters('AdminUsername')]",
+                  "Password": "[parameters('AdminPassword')]"
+                },
+                "DomainName": "[variables('DomainDNSName')]",
+                "DomainDN": "[variables('DomainDN')]",
+                "CompanyName": "[variables('CompanyName')]",
+                "DomainNetBIOSName": "[variables('DomainNetBIOSName')]"
+              }
+            },
+            "protectedSettings": {}
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "[variables('FILE-VMName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-07-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('FILE-NicName'))]"
+      ],
+      "tags": {
+        "displayName": "[variables('FILE-VMName')]"
+      },
+      "properties": {
+        "licenseType": "Windows_Server",
+ 		    "hardwareProfile": {
+          "vmSize": "[parameters('VMSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('FILE-VMName')]",
+          "adminUsername": "[parameters('AdminUsername')]",
+          "adminPassword": "[parameters('AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "[parameters('WindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('FILE-VMName'), 'OSDisk')]",
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('FILE-VMName'), 'OSDisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('FILE-NicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "FILE-DSC",
+          "type":"extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn":  [
+			"[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
+            "[concat('Microsoft.Compute/virtualMachines/', variables('FILE-VMName'))]"
+          ],
+          "tags": {
+            "displayName": "FILE-DSC"
+          },
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('FILE-ConfigScriptURL')]",
+                "script": "[variables('FILE-ConfigScript')]",
+                "function": "[variables('FILE-VMName')]"
+              },
+              "configurationArguments": {
+                "DomainCred": {
+                  "UserName": "[concat(variables('DomainNetBIOSName'), '\\', parameters('AdminUsername'))]",
+                  "Password": "[parameters('AdminPassword')]"
+                },
+                "DomainName": "[variables('DomainDNSName')]"
+              }
+            },
+            "protectedSettings": {}
+          }
+        }
+      ]
+    },
+	
+	{
+      "name": "[variables('SCCM-VMName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-07-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('SCCM-NicName'))]"
+      ],
+      "tags": {
+        "displayName": "[variables('SCCM-VMName')]"
+      },
+      "properties": {
+        "licenseType": "Windows_Server",
+        "hardwareProfile": {
+          "vmSize": "Standard_D8_v3"
+        },
+        "osProfile": {
+          "computerName": "[variables('SCCM-VMName')]",
+          "adminUsername": "[parameters('AdminUsername')]",
+          "adminPassword": "[parameters('AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "[parameters('WindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('SCCM-VMName'), 'OSDisk')]",
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('SCCM-VMName'), 'OSDisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('SCCM-NicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "SCCM-DSC",
+          "type":"extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn":  [
+			"[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
+            "[concat('Microsoft.Compute/virtualMachines/', variables('SCCM-VMName'))]"
+          ],
+          "tags": {
+            "displayName": "SCCM-DSC"
+          },
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "configuration": {
+                "url": "[variables('SCCM-ConfigScriptURL')]",
+                "script": "[variables('SCCM-ConfigScript')]",
+                "function": "[variables('SCCM-VMName')]"
+              },
+              "configurationArguments": {
+                "DomainCred": {
+                  "UserName": "[concat(variables('DomainNetBIOSName'), '\\', parameters('AdminUsername'))]",
+                  "Password": "[parameters('AdminPassword')]"
+                },
+                "DomainName": "[variables('DomainDNSName')]",
+				"SQLPass": "[parameters('AdminPassword')]"
+              }
+            },
+            "protectedSettings": {}
+          }
+        }
+      ]
+    }	
+  ],
+  "outputs": {
+  }
+}
