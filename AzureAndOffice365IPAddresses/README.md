@@ -1,2 +1,2 @@
 # PowerBI
-Power BI repository for sharing my templates with the community
+Power BI report that shows all Azure and Office 365 IP Addresses
