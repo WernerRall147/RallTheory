@@ -1,0 +1,10 @@
+{
+    "action": "PerfDataCollection",
+    "perfQueryIntervalInSec": 30,
+    "staticQueryIntervalInSec": 60,
+    "numberOfIterations": 2,
+    "sqlConnectionStrings": [
+    "Data Source=<SQL MI Server>,3342;Persist Security Info=False;User ID=<UserName>;Password=<Password>;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Initial Catalog=master;Integrated Security=False;"
+    ],
+    "outputFolder": "C:\\Temp\\SQL\\"
+  }
