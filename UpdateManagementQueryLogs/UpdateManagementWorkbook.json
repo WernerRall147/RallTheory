@@ -449,7 +449,7 @@
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
               "crossComponentResources": [
-                "{Workspaces}"
+                "{Workspace}"
               ],
               "visualization": "table"
             },
@@ -476,7 +476,7 @@
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
               "crossComponentResources": [
-                "{Workspaces}"
+                "{Workspace}"
               ]
             },
             "name": "query - 5"
