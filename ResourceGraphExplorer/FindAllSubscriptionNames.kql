@@ -1,0 +1,3 @@
+resources
+| join kind=leftouter (ResourceContainers | where type=='microsoft.resources/subscriptions' | project SubName=name, subscriptionId) on subscriptionId
+| project SubName, subscriptionId
