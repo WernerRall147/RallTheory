@@ -4,16 +4,20 @@
     "if": {
       "allOf": [
         {
+          "not":{
           "field": "[concat('tags[', parameters('tagName'), ']')]",
-          "exists": "false"
+          "exists": "true"
+          }
         },
-        {
+        { "not":{
           "field": "[concat('tags[', parameters('tagName2'), ']')]",
-          "exists": "false"
+          "exists": "true"
+        }
         },
-        {
+        { "not":{
           "field": "[concat('tags[', parameters('tagName3'), ']')]",
-          "exists": "false"
+          "exists": "true"
+        }  
         }
       ]
     },
@@ -25,7 +29,7 @@
     "tagName": {
       "type": "String",
       "metadata": {
-        "displayName": "OwnerTagName",
+        "displayName": "Owner",
         "description": "Name of the tag, such as 'Owner'"
       },
 			"defaultValue": "Owner"
@@ -33,7 +37,7 @@
     "tagName2": {
       "type": "String",
       "metadata": {
-        "displayName": "CostCenterTagName",
+        "displayName": "CostCenter",
         "description": "Name of the tag, such as 'CostCenter'"
       },
       "defaultValue": "CostCenter"
@@ -41,7 +45,7 @@
     "tagName3": {
       "type": "String",
       "metadata": {
-        "displayName": "DepartmentTagName",
+        "displayName": "Department",
         "description": "Name of the tag, such as 'Department'"
       },
       "defaultValue": "Department"
