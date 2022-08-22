@@ -1,35 +1,23 @@
 {
-    "mode": "Indexed",
-                "policyRule": {
-      "if": {
-        "field": "[concat('tags[', parameters('tagName'), ']')]",
-        "exists": "false"
-      },
-      "then": {
-        "effect": "deny"
-      }
+  "mode": "Indexed",
+        "policyRule": {
+    "if": {
+      "field": "[concat('tags[', parameters('tagName'), ']')]",
+      "in":[parameters()]
+      "exists": "false"
     },
-    "parameters": {
-      "CostCenter": {
-        "type": "String",
+    "then": {
+      "effect": "deny"
+    }
+  },
+  "parameters": {
+    "requiredTags":{
+      "type": "Array",
         "metadata": {
-          "displayName": "CostCenter",
-          "description": "Cost Center responsible for resource"
-                              }
-                  },
-     "Department": {
-        "type": "String",
-       "metadata": {
-        "displayName": "Department",
-        "description": "Department resource belongs to"
-                   }
-                  },
-      "Owner": {
-        "type": "String",
-        "metadata": {
-        "displayName": "Owner",
-        "description": "Person resbonsible for the solution"
-                    }
-              }
-  }
+        "displayName": "Required Tags",
+        "description": "The tags required for before resource creation are CostCenter, Department, Owner",
+                  }
+
+    }
+}
 }
