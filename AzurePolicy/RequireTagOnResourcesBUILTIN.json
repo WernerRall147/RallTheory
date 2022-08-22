@@ -1,26 +1,25 @@
 {
-  "mode": "All",
+  "mode": "Indexed",
   "policyRule": {
     "if": {
+      "not": {
       "allOf": [
         {
-          "not":{
           "field": "[concat('tags[', parameters('tagName'), ']')]",
           "exists": "true"
-          }
         },
-        { "not":{
+        { 
           "field": "[concat('tags[', parameters('tagName2'), ']')]",
           "exists": "true"
-        }
+
         },
-        { "not":{
+        {
           "field": "[concat('tags[', parameters('tagName3'), ']')]",
           "exists": "true"
         }  
-        }
       ]
-    },
+    }
+  },
     "then": {
       "effect": "deny"
     }
