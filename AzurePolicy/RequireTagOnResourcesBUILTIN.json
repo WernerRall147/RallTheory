@@ -1,21 +1,22 @@
 {
-  "mode": "Indexed",
+  "mode": "All",
   "policyRule": {
     "if": {
-			"allOf": [{
-      "field": "[concat('tags[', parameters('tagName'), ']')]",
-      "exists": "false"
-		},
-     {
-      "field": "[concat('tags[', parameters('tagName2'), ']')]",
-      "exists": "false"
-		},
-    {
-      "field": "[concat('tags[', parameters('tagName3'), ']')]",
-      "exists": "false"
-		}
-  ]
-		},
+      "allOf": [
+        {
+          "field": "[concat('tags[', parameters('tagName'), ']')]",
+          "exists": "false"
+        },
+        {
+          "field": "[concat('tags[', parameters('tagName2'), ']')]",
+          "exists": "false"
+        },
+        {
+          "field": "[concat('tags[', parameters('tagName3'), ']')]",
+          "exists": "false"
+        }
+      ]
+    },
     "then": {
       "effect": "deny"
     }
@@ -24,25 +25,26 @@
     "tagName": {
       "type": "String",
       "metadata": {
-        "displayName": "Owner",
+        "displayName": "OwnerTagName",
         "description": "Name of the tag, such as 'Owner'"
-      }
+      },
+			"defaultValue": "Owner"
     },
     "tagName2": {
       "type": "String",
       "metadata": {
-        "displayName": "CostCenter",
+        "displayName": "CostCenterTagName",
         "description": "Name of the tag, such as 'CostCenter'"
       },
-      "defaultValue": ""
+      "defaultValue": "CostCenter"
     },
     "tagName3": {
       "type": "String",
       "metadata": {
-        "displayName": "Department",
+        "displayName": "DepartmentTagName",
         "description": "Name of the tag, such as 'Department'"
       },
-      "defaultValue": ""
+      "defaultValue": "Department"
     }
   }
 }
