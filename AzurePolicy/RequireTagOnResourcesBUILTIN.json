@@ -1,0 +1,35 @@
+{
+    "mode": "Indexed",
+                "policyRule": {
+      "if": {
+        "field": "[concat('tags[', parameters('tagName'), ']')]",
+        "exists": "false"
+      },
+      "then": {
+        "effect": "deny"
+      }
+    },
+    "parameters": {
+      "CostCenter": {
+        "type": "String",
+        "metadata": {
+          "displayName": "CostCenter",
+          "description": "Cost Center responsible for resource"
+                              }
+                  },
+     "Department": {
+        "type": "String",
+       "metadata": {
+        "displayName": "Department",
+        "description": "Department resource belongs to"
+                   }
+                  },
+      "Owner": {
+        "type": "String",
+        "metadata": {
+        "displayName": "Owner",
+        "description": "Person resbonsible for the solution"
+                    }
+              }
+  }
+}
