@@ -1,23 +1,48 @@
 {
   "mode": "Indexed",
-        "policyRule": {
+  "policyRule": {
     "if": {
+			"allOf": [{
       "field": "[concat('tags[', parameters('tagName'), ']')]",
-      "in":[parameters()]
       "exists": "false"
-    },
+		},
+     {
+      "field": "[concat('tags[', parameters('tagName2'), ']')]",
+      "exists": "false"
+		},
+    {
+      "field": "[concat('tags[', parameters('tagName3'), ']')]",
+      "exists": "false"
+		}
+  ]
+		},
     "then": {
       "effect": "deny"
     }
   },
   "parameters": {
-    "requiredTags":{
-      "type": "Array",
-        "metadata": {
-        "displayName": "Required Tags",
-        "description": "The tags required for before resource creation are CostCenter, Department, Owner",
-                  }
-
+    "tagName": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Owner",
+        "description": "Name of the tag, such as 'Owner'"
+      }
+    },
+    "tagName2": {
+      "type": "String",
+      "metadata": {
+        "displayName": "CostCenter",
+        "description": "Name of the tag, such as 'CostCenter'"
+      },
+      "defaultValue": ""
+    },
+    "tagName3": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Department",
+        "description": "Name of the tag, such as 'Department'"
+      },
+      "defaultValue": ""
     }
-}
+  }
 }
