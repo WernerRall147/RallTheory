@@ -22,7 +22,7 @@ $Subs | ForEach-Object -Parallel {
         $activityLogAlertName = "serviceHealthAlert"
 
         #Create Health Alert Option 1
-        New-AzResourceGroupDeployment -ResourceGroupName "RLY-mgmt" -TemplateUri https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/demos/monitor-servicehealth-alert/azuredeploy.json `
+        New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateUri https://raw.githubusercontent.com/WernerRall147/RallTheory/main/CreateServiceHealthAlertsForMyResources/ServiceHealthResourceGroupOnly.json `
          -actionGroupName $actionGroupName -actionGroupShortName $actionGroupShortName -activityLogAlertName $activityLogAlertName 
         
         <#Create Health Alert Option 2
