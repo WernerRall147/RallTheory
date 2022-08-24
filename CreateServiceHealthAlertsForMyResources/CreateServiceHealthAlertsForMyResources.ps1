@@ -2,47 +2,49 @@
 Connect-AzAccount
 
 #Get list of Azure Subscription ID's
-$Subs = get-AzSubscription
+$Subs = (get-AzSubscription).Id
 
 #Loop through the subscriptions to find all Resource Groups and create the Service Health Alerts
 $Subs | ForEach-Object -Parallel {
-    Set-AzContext -SubscriptionId $_.Id
-    $AllRGs = (Get-AzResourceGroup).ResourceGroupName
-    foreach($rg in $AllRGs){
-        #For each member of the Contributor group
-        $rContributors = Get-AzRoleAssignment -ResourceGroupName $rg -RoleDefinitionName Contributor
-        
-        #Look for specific resource types in each Resource Group
-        #$rTypes = Get-AzResource -ResourceGroupName $rg | Select-Object ResourceType | Sort-Object ResourceType -Unique
+Write-Host "Switching Subscriptions"
+Set-AzContext -SubscriptionId $_.Id
 
+Write-Host "Getting all Resource Groups"
+$AllRGs = (Get-AzResourceGroup).ResourceGroupName
+
+    foreach($rg in $AllRGs){
+        #For each IAM the RG until you find an email address for either Owner or Contributor
+        $rContributors = Get-AzRoleAssignment -ResourceGroupName $rg -RoleDefinitionName 'Contributor' | where-object SignInName -NE $null | Select-Object SignInName | Sort-Object ResourceType -Unique
+        $rOwners = Get-AzRoleAssignment -ResourceGroupName $rg -RoleDefinitionName 'Owner' | where-object SignInName -NE $null | Select-Object SignInName | Sort-Object ResourceType -Unique
+        Write-Host "Search for Contributors in the " + $rg + " Resource Group"
+
+         if ($rContributors.SignInName -ne $null) {
+            Write-Host "Contributors Found in the Resource Group, building an Array"
+            $contactemailadress = $rContributors.SignInName
+         }
+         elseif ($rOwners.SignInName -ne $null) {
+            Write-Host "No Contributors found, looking for Owners"
+            $contactemailadress = $rOwners.SignInName
+            Write-Host "Owners Found in the Resource Group, building an Array"
+         }else {
+            Write-Host "No Valid Contributors or Owners found for $rg"
+         }
+        
         #Create Service Health Alerts
+        Write-Host "Generating some numbers"
         $randomnumber = Get-Random -Minimum 1000 -Maximum 9999
         $actionGroupName = $rg + "actionGroup" + $randomnumber
-        $actionGroupShortName = "actionGroup" + $randomnumber
+        $actionGroupShortName = "action" + $randomnumber
         $activityLogAlertName = "serviceHealthAlert"
 
         #Create Health Alert Option 1
+        foreach($ctact in $contactemailadress){
+        Write-Host "Creating a Health Alert for $ctact"
         New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateUri https://raw.githubusercontent.com/WernerRall147/RallTheory/main/CreateServiceHealthAlertsForMyResources/ServiceHealthResourceGroupOnly.json `
-         -actionGroupName $actionGroupName -actionGroupShortName $actionGroupShortName -activityLogAlertName $activityLogAlertName 
-        
-        <#Create Health Alert Option 2
-        $location = 'Global'
-        $alertName = 'myAlert'
-        $resourceGroupName = $rg
-        $condition1 = New-AzActivityLogAlertCondition -Field 'field1' -Equal 'equals1'
-        $condition2 = New-AzActivityLogAlertCondition -Field 'field2' -Equal 'equals2'
-        $dict = New-Object "System.Collections.Generic.Dictionary``2[System.String,System.String]"
-        $dict.Add('key1', 'value1')
-        $actionGrp1 = New-AzActionGroup -ActionGroupId 'actiongr1' -WebhookProperty $dict
-        Set-AzActivityLogAlert -Location $location -Name $alertName -ResourceGroupName $resourceGroupName -Scope 'scope1','scope2' -Action $actionGrp1 -Condition $condition1, $condition2
-            #>
+        -actionGroupName $actionGroupName -actionGroupShortName $actionGroupShortName -activityLogAlertName $activityLogAlertName -emailAddress $ctact
         }
     
-    $output = "Service Health Alerts have been created for " + $_.Name + "is your subscription"
+    $output = "Service Health Alerts have been created for your " + $_.Name + " subscription"
     $output   
+ }
 }
-
-#Look for specific resource types in each Resource Group
-#Foe each resource type found, set up a Resource Health Alert
-#For each member of the Contributor group that has access to that Resource Group, convert elevated user to usable email address
-#Add email addresses to action group for that health alert.
