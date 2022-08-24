@@ -1,0 +1,14 @@
+// Cost Analysis by project where a project correspond to Resource Group Logging to certain LA
+// specify the RG Name
+let rgName = "mitbc";
+let excludedTables = dynamic(['Usage', 'myOtherTable']);
+let includedTables =dynamic(['Update', 'UpdateRunProgress', 'UpdateSummary']);
+union withsource=table *
+| where TimeGenerated > ago(31d)
+| where table in (includedTables)
+| where _ResourceId has rgName or ResourceId has rgName
+| where _IsBillable == true
+| summarize recNum = count(), Gbytes=((sum(_BilledSize))/1000/1000/1000)
+| extend costInEuro = (Gbytes*2.522)
+| extend costInDollar = (Gbytes*2.99)
+| project TimeGenerated=now(), recNum, Gbytes, costInEuro, costInDollar, seperator = "Decimal according to you regional settings for the Azure Portal"
