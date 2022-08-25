@@ -43,7 +43,7 @@
     },
     "subName": {
       "type": "string",
-      "defaultValue": "[subscription().id]",
+      "defaultValue": "[subscription().name]",
       "minLength": 1,
       "metadata": {
         "description": "Resource Group Scope for the Activity Logs ."
