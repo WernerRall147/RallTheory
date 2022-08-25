@@ -32,6 +32,14 @@
       "metadata": {
         "description": "Name for the Activity log alert."
       }
+    },
+    "scopePathMake": {
+      "type": "string",
+      "defaultValue": "subscription().id",
+      "minLength": 1,
+      "metadata": {
+        "description": "Resource Group Scope for the Activity Logs ."
+      }
     }
   },
   "resources": [
@@ -62,7 +70,7 @@
       "properties": {
         "enabled": true,
         "scopes": [
-          "/subscriptions/((subscriptionId).id)/resourcegroups/((resourceGroupName).Name)"
+          "[parameters('scopePathMake')]"
         ],
         "condition": {
           "allOf": [
