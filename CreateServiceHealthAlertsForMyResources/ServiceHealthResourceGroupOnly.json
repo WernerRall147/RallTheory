@@ -62,18 +62,14 @@
       "properties": {
         "enabled": true,
         "scopes": [
-          "[subscription().name]"
+          "['/subscriptions/'(subscription().id)'/resourcegroups/'(resourcegroup().name)]"
         ],
         "condition": {
           "allOf": [
             {
               "field": "category",
               "equals": "ServiceHealth"
-            },
-            {
-              "field":"resourceGroup",
-              "equals": "[resourceGroup().name]"
-            } 
+            }
           ]
         },
         "actions": {
