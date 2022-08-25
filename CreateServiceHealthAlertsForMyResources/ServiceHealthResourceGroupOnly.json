@@ -62,7 +62,7 @@
       "properties": {
         "enabled": true,
         "scopes": [
-          "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}"
+          "/subscriptions/((subscriptionId).id)/resourcegroups/((resourceGroupName).Name)"
         ],
         "condition": {
           "allOf": [
