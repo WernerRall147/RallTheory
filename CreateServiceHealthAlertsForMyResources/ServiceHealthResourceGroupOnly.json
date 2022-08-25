@@ -33,7 +33,7 @@
         "description": "Name for the Activity log alert."
       }
     },
-    "scopePathMake": {
+    "scopePath": {
       "type": "string",
       "defaultValue": "subscription().id",
       "minLength": 1,
@@ -70,7 +70,7 @@
       "properties": {
         "enabled": true,
         "scopes": [
-          "[parameters('scopePathMake')]"
+          "[parameters('scopePath')]"
         ],
         "condition": {
           "allOf": [

@@ -2,7 +2,7 @@
 Connect-AzAccount
 
 #Get list of Azure Subscription ID's
-$Subs = (get-AzSubscription).Id
+$Subs = get-AzSubscription -SubscriptionId 58017650-8836-4894-8bc4-0f832005c5f1
 
 #Loop through the subscriptions to find all Resource Groups and create the Service Health Alerts
 $Subs | ForEach-Object -Parallel {
@@ -36,12 +36,13 @@ $AllRGs = (Get-AzResourceGroup).ResourceGroupName
         $actionGroupName = $rg + "actionGroup" + $randomnumber
         $actionGroupShortName = "action" + $randomnumber
         $activityLogAlertName = "serviceHealthAlert" + $randomnumber
+        $scopePath = "/subscription/$_.Id/resourcegroups/$rg"
 
         #Create Health Alert Option 1
         foreach($ctact in $contactemailadress){
         Write-Host "Creating a Health Alert for $ctact"
         New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateUri https://raw.githubusercontent.com/WernerRall147/RallTheory/main/CreateServiceHealthAlertsForMyResources/ServiceHealthResourceGroupOnly.json `
-        -actionGroupName $actionGroupName -actionGroupShortName $actionGroupShortName -activityLogAlertName $activityLogAlertName -emailAddress $ctact
+        -actionGroupName $actionGroupName -actionGroupShortName $actionGroupShortName -activityLogAlertName $activityLogAlertName -emailAddress $ctact -scopePath $scopePath
         }
     
     $output = "Service Health Alerts have been created for your " + $_.Name + " subscription"
