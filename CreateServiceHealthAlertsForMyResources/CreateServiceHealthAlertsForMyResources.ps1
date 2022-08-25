@@ -35,7 +35,7 @@ $AllRGs = (Get-AzResourceGroup).ResourceGroupName
         $randomnumber = Get-Random -Minimum 1000 -Maximum 9999
         $actionGroupName = $rg + "actionGroup" + $randomnumber
         $actionGroupShortName = "action" + $randomnumber
-        $activityLogAlertName = "serviceHealthAlert"
+        $activityLogAlertName = "serviceHealthAlert" + $randomnumber
 
         #Create Health Alert Option 1
         foreach($ctact in $contactemailadress){
