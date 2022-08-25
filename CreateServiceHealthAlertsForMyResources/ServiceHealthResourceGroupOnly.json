@@ -33,9 +33,17 @@
         "description": "Name for the Activity log alert."
       }
     },
-    "scopePath": {
+    "rgName": {
       "type": "string",
-      "defaultValue": "subscription().id",
+      "defaultValue": "[resourceGroup().name]",
+      "minLength": 1,
+      "metadata": {
+        "description": "Resource Group Scope for the Activity Logs ."
+      }
+    },
+    "subName": {
+      "type": "string",
+      "defaultValue": "[subscription().id]",
       "minLength": 1,
       "metadata": {
         "description": "Resource Group Scope for the Activity Logs ."
@@ -70,7 +78,7 @@
       "properties": {
         "enabled": true,
         "scopes": [
-          "[parameters('scopePath')]"
+          "[concat('/subscriptions/',uriComponent(parameters('subName')),'/resourcegroups/',uriComponent(parameters('rgName')))]"
         ],
         "condition": {
           "allOf": [
