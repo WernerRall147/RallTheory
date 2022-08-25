@@ -2,7 +2,7 @@
 Connect-AzAccount
 
 #Get list of Azure Subscription ID's
-$Subs = get-AzSubscription -SubscriptionId 58017650-8836-4894-8bc4-0f832005c5f1
+$Subs = get-AzSubscription
 
 #Loop through the subscriptions to find all Resource Groups and create the Service Health Alerts
 $Subs | ForEach-Object -Parallel {
