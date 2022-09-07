@@ -28,11 +28,12 @@
 [CmdletBinding()]
 param (
     [Parameter()]$azMigrateProjects,
-    [Parameter()]$servers,
+    [Parameter()]$resourceGroupName,
+    [Parameter()]$server,
     [Parameter()]$serverReadiness,
     [Parameter()]$destination,
-    [Parameter()]$AppID,
-    [Parameter()]$appSecret,
+    [Parameter()]$AppID = "",
+    [Parameter()]$appSecret = "",
     [Parameter()]$tenant = ""
 )
 
@@ -49,7 +50,7 @@ Connect-AzAccount -ServicePrincipal -Credential $credObject -Tenant $tenant | Ou
 }
 
 #Select Server from Azure Migrate 
-function azMigrateParms {
+function FindAzMigrateServer {
 
     $azMigrateProjects = Search-AzGraph -Query '
     resources
@@ -57,14 +58,40 @@ function azMigrateParms {
     '
     
 foreach($proj in $azMigrateProjects){
-    
-    Get-AzMigrateDiscoveredServer -Name -ProjectName -ResourceGroupName
-
-}
-     
-    
+   $chosenServ = Get-AzMigrateDiscoveredServer -Name $server -SubscriptionId $proj.subscriptionId -ProjectName $proj.name -ResourceGroupName $proj.resourceGroup
+ }   
 }
 
+#Check if Server is already replicating otherwise start replication
+function assessAzChosenServReadiness {
+    
+    $serverReplication = Get-AzMigrateServerReplication -MachineName $chosenServ -SubscriptionId $proj.subscriptionId -ProjectName $proj.name -ResourceGroupName $proj.resourceGroup
+
+    if ($serverReplication.MigrationState -eq "Replicating") {
+        #Do Nothing
+    }else {
+        New-AzMigrateServerReplication
+    }
+
+}
+
+#Start a Test Migration
+function startTestMigration {
+    
+    Start-AzMigrateTestMigration
+    
+}
+
+#Clean up a successful Test Migration
+function cleanupTestMigration {
+    Start-AzMigrateTestMigrationCleanup
+
+}
+
+#Start the real production migration
+function startMigration {
+    Start-AzMigrateServerMigration
+}
 
 
 
