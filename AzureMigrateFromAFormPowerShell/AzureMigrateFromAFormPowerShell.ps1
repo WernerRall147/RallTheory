@@ -29,7 +29,7 @@
 param (
     [Parameter()]$azMigrateProjects,
     [Parameter()]$resourceGroupName,
-    [Parameter()]$server,
+    [Parameter()]$server = "",
     [Parameter()]$serverReadiness,
     [Parameter()]$destination,
     [Parameter()]$AppID = "",
@@ -58,7 +58,7 @@ function FindAzMigrateServer {
     '
     
 foreach($proj in $azMigrateProjects){
-   $chosenServ = Get-AzMigrateDiscoveredServer -Name $server -SubscriptionId $proj.subscriptionId -ProjectName $proj.name -ResourceGroupName $proj.resourceGroup
+   $chosenServ = Get-AzMigrateDiscoveredServer $server -SubscriptionId $proj.subscriptionId -ProjectName $proj.name -ResourceGroupName $proj.resourceGroup -DisplayName $server
  }   
 }
 
@@ -70,28 +70,30 @@ function assessAzChosenServReadiness {
     if ($serverReplication.MigrationState -eq "Replicating") {
         #Do Nothing
     }else {
-        New-AzMigrateServerReplication
+        New-AzMigrateServerReplication -DiskType Standard_LRS -LicenseType WindowsServer -MachineId "" 
+        -OSDiskID "" -TargetNetworkId "" -TargetResourceGroupId "" -TargetSubnetName "" -TargetVMName "" 
     }
 
 }
 
 #Start a Test Migration
 function startTestMigration {
-    
-    Start-AzMigrateTestMigration
-    
+    $obj = Get-AzMigrateServerReplication -TargetObjectID $env.srsMachineId -SubscriptionId $env.srsSubscriptionId
+    Start-AzMigrateTestMigration -InputObject $obj -TestNetworkId ""
 }
 
 #Clean up a successful Test Migration
 function cleanupTestMigration {
-    Start-AzMigrateTestMigrationCleanup
+    Start-AzMigrateTestMigrationCleanup -TargetObjectID ""
 
 }
 
 #Start the real production migration
 function startMigration {
-    Start-AzMigrateServerMigration
+    Start-AzMigrateServerMigration -TargetObjectID ""
 }
+
+
 
 
 
