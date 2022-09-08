@@ -1,4 +1,4 @@
-##############Original Script
+<##############Original Script
 
 Set-AzContext -Subscription "sA"
 New-AzDiskAccess -ResourceGroupName "rA" -Name "" -Location "lA"
@@ -47,7 +47,7 @@ New-AzPrivateDnsRecordSet -Name $alias -RecordType CNAME -ResourceGroupName "rB"
 ## What input do I need
 ## What steps do I need to take
 ## What is my outcome
-
+#>
 [CmdletBinding()]
 param (
     #[Parameter()]$AppID = "",
@@ -110,5 +110,9 @@ function newPrivateEndpoint {
     New-AzPrivateDnsRecordSet -Name $customDNSName[0] -RecordType CNAME -ResourceGroupName $vnetResourceGroup -Ttl 3600 -ZoneName "blob.storage.azure.net" -PrivateDnsRecord (New-AzPrivateDnsRecordConfig -Cname $dnsCName)
     
 }
+
+azureAuth
+newDiskAccess
+newPrivateEndpoint
 
 
