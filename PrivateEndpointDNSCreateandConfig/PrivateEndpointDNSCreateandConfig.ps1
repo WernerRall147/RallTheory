@@ -64,7 +64,7 @@ param (
     #[Parameter()]$diskAccessObject,
     [Parameter(Mandatory=$true)]$virtualNetwork = "", 
     [Parameter(Mandatory=$true)]$vnetSubnet = "",
-    [Parameter(Mandatory=$true)]$peVnetSub
+    [Parameter(Mandatory=$true)]$peVnetSub = ""
     #[Parameter()]$plsConnection,
     #[Parameter()]$peName,
     #[Parameter()]$customDNSName,
@@ -84,7 +84,7 @@ function azureAuth {
 }
 
 function newDiskAccess {
-    Set-AzContext -Subscription $azResContext
+    #Set-AzContext -Subscription $azResContext
     New-AzDiskAccess -ResourceGroupName $daResourceGroup -DiskAccessName $diskAccessName -location $location
 
     $diskAccessObject = Get-AzResource -ResourceName $diskAccessName -ResourceGroupName $daResourceGroup
@@ -92,13 +92,13 @@ function newDiskAccess {
 }
 
 function newPrivateEndpoint {
-    Set-AzContext -Subscription $azSecContext
+    #Set-AzContext -Subscription $azSecContext
     $virtualNetworkObject = Get-AzVirtualNetwork -Name $virtualNetwork -ResourceGroupName $vnetResourceGroup
-    $peVnetSub = $virtualNetworkObject | Select-Object -ExpandProperty Subnets | Where-Object Name -eq $vnetSub
+    $peVnetSub = $virtualNetworkObject | Select-Object -ExpandProperty Subnets | Where-Object Name -eq $vnetSubnet
 
     $plsConnection = New-AzPrivateLinkServiceConnection -Name $diskAccessObject.Name -privatelinkserviceid $diskAccessObject.Id -groupid disks
     New-AzPrivateEndpoint -Name $diskAccessObject.Name -ResourceGroupName $plResourceGroup -Location $location -PrivateLinkServiceConnection $plsconnection -Subnet $peVnetSub
-    $pename = Get-AzPrivateEnd point -ResourceGroupName $plResourceGroup -Name $diskAccessObject.Name
+    $pename = Get-AzPrivateEndpoint -ResourceGroupName $plResourceGroup -Name $diskAccessObject.Name
     
     $customDNSName = ($pename.CustomDnsConfigs.fqdn).Split(".blob.storage.azure.net")
     $ipadress = $pename.CustomDnsConfigs.ipaddresses
