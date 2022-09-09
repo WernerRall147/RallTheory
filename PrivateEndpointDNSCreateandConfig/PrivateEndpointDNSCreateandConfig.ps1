@@ -68,7 +68,7 @@ function newPrivateEndpoint {
 
     $dnsZoneObject = Get-AzPrivateDnsZone -ResourceGroupName $vnetResourceGroup -Name 'privatelink.blob.core.windows.net'
     $dnszoneConfig = New-AzPrivateDnsZoneConfig -Name 'privatelink.blob.core.windows.net' -PrivateDnsZoneId $dnsZoneObject.ResourceId
-    New-AzPrivateDnsZoneGroup -Name 'default' -ResourceGroupName $vnetResourceGroup -PrivateEndpointName $diskAccessObject.Name -PrivateDnsZoneConfig $dnszoneConfig 
+    Set-AzPrivateDnsZoneGroup -Name 'default' -ResourceGroupName $vnetResourceGroup -PrivateEndpointName $diskAccessObject.Name -PrivateDnsZoneConfig $dnszoneConfig
 
 }
 
