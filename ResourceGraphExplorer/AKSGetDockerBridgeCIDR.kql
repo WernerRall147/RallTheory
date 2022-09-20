@@ -1,0 +1,3 @@
+resources
+| where type == "microsoft.containerservice/managedclusters"
+| project  name, properties.networkProfile.dockerBridgeCidr
