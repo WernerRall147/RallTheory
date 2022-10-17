@@ -44,13 +44,15 @@
             "crossComponentResources": [
               "value::all"
             ],
-            "value": null,
             "typeSettings": {
-              "additionalResourceOptions": [],
+              "additionalResourceOptions": [
+                "value::1"
+              ],
               "showDefault": false
             },
             "queryType": 1,
-            "resourceType": "microsoft.resourcegraph/resources"
+            "resourceType": "microsoft.resourcegraph/resources",
+            "value": "value::1"
           },
           {
             "id": "25eef459-d903-41fa-b477-94c18b3e1266",
@@ -59,7 +61,7 @@
             "type": 4,
             "isRequired": true,
             "value": {
-              "durationMs": 86400000
+              "durationMs": 2592000000
             },
             "typeSettings": {
               "selectableValues": [
@@ -132,6 +134,14 @@
             "linkLabel": "Alerts",
             "subTarget": "Alerts",
             "style": "link"
+          },
+          {
+            "id": "971770a4-95fe-49a8-9347-1ad18022a835",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "PatchSchedules",
+            "subTarget": "PatchSchedules",
+            "style": "link"
           }
         ]
       },
@@ -156,7 +166,174 @@
           {
             "type": 1,
             "content": {
-              "json": "## Windows Updates Needed by Classification"
+              "json": "## Compliant Servers\r\nThese Servers are patched for Security and Critical but there may be other patches available",
+              "style": "success"
+            },
+            "customWidth": "50",
+            "name": "text - 9"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "## Non - Compliant Servers\r\nThese servers are missing Security and Critical Patches",
+              "style": "error"
+            },
+            "customWidth": "50",
+            "name": "text - 9 - Copy"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Update \r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, Product, ProductArch\r\n| where UpdateState!=\"Needed\" and (Classification has \"Security Updates\" or Classification has \"Critical Updates\")\r\n| summarize Compliant=dcount(Computer) by Computer\r\n\r\n\r\n",
+              "size": 3,
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ],
+              "visualization": "piechart",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Computer",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "Compliant",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              },
+              "graphSettings": {
+                "type": 0,
+                "topContent": {
+                  "columnMatch": "Computer",
+                  "formatter": 1
+                },
+                "centerContent": {
+                  "columnMatch": "Compliant",
+                  "formatter": 1,
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              },
+              "chartSettings": {
+                "yAxis": [
+                  "Compliant"
+                ],
+                "showMetrics": false,
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "All",
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "name": "query - 10",
+            "styleSettings": {
+              "maxWidth": "50"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Update \r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, Product, ProductArch\r\n| where UpdateState=~\"Needed\" and (Classification has \"Critical Updates\" or Classification has \"Security Updates\") \r\n| summarize NonCompliant=dcount(Computer) by Computer\r\n",
+              "size": 3,
+              "timeContext": {
+                "durationMs": 604800000
+              },
+              "showExportToExcel": true,
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ],
+              "visualization": "piechart",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Computer",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "Compliant",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              },
+              "graphSettings": {
+                "type": 0,
+                "topContent": {
+                  "columnMatch": "Computer",
+                  "formatter": 1
+                },
+                "centerContent": {
+                  "columnMatch": "Compliant",
+                  "formatter": 1,
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              },
+              "chartSettings": {
+                "yAxis": [
+                  "NonCompliant"
+                ],
+                "showMetrics": false,
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "All",
+                    "color": "red"
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "name": "query - 10 - Copy",
+            "styleSettings": {
+              "maxWidth": "50"
+            }
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "## Windows Updates Needed by Classification",
+              "style": "warning"
             },
             "customWidth": "50",
             "name": "text - 8"
@@ -164,7 +341,8 @@
           {
             "type": 1,
             "content": {
-              "json": "## Linux Updates Needed by Classification"
+              "json": "## Linux Updates Needed by Classification",
+              "style": "warning"
             },
             "customWidth": "50",
             "name": "text - 7"
@@ -173,7 +351,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| summarize UpdatesNeeded=count(Classification) by Classification",
+              "query": "Update\r\n| where OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| summarize UpdatesNeeded=count(Classification) by Classification",
               "size": 3,
               "timeContextFromParameter": "Time",
               "showExportToExcel": true,
@@ -239,9 +417,10 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "Update\r\n| where TimeGenerated>ago(5h) and OSType==\"Linux\"\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification) by Computer, SourceComputerId, Product, ProductArch\r\n| where UpdateState=~\"Needed\"\r\n| summarize by Product, ProductArch, Classification, Computer\r\n| summarize count(Classification) by Classification",
+              "query": "Update\r\n| where OSType==\"Linux\"\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification) by Computer, SourceComputerId, Product, ProductArch\r\n| where UpdateState=~\"Needed\"\r\n| summarize by Product, ProductArch, Classification, Computer\r\n| summarize count(Classification) by Classification",
               "size": 3,
               "timeContextFromParameter": "Time",
+              "showExportToExcel": true,
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
               "crossComponentResources": [
@@ -355,7 +534,7 @@
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
               "crossComponentResources": [
-                "{Workspaces}"
+                "{Workspace}"
               ],
               "gridSettings": {
                 "formatters": [
@@ -704,6 +883,189 @@
         "value": "Alerts"
       },
       "name": "Alerts"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "title": "PatchSchedules",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "UpdateRunProgress",
+              "size": 0,
+              "timeContextFromParameter": "Time",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ]
+            },
+            "name": "query - 0"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "PatchSchedules"
+      },
+      "name": "group - 5"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "# Update Schedules that have been executed"
+      },
+      "name": "text - 6"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "UpdateRunProgress \r\n| summarize arg_max(TimeGenerated,InstallationStatus ) by UpdateRunName, Resource\r\n| project TimeGenerated, UpdateRunName, Resource, InstallationStatus\r\n| order by TimeGenerated",
+        "size": 0,
+        "timeContextFromParameter": "Time",
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "TimeGenerated",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "UpdateRunName",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "Resource",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "Initial_Access",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "InstallationStatus",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "==",
+                    "thresholdValue": "NotStarted",
+                    "representation": "1",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "Succeeded",
+                    "representation": "success",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "Install Failed",
+                    "representation": "3",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "pending",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            }
+          ],
+          "hierarchySettings": {
+            "treeType": 1,
+            "groupBy": [
+              "UpdateRunName"
+            ],
+            "expandTopLevel": true,
+            "finalBy": "TimeGenerated"
+          }
+        },
+        "sortBy": [],
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "TenantId",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "ResultCode",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        },
+        "graphSettings": {
+          "type": 0,
+          "topContent": {
+            "columnMatch": "TenantId",
+            "formatter": 1
+          },
+          "centerContent": {
+            "columnMatch": "ResultCode",
+            "formatter": 1,
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        },
+        "chartSettings": {
+          "xAxis": "TimeGenerated",
+          "yAxis": [
+            "Resource"
+          ]
+        },
+        "mapSettings": {
+          "locInfo": "AzureResource",
+          "sizeSettings": "ResultCode",
+          "sizeAggregation": "Sum",
+          "legendMetric": "ResultCode",
+          "legendAggregation": "Sum",
+          "itemColorSettings": {
+            "type": "heatmap",
+            "colorAggregation": "Sum",
+            "nodeColorField": "ResultCode",
+            "heatmapPalette": "greenRed"
+          },
+          "locInfoColumn": "ResourceId"
+        }
+      },
+      "name": "query - 7"
     }
   ],
   "fallbackResourceIds": [

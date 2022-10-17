@@ -2,7 +2,7 @@
 Connect-AzAccount
 
 #Get list of Azure Subscription ID's
-$Subs = get-AzSubscription
+$Subs = get-AzSubscription -SubscriptionId '6690c42b-73e0-437c-92f6-a4161424f2a3'
 
 #Loop through the subscriptions to find all Resource Groups and create the Service Health Alerts
 $Subs | ForEach-Object -Parallel {
@@ -30,7 +30,7 @@ $AllRGs = (Get-AzResourceGroup).ResourceGroupName
             Write-Host "No Valid Contributors or Owners found for $rg"
          }
         
-        #Create Service Health Alerts
+        #(Needs to be idempotent) Create Service Health Alerts
         Write-Host "Generating some numbers"
         $randomnumber = Get-Random -Minimum 1000 -Maximum 9999
         $actionGroupName = $rg + "actionGroup" + $randomnumber
