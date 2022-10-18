@@ -920,13 +920,18 @@
       "content": {
         "json": "# Update Schedules that have been executed"
       },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "PatchSchedules"
+      },
       "name": "text - 6"
     },
     {
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "UpdateRunProgress \r\n| summarize arg_max(TimeGenerated,InstallationStatus ) by UpdateRunName, Resource\r\n| project TimeGenerated, UpdateRunName, Resource, InstallationStatus\r\n| order by TimeGenerated",
+        "query": "UpdateRunProgress \r\n| summarize arg_max(TimeGenerated,InstallationStatus ) by UpdateRunName, Resource, ResourceId\r\n| project TimeGenerated, UpdateRunName, Resource, InstallationStatus, ResourceId\r\n| order by TimeGenerated",
         "size": 0,
         "timeContextFromParameter": "Time",
         "showExportToExcel": true,
@@ -1064,6 +1069,11 @@
           },
           "locInfoColumn": "ResourceId"
         }
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "PatchSchedules"
       },
       "name": "query - 7"
     }
