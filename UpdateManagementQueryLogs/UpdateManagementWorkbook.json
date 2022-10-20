@@ -892,190 +892,82 @@
         "title": "PatchSchedules",
         "items": [
           {
+            "type": 1,
+            "content": {
+              "json": "## Update Schedules that have been executed"
+            },
+            "name": "text - 5"
+          },
+          {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "UpdateRunProgress",
+              "query": "UpdateRunProgress \r\n| summarize arg_max(TimeGenerated,InstallationStatus ) by UpdateRunName, Resource, ResourceId\r\n| project TimeGenerated, UpdateRunName, Resource, InstallationStatus, ResourceId\r\n| order by TimeGenerated",
               "size": 0,
               "timeContextFromParameter": "Time",
+              "showExportToExcel": true,
               "queryType": 0,
               "resourceType": "microsoft.operationalinsights/workspaces",
               "crossComponentResources": [
                 "{Workspace}"
-              ]
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "TimeGenerated",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "UpdateRunName",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "InstallationStatus",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Succeeded",
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Install Failed",
+                          "representation": "4",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "UpdateRunName"
+                  ],
+                  "finalBy": "TimeGenerated"
+                }
+              }
             },
-            "name": "query - 0"
+            "name": "query - 1"
           }
         ]
       },
       "conditionalVisibility": {
-        "parameterName": "SelectedTab",
+        "parameterName": "selectedTab",
         "comparison": "isEqualTo",
         "value": "PatchSchedules"
       },
-      "name": "group - 5"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "# Update Schedules that have been executed"
-      },
-      "conditionalVisibility": {
-        "parameterName": "SelectedTab",
-        "comparison": "isEqualTo",
-        "value": "PatchSchedules"
-      },
-      "name": "text - 6"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "UpdateRunProgress \r\n| summarize arg_max(TimeGenerated,InstallationStatus ) by UpdateRunName, Resource, ResourceId\r\n| project TimeGenerated, UpdateRunName, Resource, InstallationStatus, ResourceId\r\n| order by TimeGenerated",
-        "size": 0,
-        "timeContextFromParameter": "Time",
-        "showExportToExcel": true,
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces",
-        "crossComponentResources": [
-          "{Workspace}"
-        ],
-        "visualization": "table",
-        "gridSettings": {
-          "formatters": [
-            {
-              "columnMatch": "TimeGenerated",
-              "formatter": 5
-            },
-            {
-              "columnMatch": "UpdateRunName",
-              "formatter": 5
-            },
-            {
-              "columnMatch": "Resource",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "Initial_Access",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            },
-            {
-              "columnMatch": "InstallationStatus",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "NotStarted",
-                    "representation": "1",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Succeeded",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Install Failed",
-                    "representation": "3",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "pending",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            }
-          ],
-          "hierarchySettings": {
-            "treeType": 1,
-            "groupBy": [
-              "UpdateRunName"
-            ],
-            "expandTopLevel": true,
-            "finalBy": "TimeGenerated"
-          }
-        },
-        "sortBy": [],
-        "tileSettings": {
-          "showBorder": false,
-          "titleContent": {
-            "columnMatch": "TenantId",
-            "formatter": 1
-          },
-          "leftContent": {
-            "columnMatch": "ResultCode",
-            "formatter": 12,
-            "formatOptions": {
-              "palette": "auto"
-            },
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "maximumSignificantDigits": 3,
-                "maximumFractionDigits": 2
-              }
-            }
-          }
-        },
-        "graphSettings": {
-          "type": 0,
-          "topContent": {
-            "columnMatch": "TenantId",
-            "formatter": 1
-          },
-          "centerContent": {
-            "columnMatch": "ResultCode",
-            "formatter": 1,
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "maximumSignificantDigits": 3,
-                "maximumFractionDigits": 2
-              }
-            }
-          }
-        },
-        "chartSettings": {
-          "xAxis": "TimeGenerated",
-          "yAxis": [
-            "Resource"
-          ]
-        },
-        "mapSettings": {
-          "locInfo": "AzureResource",
-          "sizeSettings": "ResultCode",
-          "sizeAggregation": "Sum",
-          "legendMetric": "ResultCode",
-          "legendAggregation": "Sum",
-          "itemColorSettings": {
-            "type": "heatmap",
-            "colorAggregation": "Sum",
-            "nodeColorField": "ResultCode",
-            "heatmapPalette": "greenRed"
-          },
-          "locInfoColumn": "ResourceId"
-        }
-      },
-      "conditionalVisibility": {
-        "parameterName": "SelectedTab",
-        "comparison": "isEqualTo",
-        "value": "PatchSchedules"
-      },
-      "name": "query - 7"
+      "name": "PatchSchedules"
     }
   ],
   "fallbackResourceIds": [
