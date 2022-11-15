@@ -52,7 +52,7 @@
     },
     "_artifactsLocation": {
       "type": "string",
-      "defaultValue": "https://github.com/WernerRall147/RallTheory/tree/main/BuildAnEntireAzureLab/Artifacts_Removed/"
+      "defaultValue": "https://mitbclabresources.blob.core.windows.net/artifactsremoved/"
     }
   },
 
