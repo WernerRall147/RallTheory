@@ -1,3 +1,6 @@
+
+Import-DscResource –ModuleName 'PSDesiredStateConfiguration'
+
 Configuration WindowsUpdate {
 
     Node localhost {
