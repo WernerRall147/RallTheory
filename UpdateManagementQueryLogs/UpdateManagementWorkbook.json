@@ -637,60 +637,6 @@
           {
             "type": 1,
             "content": {
-              "json": "## Confirm that non-Azure machines are enabled for Update Management"
-            },
-            "name": "text - 4"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "Heartbeat\r\n| where OSType == \"Windows\" | summarize arg_max(TimeGenerated, *) by SourceComputerId | top 500000 by Computer asc | render table\r\n",
-              "size": 0,
-              "showAnalytics": true,
-              "timeContext": {
-                "durationMs": 86400000
-              },
-              "showExportToExcel": true,
-              "queryType": 0,
-              "resourceType": "microsoft.operationalinsights/workspaces",
-              "crossComponentResources": [
-                "{Workspace}"
-              ]
-            },
-            "name": "query - 5"
-          },
-          {
-            "type": 1,
-            "content": {
-              "json": "## All Computers in the Tenant"
-            },
-            "name": "text - 4"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "Resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'",
-              "size": 0,
-              "showExportToExcel": true,
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "gridSettings": {
-                "rowLimit": 10000
-              },
-              "graphSettings": {
-                "type": 0
-              }
-            },
-            "name": "query - 5"
-          },
-          {
-            "type": 1,
-            "content": {
               "json": "## All Operating Systems in Tenant"
             },
             "name": "text - 6"
