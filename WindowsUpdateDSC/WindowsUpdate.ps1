@@ -1,8 +1,7 @@
-
-Import-DscResource –ModuleName 'PSDesiredStateConfiguration'
-
 Configuration WindowsUpdate {
 
+    Import-DscResource -ModuleName PSDesiredStateConfiguration
+    
     Node localhost {
 
         Registry WindowsUpdateAUWUServer {
