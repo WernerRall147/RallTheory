@@ -5,9 +5,6 @@
       "type": 9,
       "content": {
         "version": "KqlParameterItem/1.0",
-        "crossComponentResources": [
-          "value::all"
-        ],
         "parameters": [
           {
             "id": "f8d6705a-e284-4077-8113-aae1038a6b7c",
@@ -61,7 +58,7 @@
             "type": 4,
             "isRequired": true,
             "value": {
-              "durationMs": 2592000000
+              "durationMs": 43200000
             },
             "typeSettings": {
               "selectableValues": [
@@ -100,8 +97,8 @@
           }
         ],
         "style": "pills",
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources"
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
       },
       "name": "parameters - 11"
     },
@@ -632,14 +629,36 @@
               ],
               "visualization": "table"
             },
-            "name": "query - 7"
+            "name": "query - 71"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "## Agent Readiness"
+            },
+            "name": "text - 6"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Heartbeat\r\n| summarize LastHeartBeat = arg_max(TimeGenerated, *) by _ResourceId\r\n| project _ResourceId, Computer, LastHeartBeat, OSType\r\n| join kind=leftouter (\r\nUpdateSummary \r\n| summarize arg_max(TimeGenerated, *) by _ResourceId\r\n| extend Compliant = iff(CriticalUpdatesMissing == 0 and SecurityUpdatesMissing == 0, \"Compliant\", \"Not Compliant\")\r\n| project _ResourceId, WindowsUpdateAgentVersion, WindowsUpdateSetting, Compliant, RestartPending\r\n) on _ResourceId\r\n| project-away _ResourceId1\r\n| extend AgentReadiness = iff(isempty(Compliant), \"Check Configuration\", \"Ready\")",
+              "size": 0,
+              "timeContextFromParameter": "Time",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspace}"
+              ]
+            },
+            "name": "query - 4"
           },
           {
             "type": 1,
             "content": {
               "json": "## All Operating Systems in Tenant"
             },
-            "name": "text - 6"
+            "name": "text - 6 - Copy"
           },
           {
             "type": 3,
