@@ -3,7 +3,7 @@
 
 #Section 1 (added this to Section 2)
 #Check for ManagedIdentity
-$subs = Get-AzSubscription -TenantId (Read-Host "Insert your tenant ID")) | Where-Object {$_.state -ne "Disabled"}
+$subs = Get-AzSubscription -TenantId (Read-Host "Insert your tenant ID") | Where-Object {$_.state -ne "Disabled"}
 
 foreach($s in $subs){
 $AllVMs += Get-AzVM | select Id,Name,Identity
