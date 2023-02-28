@@ -75,15 +75,6 @@ Write-Output "The rules do not match, trying to repair"
 
 # Check inbound port rules for VMs in the Virtual Networks if NSGs are on Servers
 
-
-# Check VM Sizes
-foreach ($res in $SourceResources) {
-    $sourcevmsize = Get-AzVMSize -Location $SourceResourceGroup.location -VMName $res
-    $destinationvmsize = Get-AzVMSize -Location $DestinationResourceGroup.location -VMName $res
-    
-    
-}    
-
 # Ensure Diagnostics Settings are enabled
 #https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-windows
 foreach ($res in $SourceResources) {
@@ -112,6 +103,8 @@ $WorkspaceKey = "#TODO"
 $SubscriptionId = "SubscriptionId"
 .\Install-VMInsights.ps1 -WorkspaceId $WorkspaceId -WorkspaceKey $WorkspaceKey -SubscriptionId $SubscriptionId -WorkspaceRegion $DestinationResourceGroup.location -ResourceGroup $DestinationResourceGroup.Name -ReInstall
 }
+
+# Set Up Azure Alerts 
 
 
 
