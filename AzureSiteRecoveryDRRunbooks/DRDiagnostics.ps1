@@ -53,7 +53,7 @@ foreach ($drres in $DestinationResources) {
         $diagnosticsconfig_update1 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateResID)",$drres.Id) | Set-Content $path 
         $diagnosticsconfig_update2 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateStorac)",$DestinationStorageAccountName) | Set-Content $path 
 
-        Set-AzVMDiagnosticsExtension -ResourceGroupName $DestinationResources.ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path
+        Set-AzVMDiagnosticsExtension -ResourceGroupName ($DestinationResources).ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path
         }else {
             Write-Output "Diagnostic Settings Correct"
         }
