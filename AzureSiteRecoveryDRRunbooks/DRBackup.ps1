@@ -36,14 +36,13 @@ catch {
 
 #Get all ARM resources from all resource groups
 $DestinationResourceGroup = Get-AZResourcegroup -Name "#TODO"
-$destinationNetworkSecurityGroup = "#TODO" 
 
 # Ensure Backup gets enabled
 $policy = Get-AzRecoveryServicesBackupProtectionPolicy -Name "DefaultPolicy"
 
-foreach ($res in $SourceResources) {
+foreach ($res in $DestinationResourceGroup) {
 Enable-AzRecoveryServicesBackupProtection `
-    -ResourceGroupName $DestinationResourceGroup `
+    -ResourceGroupName ($DestinationResourceGroup).ResourceGroupName `
     -Name $res `
     -Policy $policy
 }
