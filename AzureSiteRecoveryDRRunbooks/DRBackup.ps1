@@ -36,13 +36,14 @@ catch {
 
 #Get all ARM resources from all resource groups
 $DestinationResourceGroup = Get-AZResourcegroup -Name "#TODO"
-$DestinationResources = Get-AZResource -ResourceGroupName $DestinationResourceGroup
+$destinationNetworkSecurityGroup = "#TODO" 
 
-# Ensure insights get enabled
-#Install-Script -Name Install-VMInsights
-foreach($drres in $DestinationResources){
-    $WorkspaceId = "#TODO"
-    $WorkspaceKey = "#TODO"
-    $SubscriptionId = "SubscriptionId"
-    .\Install-VMInsights.ps1 -WorkspaceId $WorkspaceId -WorkspaceKey $WorkspaceKey -SubscriptionId $SubscriptionId -WorkspaceRegion $DestinationResourceGroup.location
-    }
+# Ensure Backup gets enabled
+$policy = Get-AzRecoveryServicesBackupProtectionPolicy -Name "DefaultPolicy"
+
+foreach ($res in $SourceResources) {
+Enable-AzRecoveryServicesBackupProtection `
+    -ResourceGroupName $DestinationResourceGroup `
+    -Name $res `
+    -Policy $policy
+}
