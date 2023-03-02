@@ -21,16 +21,28 @@ catch {
     throw $_.Exception
 }
 
+#Decyfer RecoveryPlan Context
+$VMinfo = $RecoveryPlanContext.VmMap | Get-Member | Where-Object MemberType -EQ NoteProperty | select -ExpandProperty Name
+$vmMap = $RecoveryPlanContext.VmMap
+    foreach($VMID in $VMinfo)
+    {
+        $VM = $vmMap.$VMID                
+            if( !(($VM -eq $Null) -Or ($VM.ResourceGroupName -eq $Null) -Or ($VM.RoleName -eq $Null))) {
+            #this check is to ensure that we skip when some data is not available else it will fail
+    Write-output "Resource group name ", $VM.ResourceGroupName
+            }
+        }
+
 #Get all ARM resources from all resource groups
-$DestinationResources = Get-AzVM -ResourceGroupName ResourceGroupName
+$DestinationResources = Get-AzVM -ResourceGroupName $VM.ResourceGroupName
 
 # Ensure Backup gets enabled
-$vault = Get-AzRecoveryServicesVault -ResourceGroupName ResourceGroupName | Set-AzRecoveryServicesVaultContext
+$vault = Get-AzRecoveryServicesVault -ResourceGroupName $VM.ResourceGroupName | Set-AzRecoveryServicesVaultContext
 $policy = Get-AzRecoveryServicesBackupProtectionPolicy -Name "DefaultPolicy"
 
 foreach ($res in $DestinationResources) {
 Enable-AzRecoveryServicesBackupProtection `
-    -ResourceGroupName ResourceGroupName `
+    -ResourceGroupName $VM.ResourceGroupName `
     -Name ($res).Name `
     -Policy $policy `
     -WhatIf

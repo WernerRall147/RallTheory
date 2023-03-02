@@ -21,9 +21,21 @@ catch {
     throw $_.Exception
 }
 
+#Decyfer RecoveryPlan Context
+$VMinfo = $RecoveryPlanContext.VmMap | Get-Member | Where-Object MemberType -EQ NoteProperty | select -ExpandProperty Name
+$vmMap = $RecoveryPlanContext.VmMap
+    foreach($VMID in $VMinfo)
+    {
+        $VM = $vmMap.$VMID                
+            if( !(($VM -eq $Null) -Or ($VM.ResourceGroupName -eq $Null) -Or ($VM.RoleName -eq $Null))) {
+            #this check is to ensure that we skip when some data is not available else it will fail
+    Write-output "Resource group name ", $VM.ResourceGroupName
+            }
+        }
+
 #Get all ARM resources from all resource groups
-$DestinationResourceGroup = Get-AZResourcegroup -Name "#TODO"
-$DestinationResources = Get-AZResource -ResourceGroupName $DestinationResourceGroup
+$DestinationResourceGroup = Get-AZResourcegroup -Name $VM.ResourceGroupName
+$DestinationResources = Get-AZResource -ResourceGroupName $VM.ResourceGroupName
 $Location = ($DestinationResourceGroup).Location
 
 # Ensure insights get enabled
@@ -31,5 +43,5 @@ $Location = ($DestinationResourceGroup).Location
 foreach($drres in $DestinationResources){
     $WorkspaceId = "#TODO"
     $WorkspaceKey = "#TODO"
-    .\Install-VMInsights.ps1 -WorkspaceId $WorkspaceId -WorkspaceKey $WorkspaceKey -SubscriptionId SubscriptionId -WorkspaceRegion $Location -Approve
+    .\Install-VMInsights.ps1 -WorkspaceId $WorkspaceId -WorkspaceKey $WorkspaceKey -SubscriptionId $VM.SubscriptionId -WorkspaceRegion $Location -Approve
     }

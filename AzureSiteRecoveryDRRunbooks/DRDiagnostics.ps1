@@ -21,10 +21,22 @@ catch {
     throw $_.Exception
 }
 
+#Decyfer RecoveryPlan Context
+$VMinfo = $RecoveryPlanContext.VmMap | Get-Member | Where-Object MemberType -EQ NoteProperty | select -ExpandProperty Name
+$vmMap = $RecoveryPlanContext.VmMap
+    foreach($VMID in $VMinfo)
+    {
+        $VM = $vmMap.$VMID                
+            if( !(($VM -eq $Null) -Or ($VM.ResourceGroupName -eq $Null) -Or ($VM.RoleName -eq $Null))) {
+            #this check is to ensure that we skip when some data is not available else it will fail
+    Write-output "Resource group name ", $VM.ResourceGroupName
+            }
+        }
+
 #Get all ARM resources from all resource groups
-$DestinationResourceGroup = Get-AZResourcegroup -Name ResourceGroupName
-$DestinationResources = Get-AzVM -ResourceGroupName ResourceGroupName
-$DestinationStorageAccountName = (Get-AzStorageAccount -ResourceGroupName ResourceGroupName -Name "#TODO").StorageAccountName
+$DestinationResourceGroup = Get-AZResourcegroup -Name $VM.ResourceGroupName
+$DestinationResources = Get-AzVM -ResourceGroupName $VM.ResourceGroupName
+$DestinationStorageAccountName = (Get-AzStorageAccount -ResourceGroupName $VM.ResourceGroupName -Name "#TODO").StorageAccountName
 
 # Ensure Diagnostics Settings are enabled
 foreach ($drres in $DestinationResources) {
@@ -41,7 +53,7 @@ foreach ($drres in $DestinationResources) {
         $diagnosticsconfig_update1 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateResID)",$drres.Id) | Set-Content $diagnosticsconfig_path 
         $diagnosticsconfig_update2 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateStorac)",$DestinationStorageAccountName) | Set-Content $diagnosticsconfig_path 
 
-        Set-AzVMDiagnosticsExtension -ResourceGroupName ($DestinationResources).ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path 
+        Set-AzVMDiagnosticsExtension -ResourceGroupName $VM.ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path 
         }else {
             Write-Output "Diagnostic Settings Correct"
         }

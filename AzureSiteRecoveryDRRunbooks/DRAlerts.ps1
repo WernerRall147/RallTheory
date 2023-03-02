@@ -21,8 +21,21 @@ catch {
     throw $_.Exception
 }
 
+
+#Decyfer RecoveryPlan Context
+$VMinfo = $RecoveryPlanContext.VmMap | Get-Member | Where-Object MemberType -EQ NoteProperty | select -ExpandProperty Name
+$vmMap = $RecoveryPlanContext.VmMap
+    foreach($VMID in $VMinfo)
+    {
+        $VM = $vmMap.$VMID                
+            if( !(($VM -eq $Null) -Or ($VM.ResourceGroupName -eq $Null) -Or ($VM.RoleName -eq $Null))) {
+            #this check is to ensure that we skip when some data is not available else it will fail
+    Write-output "Resource group name ", $VM.ResourceGroupName
+            }
+        }
+
 Write-Host "Getting DR Resource Groups"
-$AllRGs = "#TODO DR RSG"
+$AllRGs = $VM.ResourceGroupName
 
     foreach($rg in $AllRGs){
         #For each IAM the RG until you find an email address for either Owner or Contributor
