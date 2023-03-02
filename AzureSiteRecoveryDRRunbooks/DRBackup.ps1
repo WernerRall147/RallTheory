@@ -22,14 +22,16 @@ catch {
 }
 
 #Get all ARM resources from all resource groups
-$DestinationResourceGroup = Get-AZResourcegroup -Name "#TODO"
+$DestinationResources = Get-AzVM -ResourceGroupName ResourceGroupName
 
 # Ensure Backup gets enabled
+$vault = Get-AzRecoveryServicesVault -ResourceGroupName ResourceGroupName | Set-AzRecoveryServicesVaultContext
 $policy = Get-AzRecoveryServicesBackupProtectionPolicy -Name "DefaultPolicy"
 
-foreach ($res in $DestinationResourceGroup) {
+foreach ($res in $DestinationResources) {
 Enable-AzRecoveryServicesBackupProtection `
-    -ResourceGroupName ($DestinationResourceGroup).ResourceGroupName `
-    -Name $res `
-    -Policy $policy
+    -ResourceGroupName ResourceGroupName `
+    -Name ($res).Name `
+    -Policy $policy `
+    -WhatIf
 }

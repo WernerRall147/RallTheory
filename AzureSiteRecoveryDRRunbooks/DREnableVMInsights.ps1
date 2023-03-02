@@ -24,15 +24,12 @@ catch {
 #Get all ARM resources from all resource groups
 $DestinationResourceGroup = Get-AZResourcegroup -Name "#TODO"
 $DestinationResources = Get-AZResource -ResourceGroupName $DestinationResourceGroup
+$Location = ($DestinationResourceGroup).Location
 
 # Ensure insights get enabled
 #Install-Script -Name Install-VMInsights
 foreach($drres in $DestinationResources){
     $WorkspaceId = "#TODO"
     $WorkspaceKey = "#TODO"
-    .\Install-VMInsights.ps1 -WorkspaceId $WorkspaceId -WorkspaceKey $WorkspaceKey -SubscriptionId SubscriptionId -WorkspaceRegion ($DestinationResourceGroup).Location
-<<<<<<< HEAD
+    .\Install-VMInsights.ps1 -WorkspaceId $WorkspaceId -WorkspaceKey $WorkspaceKey -SubscriptionId SubscriptionId -WorkspaceRegion $Location -Approve
     }
-=======
-    }
->>>>>>> 0f377ab6106a60aba82c38e0194dc2d7c4428a6a

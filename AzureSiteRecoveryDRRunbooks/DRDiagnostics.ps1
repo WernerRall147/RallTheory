@@ -22,8 +22,9 @@ catch {
 }
 
 #Get all ARM resources from all resource groups
-$DestinationResourceGroup = Get-AZResourcegroup -Name "#TODO"
-$DestinationResources = Get-AZResource -ResourceGroupName $DestinationResourceGroup
+$DestinationResourceGroup = Get-AZResourcegroup -Name ResourceGroupName
+$DestinationResources = Get-AzVM -ResourceGroupName ResourceGroupName
+$DestinationStorageAccountName = (Get-AzStorageAccount -ResourceGroupName ResourceGroupName -Name "#TODO").StorageAccountName
 
 # Ensure Diagnostics Settings are enabled
 foreach ($drres in $DestinationResources) {
@@ -35,13 +36,13 @@ foreach ($drres in $DestinationResources) {
         
         $url = "https://raw.githubusercontent.com/WernerRall147/RallTheory/main/AzureSiteRecoveryDRRunbooks/diagnostics_publicconfig.xml"
         $diagnosticsconfig_path = "$env:SystemDrive\temp\DiagnosticsPubConfig.xml"
-        Invoke-WebRequest -Uri $url -OutFile $dest
+        Invoke-WebRequest -Uri $url -OutFile $diagnosticsconfig_path
 
-        $diagnosticsconfig_update1 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateResID)",$drres.Id) | Set-Content $path 
-        $diagnosticsconfig_update2 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateStorac)",$DestinationStorageAccountName) | Set-Content $path 
+        $diagnosticsconfig_update1 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateResID)",$drres.Id) | Set-Content $diagnosticsconfig_path 
+        $diagnosticsconfig_update2 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateStorac)",$DestinationStorageAccountName) | Set-Content $diagnosticsconfig_path 
 
-        Set-AzVMDiagnosticsExtension -ResourceGroupName ($DestinationResources).ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path
+        Set-AzVMDiagnosticsExtension -ResourceGroupName ($DestinationResources).ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path 
         }else {
             Write-Output "Diagnostic Settings Correct"
         }
-}    
+}  

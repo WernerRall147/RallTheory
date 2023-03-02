@@ -193,7 +193,7 @@ function Get-VMExtension {
         [Parameter(mandatory = $true)][string]$ExtensionType
     )
 
-    $vm = Get-AzureRmVM -Name $VMName -ResourceGroupName $vmResourceGroupName -DisplayHint Expand
+    $vm = Get-AzVM -Name $VMName -ResourceGroupName $vmResourceGroupName -DisplayHint Expand
     $extensions = $vm.Extensions
 
     foreach ($extension in $extensions) {
@@ -273,7 +273,7 @@ function Install-VMExtension {
 
         if ($ExtensionType -eq "OmsAgentForLinux") {
             Write-Output("$VMName : ExtensionType: $ExtensionType does not support updating workspace. Uninstalling and Re-Installing")
-            $removeResult = Remove-AzureRmVMExtension -ResourceGroupName $VMResourceGroupName -VMName $VMName -Name $extensionName -Force
+            $removeResult = Remove-AzVMExtension -ResourceGroupName $VMResourceGroupName -VMName $VMName -Name $extensionName -Force
 
             if ($removeResult -and $removeResult.IsSuccessStatusCode) {
                 $message = "$VMName : Successfully removed $ExtensionType"
@@ -287,7 +287,7 @@ function Install-VMExtension {
         }
 
         Write-Output("$VMName : Deploying $ExtensionType with name $extensionName")
-        $result = Set-AzureRmVMExtension @parameters
+        $result = Set-AzVMExtension @parameters
 
         if ($result -and $result.IsSuccessStatusCode) {
             $message = "$VMName : Successfully deployed $ExtensionType"
@@ -344,7 +344,7 @@ function Install-VMssExtension {
     # Use supplied name unless already deployed, use same name
     $extensionName = $ExtensionName
 
-    $scalesetObject = Get-AzureRMVMSS -VMScaleSetName $VMScaleSetName -ResourceGroupName $VMScaleSetResourceGroupName
+    $scalesetObject = Get-AzVMSS -VMScaleSetName $VMScaleSetName -ResourceGroupName $VMScaleSetResourceGroupName
 
     $extension = Get-VMssExtension -VMss $scalesetObject -ExtensionType $ExtensionType
     if ($extension) {
@@ -369,10 +369,10 @@ function Install-VMssExtension {
         }
 
         Write-Verbose("$VMScaleSetName : Adding $ExtensionType with name $extensionName")
-        $scalesetObject = Add-AzureRmVmssExtension @parameters
+        $scalesetObject = Add-AzVmssExtension @parameters
 
         Write-Output("$VMScaleSetName Updating scale set with $ExtensionType extension")
-        $result = Update-AzureRmVmss -VMScaleSetName $VMScaleSetName -ResourceGroupName $VMScaleSetResourceGroupName -VirtualMachineScaleSet $scalesetObject
+        $result = Update-AzVmss -VMScaleSetName $VMScaleSetName -ResourceGroupName $VMScaleSetResourceGroupName -VirtualMachineScaleSet $scalesetObject
         if ($result -and $result.ProvisioningState -eq "Succeeded") {
             $message = "$VMScaleSetName : Successfully updated scale set with $ExtensionType extension"
             Write-Output($message)
@@ -393,10 +393,10 @@ function Install-VMssExtension {
 #
 # First make sure authenticed and Select the subscription supplied
 #
-$account = Get-AzureRmContext
+$account = Get-AzContext
 if ($null -eq $account.Account) {
     Write-Output("Account Context not found, please login")
-    Login-AzureRmAccount -subscriptionid $SubscriptionId
+    Login-AzAccount -subscriptionid $SubscriptionId
 }
 else {
     if ($account.Subscription.Id -eq $SubscriptionId) {
@@ -407,7 +407,7 @@ else {
         Write-Output("Current Subscription:")
         $account
         Write-Output("Changing to subscription: $SubscriptionId")
-        Select-AzureRmSubscription -SubscriptionId $SubscriptionId
+        Select-AzSubscription -SubscriptionId $SubscriptionId
     }
 }
 
@@ -446,7 +446,7 @@ $DAExtensionName = "DAExtension"
 
 if ($PolicyAssignmentName) {
     Write-Output("Getting list of VM's from PolicyAssignmentName: " + $PolicyAssignmentName)
-    $complianceResults = Get-AzureRmPolicyState -PolicyAssignmentName $PolicyAssignmentName
+    $complianceResults = Get-AzPolicyState -PolicyAssignmentName $PolicyAssignmentName
 
     foreach ($result in $complianceResults) {
         Write-Verbose($result.ResourceId)
@@ -462,8 +462,8 @@ if ($PolicyAssignmentName) {
         if ($ResourceGroup -and $ResourceGroup -ne $vmResourceGroup) { continue }
         if ($Name -and $Name -ne $vmName) { continue }
 
-        $vm = Get-AzureRmVM -Name $vmName -ResourceGroupName $vmResourceGroup
-        $vmStatus = Get-AzureRmVM -Status -Name $vmName -ResourceGroupName $vmResourceGroup
+        $vm = Get-AzVM -Name $vmName -ResourceGroupName $vmResourceGroup
+        $vmStatus = Get-AzVM -Status -Name $vmName -ResourceGroupName $vmResourceGroup
 
         # fix to have same property as VM that is retrieved without Name
         $vm | Add-Member -NotePropertyName PowerState -NotePropertyValue $vmStatus.Statuses[1].DisplayStatus
@@ -476,17 +476,17 @@ if (! $PolicyAssignmentName) {
     Write-Output("Getting list of VM's or VM ScaleSets matching criteria specified")
     if (!$ResourceGroup -and !$Name) {
         # If ResourceGroup value is not passed - get all VMs under given SubscriptionId
-        $VMs = Get-AzureRmVM -Status
-        $ScaleSets = Get-AzureRmVmss
+        $VMs = Get-AzVM -Status
+        $ScaleSets = Get-AzVmss
         $VMs = @($VMs) + $ScaleSets
     }
     else {
         # If ResourceGroup value is passed - select all VMs under given ResourceGroupName
-        $VMs = Get-AzureRmVM -ResourceGroupName $ResourceGroup -Status
+        $VMs = Get-AzVM -ResourceGroupName $ResourceGroup -Status
         if ($Name) {
             $VMs = $VMs | Where-Object {$_.Name -like $Name}
         }
-        $ScaleSets = Get-AzureRmVmss -ResourceGroupName $ResourceGroup
+        $ScaleSets = Get-AzVmss -ResourceGroupName $ResourceGroup
         if ($Name) {
             $ScaleSets = $ScaleSets | Where-Object {$_.Name -like $Name}
         }
@@ -510,7 +510,7 @@ else {
 }
 
 Write-Output "Register the Resource Provider Microsoft.AlertsManagement for Health feature"
-Register-AzureRmResourceProvider -ProviderNamespace Microsoft.AlertsManagement
+Register-AzResourceProvider -ProviderNamespace Microsoft.AlertsManagement
 
 #
 # Loop through each VM/VM Scale set, as appropriate handle installing VM Extensions
@@ -528,7 +528,7 @@ Foreach ($vm in $VMs) {
         $isScaleset = $true
 
         $scalesetVMs = @()
-        $scalesetVMs = Get-AzureRmVMssVM -ResourceGroupName $vmResourceGroupName -VMScaleSetName $vmName
+        $scalesetVMs = Get-AzVMssVM -ResourceGroupName $vmResourceGroupName -VMScaleSetName $vmName
         if ($scalesetVMs.length -gt 0) {
             if ($scalesetVMs[0]) {
                 $osType = $scalesetVMs[0].storageprofile.osdisk.ostype
@@ -582,19 +582,19 @@ Foreach ($vm in $VMs) {
             -ExtensionVersion $daExtVersion `
             -ReInstall $ReInstall
 
-        $scalesetObject = Get-AzureRMVMSS -VMScaleSetName $vmName -ResourceGroupName $vmResourceGroupName
+        $scalesetObject = Get-AzVMSS -VMScaleSetName $vmName -ResourceGroupName $vmResourceGroupName
         if ($scalesetObject.UpgradePolicy.mode -eq 'Manual') {
             if ($TriggerVmssManualVMUpdate -eq $true) {
 
                 Write-Output("$vmName : Upgrading scale set instances since the upgrade policy is set to Manual")
                 $scaleSetInstances = @{}
-                $scaleSetInstances = Get-AzureRMVMSSvm -ResourceGroupName $vmResourceGroupName -VMScaleSetName $vmName -InstanceView
+                $scaleSetInstances = Get-AzVMSSvm -ResourceGroupName $vmResourceGroupName -VMScaleSetName $vmName -InstanceView
                 $i = 0
                 $instanceCount = $scaleSetInstances.Length
                 Foreach ($scaleSetInstance in $scaleSetInstances) {
                     $i++
                     Write-Output("$vmName : Updating instance " + $scaleSetInstance.Name + " $i of $instanceCount")
-                    Update-AzureRmVmssInstance -ResourceGroupName $vmResourceGroupName -VMScaleSetName $vmName -InstanceId $scaleSetInstance.InstanceId
+                    Update-AzVmssInstance -ResourceGroupName $vmResourceGroupName -VMScaleSetName $vmName -InstanceId $scaleSetInstance.InstanceId
                 }
                 Write-Output("$vmName All scale set instances upgraded")
             }
