@@ -31,4 +31,8 @@ foreach($drres in $DestinationResources){
     $WorkspaceId = "#TODO"
     $WorkspaceKey = "#TODO"
     .\Install-VMInsights.ps1 -WorkspaceId $WorkspaceId -WorkspaceKey $WorkspaceKey -SubscriptionId SubscriptionId -WorkspaceRegion ($DestinationResourceGroup).Location
+<<<<<<< HEAD
     }
+=======
+    }
+>>>>>>> 0f377ab6106a60aba82c38e0194dc2d7c4428a6a
