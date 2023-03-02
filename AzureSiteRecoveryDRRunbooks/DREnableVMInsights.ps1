@@ -43,6 +43,5 @@ $DestinationResources = Get-AZResource -ResourceGroupName $DestinationResourceGr
 foreach($drres in $DestinationResources){
     $WorkspaceId = "#TODO"
     $WorkspaceKey = "#TODO"
-    $SubscriptionId = "SubscriptionId"
-    .\Install-VMInsights.ps1 -WorkspaceId $WorkspaceId -WorkspaceKey $WorkspaceKey -SubscriptionId $SubscriptionId -WorkspaceRegion ($DestinationResourceGroup).Location
+    .\Install-VMInsights.ps1 -WorkspaceId $WorkspaceId -WorkspaceKey $WorkspaceKey -SubscriptionId SubscriptionId -WorkspaceRegion ($DestinationResourceGroup).Location
     }
