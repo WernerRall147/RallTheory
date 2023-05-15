@@ -7,6 +7,10 @@
         LASTEDIT: 20230302
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
+param (
+[parameter(Mandatory=$false)]
+[Object]$RecoveryPlanContext
+)
 
 "Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
 
