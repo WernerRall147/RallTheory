@@ -47,7 +47,7 @@ $vmMap = $RecoveryPlanContext.VmMap
 # Ensure Diagnostics Settings are enabled
     try {
     foreach ($drres in $DestinationResources) {
-        $DiagSettings = Get-AzDiagnosticSetting -ResourceId $drres.Id
+        $DiagSettings = Get-AzVMDiagnosticsExtension -ResourceGroupName $VM.ResourceGroupName -VMName ($drres).Name
         if ($null -eq $DiagSettings) {
             Write-Output "Diagnostics settings are not enabled, trying to remediate"
             
