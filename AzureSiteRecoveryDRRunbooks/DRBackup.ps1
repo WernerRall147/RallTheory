@@ -25,7 +25,7 @@ catch {
 }
 
 #Decyfer RecoveryPlan Context
-$VMinfo = $RecoveryPlanContext.VmMap | Get-Member | Where-Object MemberType -EQ NoteProperty | select -ExpandProperty Name
+$VMinfo = $RecoveryPlanContext.VmMap | Get-Member | Where-Object MemberType -EQ NoteProperty | Select-Object -ExpandProperty Name
 $vmMap = $RecoveryPlanContext.VmMap
 
 try{

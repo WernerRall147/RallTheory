@@ -42,24 +42,28 @@ $vmMap = $RecoveryPlanContext.VmMap
    # $DestinationResourceGroup = Get-AZResourcegroup -Name $VM.ResourceGroupName
     $DestinationResources = Get-AzVM -ResourceGroupName $VM.ResourceGroupName
     $DestinationStorageAccountName = (Get-AzStorageAccount -ResourceGroupName $VM.ResourceGroupName -Name "#TODO").StorageAccountName
+    $StorageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $VM.ResourceGroupName -Name $DestinationStorageAccountName).Value[0]
 
 # Ensure Diagnostics Settings are enabled
+    try {
     foreach ($drres in $DestinationResources) {
-
-        $resId = $drres.Id
-        $DiagSettings = Get-AzDiagnosticSetting -ResourceId $resId 
+        $DiagSettings = Get-AzDiagnosticSetting -ResourceId $drres.Id
         if ($null -eq $DiagSettings) {
             Write-Output "Diagnostics settings are not enabled, trying to remediate"
             
-            $url = "https://raw.githubusercontent.com/WernerRall147/RallTheory/main/AzureSiteRecoveryDRRunbooks/diagnostics_publicconfig.xml"
-            $diagnosticsconfig_path = "$env:SystemDrive\temp\DiagnosticsPubConfig.xml"
+            $url = "https://raw.githubusercontent.com/WernerRall147/RallTheory/main/AzureSiteRecoveryDRRunbooks/DiagnosticsConfiguration.json"
+            $diagnosticsconfig_path = "$env:SystemDrive\temp\DiagnosticsConfiguration.json"
             Invoke-WebRequest -Uri $url -OutFile $diagnosticsconfig_path
 
-            $diagnosticsconfig_update1 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateResID)",$drres.Id) | Set-Content $diagnosticsconfig_path 
+            $diagnosticsconfig_update1 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateResID)",$StorageAccountKey) | Set-Content $diagnosticsconfig_path 
             $diagnosticsconfig_update2 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateStorac)",$DestinationStorageAccountName) | Set-Content $diagnosticsconfig_path 
 
-            Set-AzVMDiagnosticsExtension -ResourceGroupName $VM.ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path 
+            Set-AzVMDiagnosticsExtension -ResourceGroupName $VM.ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path -StorageAccountName $DestinationStorageAccountName  -StorageAccountKey $StorageAccountKey
             }else {
                 Write-Output "Diagnostic Settings Correct"
             }
-    }  
+    }
+}
+catch {
+    Write-Output "An error occurred: $($_.Exception.Message)"
+} 
