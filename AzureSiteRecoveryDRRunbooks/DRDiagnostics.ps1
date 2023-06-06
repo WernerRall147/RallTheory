@@ -31,10 +31,10 @@ $vmMap = $RecoveryPlanContext.VmMap
 
     foreach($VMID in $VMinfo)
     {
-        $VM = $vmMap.$VMID                
+        $VM = $vmMap.$VMID
             if( !(($Null -eq $VM) -Or ($Null -eq $VM.ResourceGroupName) -Or ($Null -eq $VM.RoleName))) {
             #this check is to ensure that we skip when some data is not available else it will fail
-    Write-output "Resource group name ", $VM.ResourceGroupName
+            Write-output "Resource group name ", $VM.ResourceGroupName
             }
         }
 
@@ -50,14 +50,13 @@ $vmMap = $RecoveryPlanContext.VmMap
         $DiagSettings = Get-AzVMDiagnosticsExtension -ResourceGroupName $VM.ResourceGroupName -VMName ($drres).Name
         if ($null -eq $DiagSettings) {
             Write-Output "Diagnostics settings are not enabled, trying to remediate"
-            
             $url = "https://raw.githubusercontent.com/WernerRall147/RallTheory/main/AzureSiteRecoveryDRRunbooks/DiagnosticsConfiguration.json"
             $diagnosticsconfig_path = "$env:SystemDrive\temp\DiagnosticsConfiguration.json"
             Invoke-WebRequest -Uri $url -OutFile $diagnosticsconfig_path
 
-            $diagnosticsconfig_update1 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateResID)",$drres.Id) | Set-Content $diagnosticsconfig_path 
-            $diagnosticsconfig_update2 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateStorac)",$DestinationStorageAccountName) | Set-Content $diagnosticsconfig_path 
-            $diagnosticsconfig_update1 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateStKey)",$StorageAccountKey) | Set-Content $diagnosticsconfig_path 
+            $diagnosticsconfig_update1 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateResID)",$drres.Id) | Set-Content $diagnosticsconfig_path
+            $diagnosticsconfig_update2 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateStorac)",$DestinationStorageAccountName) | Set-Content $diagnosticsconfig_path
+            $diagnosticsconfig_update1 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateStKey)",$StorageAccountKey) | Set-Content $diagnosticsconfig_path
 
             Set-AzVMDiagnosticsExtension -ResourceGroupName $VM.ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path -storageAccountName $DestinationStorageAccountName -StorageAccountKey $StorageAccountKey
             }else {
@@ -67,4 +66,4 @@ $vmMap = $RecoveryPlanContext.VmMap
 }
 catch {
     Write-Output "An error occurred: $($_.Exception.Message)"
-} 
+}

@@ -32,7 +32,7 @@ try{
 foreach($VMID in $VMinfo)
 {
     $VM = $vmMap.$VMID                
-        if( !(($VM -eq $Null) -Or ($VM.ResourceGroupName -eq $Null) -Or ($VM.RoleName -eq $Null))) {
+        if( !(($Null -eq $VM) -Or ($Null -eq $VM.ResourceGroupName) -Or ($Null -eq $VM.RoleName))) {
         #this check is to ensure that we skip when some data is not available else it will fail
         Write-output "The Resource group name ", $VM.ResourceGroupName
         Write-output "The current Server name is ", $VM.RoleName
