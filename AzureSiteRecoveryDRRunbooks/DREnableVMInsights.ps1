@@ -75,16 +75,16 @@ http://aka.ms/OnBoardVMInsights
 #>
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
-    [Parameter(mandatory = $true)][string]$WorkspaceId,
-    [Parameter(mandatory = $true)][string]$WorkspaceKey,
-    [Parameter(mandatory = $true)][string]$SubscriptionId,
-    [Parameter(mandatory = $true)][string]$ResourceGroup, #to avoid applying at subscription level
+    [Parameter(mandatory = $false)][string]$WorkspaceId,
+    [Parameter(mandatory = $false)][string]$WorkspaceKey,
+    [Parameter(mandatory = $false)][string]$SubscriptionId,
+    [Parameter(mandatory = $false)][string]$ResourceGroup, #to avoid applying at subscription level
     [Parameter(mandatory = $false)][string]$Name,
     [Parameter(mandatory = $false)][string]$PolicyAssignmentName,
     [Parameter(mandatory = $false)][boolean]$ReInstall,
     [Parameter(mandatory = $false)][switch]$TriggerVmssManualVMUpdate,
     [Parameter(mandatory = $false)][boolean]$Approve,
-    [Parameter(mandatory = $true)] `
+    [Parameter(mandatory = $false)] `
         [ValidateSet(
             "Australia East", "australiaeast",
             "Australia Central", "australiacentral",
