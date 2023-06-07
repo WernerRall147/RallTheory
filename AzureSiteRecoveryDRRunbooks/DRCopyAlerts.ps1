@@ -108,24 +108,26 @@ if ($rule.type -eq "microsoft.insights/metricalerts")
         -Operator $rule.properties.criteria.allOf.operator -Threshold $rule.properties.criteria.allOf.threshold `
         -TimeAggregation $rule.properties.criteria.allOf.timeAggregation
 
-        # Get the actingroup
-        $actG = Get-AzActionGroup -ResourceGroupName $destResourceGroup -Name $actionGroup  
+        # Get the actiongroup
+        $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup}
+        $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup  
 
         # Create the alert rule
         Add-AzMetricAlertRuleV2 -Name $rule.name -ResourceGroupName "$destResourceGroup" -WindowSize 00:05:00 `
         -Frequency 00:05:00 -TargetResourceId $resource.Id -Condition $condition -Severity $rule.Properties.severity `
-        -ActionGroup $actG
+        -ActionGroupId $actG.Id 
 
 
 } elseif ($rule.type -eq "microsoft.insights/activitylogalerts") {
-    <# Action when this condition is true #>
+    Write-Output "This is an Activity Log Alert: $rule.Name"
+
+    
+
+
 
 
 } else {
 Write-Output "$rule.type is not supported. This script only supports microsoft.insights/metricalerts and microsoft.insights/activitylogalerts"
-
-
-
 }
 }
 }

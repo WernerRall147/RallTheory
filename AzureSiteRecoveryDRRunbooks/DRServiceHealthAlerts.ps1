@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: Werner Rall
-        LASTEDIT: 20230606
+        LASTEDIT: 20230607
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
 param (
@@ -47,11 +47,11 @@ $AllRGs = $VM.ResourceGroupName
         $rOwners = Get-AzRoleAssignment -ResourceGroupName $rg -RoleDefinitionName 'Owner' | where-object SignInName -NE $null | Select-Object SignInName | Sort-Object ResourceType -Unique
         Write-Host "Search for Contributors in the " + $rg + " Resource Group"
 
-         if ($rContributors.SignInName -ne $null) {
+         if ($null -ne $rContributors.SignInName) {
             Write-Host "Contributors Found in the Resource Group, building an Array"
             $contactemailadress = $rContributors.SignInName
          }
-         elseif ($rOwners.SignInName -ne $null) {
+         elseif ($null -ne $rOwners.SignInName) {
             Write-Host "No Contributors found, looking for Owners"
             $contactemailadress = $rOwners.SignInName
             Write-Host "Owners Found in the Resource Group, building an Array"
