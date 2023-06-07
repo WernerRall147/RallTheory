@@ -66,10 +66,117 @@ $AllRGs = $VM.ResourceGroupName
         $actionGroupShortName = "action" + $randomnumber
         $activityLogAlertName = "serviceHealthAlert" + $randomnumber
 
+         #Create a JSON file ARM Template to use for deployment can be found https://raw.githubusercontent.com/WernerRall147/RallTheory/main/CreateServiceHealthAlertsForMyResources/ServiceHealthResourceGroupOnly.json
+         $templateFile = '
+         {
+            "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "parameters": {
+              "actionGroupName": {
+                "type": "string",
+                "defaultValue":  "serviceHealthActionGroup",
+                "minLength": 1,
+                "metadata": {
+                  "description": "Name for the Action group."
+                }
+              },
+              "actionGroupShortName": {
+                "type": "string",
+                "defaultValue": "serviceAG",
+                "minLength": 1,
+                "maxLength": 12,
+                "metadata": {
+                  "description": "Short name for the Action group."
+                }
+              },
+              "emailAddress": {
+                "type": "string",
+                "metadata": {
+                  "description": "Email address."
+                }
+              },
+              "activityLogAlertName": {
+                "type": "string",
+                "defaultValue": "serviceHealthAlert",
+                "minLength": 1,
+                "metadata": {
+                  "description": "Name for the Activity log alert."
+                }
+              },
+              "rgName": {
+                "type": "string",
+                "defaultValue": "[resourceGroup().name]",
+                "minLength": 1,
+                "metadata": {
+                  "description": "Resource Group Scope for the Activity Logs ."
+                }
+              },
+              "subName": {
+                "type": "string",
+                "defaultValue": "[subscription().subscriptionId]",
+                "minLength": 1,
+                "metadata": {
+                  "description": "Resource Group Scope for the Activity Logs ."
+                }
+              }
+            },
+            "resources": [
+              {
+                "type": "Microsoft.Insights/actionGroups",
+                "apiVersion": "2019-06-01",
+                "name": "[parameters("actionGroupName")]",
+                "location": "Global",
+                "properties": {
+                  "groupShortName": "[parameters("actionGroupShortName")]",
+                  "enabled": true,
+                  "emailReceivers": [
+                    {
+                      "name": "emailReceiver",
+                      "emailAddress": "[parameters("emailAddress")]"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Microsoft.Insights/activityLogAlerts",
+                "apiVersion": "2020-10-01",
+                "name": "[parameters("activityLogAlertName")]",
+                "location": "Global",
+                "dependsOn": [
+                  "[parameters("actionGroupName")]"
+                ],
+                "properties": {
+                  "enabled": true,
+                  "scopes": [
+                    "[concat("/subscriptions/",uriComponent(parameters("subName")),"/resourcegroups/",uriComponent(parameters("rgName")))]"
+                  ],
+                  "condition": {
+                    "allOf": [
+                      {
+                        "field": "category",
+                        "equals": "ServiceHealth"
+                      }
+                    ]
+                  },
+                  "actions": {
+                    "actionGroups": [
+                      {
+                        "actionGroupId": "[resourceId("Microsoft.Insights/actionGroups", parameters("actionGroupName"))]"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+         '
+         $templatefile_path = "$env:SystemDrive\temp\Deploy.json"
+         $templateFile | Out-File -FilePath $templatefile_path
+
         #Create Health Alert Option 1
         foreach($ctact in $contactemailadress){
         Write-Host "Creating a Health Alert for $ctact"
-        New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateUri https://raw.githubusercontent.com/WernerRall147/RallTheory/main/CreateServiceHealthAlertsForMyResources/ServiceHealthResourceGroupOnly.json `
+        New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile $templatefile_path  `
         -actionGroupName $actionGroupName -actionGroupShortName $actionGroupShortName -activityLogAlertName $activityLogAlertName -emailAddress $ctact
         }
     
