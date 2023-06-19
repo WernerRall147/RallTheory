@@ -19,6 +19,9 @@ param (
 [string]$SubscriptionId = "#TODO Your Subscription ID",
 
 [parameter(Mandatory=$false)]
+[string]$laworkspace = "#TODO Your current log analytics workspace name",
+
+[parameter(Mandatory=$false)]
 [string]$actionGroup = "#TODO Your current actiongroup name",
 
 [parameter(Mandatory=$false)] `
@@ -93,47 +96,163 @@ resources
 | where enabled in~ ("true") | project id,name,type,properties,enabled,severity,subscriptionId)
 | order by tolower(name) asc'
 
-
 try{
-foreach($rule in $allAlerts)
-{
-if ($rule.type -eq "microsoft.insights/metricalerts") 
-     {
-        # Get the resource you want to monitor and Create the metric alert rule
-        $resource = Get-AzResource -ResourceGroupName $destResourceGroup -Name #TODO
+    foreach($rule in $allAlerts)
+    {
+        switch ($rule.type) {
+            "microsoft.insights/metricalerts" {# Get the resource you want to monitor and Create the metric alert rule
+                $targetResource = $rule.properties.scope
+                $resource = Get-AzResource -TargetResourceId $targetResource
+        
+                # Define the condition for the alert
+                #$condition = $rule.Properties.criteria | ConvertFrom-Json .................... $allAlerts.properties.criteria.allOf
+                $condition = New-AzMetricAlertRuleV2Criteria -MetricName $rule.properties.criteria.allOf.metricName `
+                -Operator $rule.properties.criteria.allOf.operator `
+                -Threshold $rule.properties.criteria.allOf.threshold `
+                -TimeAggregation $rule.properties.criteria.allOf.timeAggregation
+        
+                # Get the actiongroup
+                $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup}
+                $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup  
+        
+                # Create the alert rule
+                Add-AzMetricAlertRuleV2 -Name $rule.name -ResourceGroupName "$destResourceGroup" -WindowSize 00:05:00 `
+                -Frequency 00:05:00 -TargetResourceId $resource.Id -Condition $condition -Severity $rule.Properties.severity `
+                -ActionGroupId $actG.Id 
+            }
 
-        # Define the condition for the alert
-        #$condition = $rule.Properties.criteria | ConvertFrom-Json .................... $allAlerts.properties.criteria.allOf
-        $condition = New-AzMetricAlertRuleV2Criteria -MetricName $rule.properties.criteria.allOf.metricName `
-        -Operator $rule.properties.criteria.allOf.operator -Threshold $rule.properties.criteria.allOf.threshold `
-        -TimeAggregation $rule.properties.criteria.allOf.timeAggregation
+            "microsoft.insights/activitylogalerts" {#Get the resource you want to monitor and Create the activity log alerts
 
-        # Get the actiongroup
-        $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup}
-        $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup  
+                # Get the actiongroup
+                $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup}
+                $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup 
+                $scope = "subscriptions/"+(Get-AzContext).Subscription.ID
+                $actiongroupobj = New-AzActivityLogAlertActionGroupObject -Id $actG.Id
 
-        # Create the alert rule
-        Add-AzMetricAlertRuleV2 -Name $rule.name -ResourceGroupName "$destResourceGroup" -WindowSize 00:05:00 `
-        -Frequency 00:05:00 -TargetResourceId $resource.Id -Condition $condition -Severity $rule.Properties.severity `
-        -ActionGroupId $actG.Id 
+                $conditionArray = @()
+                foreach ($condition in $rule.properties.condition.allOf) {
+                $conditionObject = New-AzActivityLogAlertAlertRuleAnyOfOrLeafConditionObject -Equal $condition.equals -Field $condition.field
+                $conditionArray += $conditionObject
+                }
 
+                #Create the alert rule
+                #New-AzActivityLogAlert -Name $AlertName -ResourceGroupName $destResourceGroup -Action $actiongroupobj -Condition @($condition1,$condition2,$condition3) -Location global -Scope $scope
+                #New-AzActivityLogAlert -Name $rule.Name -ResourceGroupName $destResourceGroup -Action $actiongroupobj -Condition $rule.properties.condition.allOf -Location global -Scope $scope
+                New-AzActivityLogAlert -Name $rule.Name -ResourceGroupName $destResourceGroup -Action $actiongroupobj -Condition $conditionArray -Location global -Scope $scope       
+            }
 
-} elseif ($rule.type -eq "microsoft.insights/activitylogalerts") {
-    Write-Output "This is an Activity Log Alert: $rule.Name"
+            "microsoft.insights/scheduledqueryrules" {#Get the resource you want to monitor and Create the scheduled query rules
+              
+                # Get the actiongroup
+                $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup}
+                $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup 
+                $targetResource = $rule.properties.scopes
+                $resource = Get-AzResource -TargetResourceId $targetResource
 
-    
+                # Create the Scheduled Query Rule
+                $subscriptionId=(Get-AzContext).Subscription.Id
+                $dimension = New-AzScheduledQueryRuleDimensionObject -Name Computer `
+                -Operator Include -Value *
 
+                $cond = New-AzScheduledQueryRuleConditionObject -Dimension $dimension `
+                 -Query "Perf | where ObjectName == `"Processor`" and CounterName == `"% Processor Time`" | summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 5m), Computer" `
+                 -TimeAggregation "Average" `
+                 -MetricMeasureColumn "AggregatedValue" `
+                 -Operator "GreaterThan" `
+                 -Threshold "70" `
+                 -FailingPeriodNumberOfEvaluationPeriod 1 `
+                 -FailingPeriodMinFailingPeriodsToAlert 1
+                
+                New-AzScheduledQueryRule `
+                -Name $rule.Name `
+                -ResourceGroupName $destResourceGroup `
+                -Location $targetRegion `
+                -DisplayName $rule.name `
+                -Scope $resource `
+                -Severity 4 `
+                -WindowSize ([System.TimeSpan]::New(0,10,0)) `
+                -EvaluationFrequency ([System.TimeSpan]::New(0,5,0)) `
+                -CriterionAllOf $cond 
 
+            }
 
+            "microsoft.alertsmanagement/smartdetectoralertrules"{#Get the resource you want to monitor and Create the smartdetector alert rules
+            
+            #Get action groups
+            $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup}
+            $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup
 
-} else {
-Write-Output "$rule.type is not supported. This script only supports microsoft.insights/metricalerts and microsoft.insights/activitylogalerts"
-}
-}
-}
-catch {
+            #Generate Bicep template for Smart Detector Alert Rules
+            # Your Bicep file
+            $schema = '$schema' 
+            $bicepFile = @"
+            {
+                "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                "contentVersion": "1.0.0.0",
+                "metadata": {
+                },
+                "parameters": {
+                  "smartdetectoralertrulesname": {
+                    "type": "string",
+                    "defaultValue": "$rule.name"
+                  },
+                  "actgid": {
+                    "type": "string",
+                    "defaultValue": "$actG.Id"
+                  },
+                  "scopes": {
+                    "type": "string",
+                    "defaultValue": "$rule.properties.scopes"
+                  }
+                },
+                "resources": [
+                  {
+                    "type": "microsoft.alertsManagement/smartDetectorAlertRules",
+                    "apiVersion": "2021-04-01",
+                    "name": "[parameters('smartdetectoralertrulesname')]",
+                    "location": "global",
+                    "properties": {
+                      "actionGroups": {
+                        "groupIds": [
+                          "[parameters('actgid')]"
+                        ]
+                      },
+                      "description": "name",
+                      "detector": {
+                        "id": "FailureAnomaliesDetector",
+                        "parameters": {}
+                      },
+                      "frequency": "PT1M",
+                      "scope": [
+                        "[parameters('scopes')]"
+                      ],
+                      "severity": "3",
+                      "state": "enabled"
+                    }
+                  }
+                ]
+              }
+"@
+            # Write the Bicep file to disk
+            $bicepFilePath = '.\smartdetectoralertrules.json'
+            Set-Content -Path $bicepFilePath -Value $bicepFile
+            
+            #Deploy using Bicep as there are no powershell modules available
+            New-AzResourceGroupDeployment -ResourceGroupName $destResourceGroup -TemplateFile .\smartdetectoralertrules.json   
+            
+            }
+
+            Default {Write-Output ""$rule.type"is not recognized and cannot be created"}
+        }
+    }
+}catch {
     Write-Error -Message $_.Exception
     throw $_.Exception
 }
+
+
+
+
+
 
 
