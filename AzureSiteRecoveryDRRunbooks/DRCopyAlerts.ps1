@@ -101,7 +101,7 @@ try{
     {
         switch ($rule.type) {
             "microsoft.insights/metricalerts" {# Get the resource you want to monitor and Create the metric alert rule
-                $targetResource = $rule.properties.scope
+                $targetResource = $rule.properties.scopes
                 $resource = Get-AzResource -ResourceId $targetResource
         
                 # Define the condition for the alert
@@ -202,7 +202,7 @@ try{
                   },
                   "scopes": {
                     "type": "string",
-                    "defaultValue": "$rule.properties.scopes"
+                    "defaultValue": "$rule.properties.scope"
                   }
                 },
                 "resources": [
