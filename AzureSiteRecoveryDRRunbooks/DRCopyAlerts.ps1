@@ -102,7 +102,7 @@ try{
         switch ($rule.type) {
             "microsoft.insights/metricalerts" {# Get the resource you want to monitor and Create the metric alert rule
                 $targetResource = $rule.properties.scope
-                $resource = Get-AzResource -TargetResourceId $targetResource
+                $resource = Get-AzResource -ResourceId $targetResource
         
                 # Define the condition for the alert
                 #$condition = $rule.Properties.criteria | ConvertFrom-Json .................... $allAlerts.properties.criteria.allOf
