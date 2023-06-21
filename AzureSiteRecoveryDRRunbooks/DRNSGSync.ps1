@@ -66,10 +66,3 @@ try {
 } catch {
     Write-Output "An error occurred: $($_.Exception.Message)"
 }
-
-$ipAddress = "192.168.207.1"
-if ($ipAddress -match "\b(2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.((2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){2}(2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9][0-9]|[0-9])\b") {
-    Write-Output "Match found: $ipAddress"
-} else {
-    Write-Output "No match found"
-}
