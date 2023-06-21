@@ -24,48 +24,8 @@ param (
 [parameter(Mandatory=$false)]
 [string]$actionGroup = "#TODO Your current actiongroup name",
 
-[parameter(Mandatory=$false)] `
-[ValidateSet(
-    "Australia East", "australiaeast",
-    "Australia Central", "australiacentral",
-    "Australia Central 2", "australiacentral2",
-    "Australia Southeast", "australiasoutheast",
-    "Brazil South", "brazilsouth",
-    "Brazil Southeast", "brazilsoutheast",
-    "Canada Central", "canadacentral",
-    "Central India", "centralindia",
-    "Central US", "centralus",
-    "East Asia", "eastasia",
-    "East US", "eastus",
-    "East US 2", "eastus2",
-    "East US 2 EUAP", "eastus2euap",
-    "France Central", "francecentral",
-    "France South", "francesouth",
-    "Germany West Central", "germanywestcentral",
-    "India South", "indiasouth",
-    "Japan East", "japaneast",
-    "Japan West", "japanwest",
-    "Korea Central", "koreacentral",
-    "North Central US", "northcentralus",
-    "North Europe", "northeurope",
-    "Norway East", "norwayeast",
-    "Norway West", "norwaywest",
-    "South Africa North", "southafricanorth",
-    "Southeast Asia", "southeastasia",
-    "South Central US", "southcentralus",
-    "Switzerland North", "switzerlandnorth",
-    "Switzerland West", "switzerlandwest",
-    "UAE Central", "uaecentral",
-    "UAE North", "uaenorth",
-    "UK South", "uksouth",
-    "West Central US", "westcentralus",
-    "West Europe", "westeurope",
-    "West US", "westus",
-    "West US 2", "westus2",
-    "USGov Arizona", "usgovarizona",
-    "USGov Virginia", "usgovvirginia"
-)]
-[string]$targetRegion = "#TODO Your target region for alerts in short notation"
+[parameter(Mandatory=$false)]
+[string]$targetRegion = "#TODO Your target region for alerts in short notation example: eastus"
 )
 
 Write-Output "Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
@@ -79,8 +39,6 @@ catch {
     Write-Error -Message $_.Exception
     throw $_.Exception
 }
-
-$thisSub = (Get-AzContext).Subscription.Id
 
 #ResourceGraphQuery for all alerts per subscription. This will query the production subscription
 Write-Output "Querying all alerts in the production subscription..."
@@ -98,14 +56,16 @@ resources
 | order by tolower(name) asc'
 
 $ErrorActionPreference = 'Continue'
-
+Write-Output "Cycling through alerts and creating them in the target subscription..."
 try{
     foreach($rule in $allAlerts)
     {
         switch ($rule.type) {
             "microsoft.insights/metricalerts" {# Get the resource you want to monitor and Create the metric alert rule
-                $targetResource = $rule.properties.scopes | ConvertTo-Json -Depth 100 -Compress
-                $resource = Get-AzResource -ResourceId $targetResource -ErrorAction Continue
+              Write-Output "Working on metric alert rule: $($rule.name)" 
+              $targetResource = $rule.properties.scopes | ConvertTo-Json -Depth 100 -Compress
+              $targetResourceformat = $targetResource -replace '"', ''
+                $resource = Get-AzResource -ResourceId $targetResourceformat -ErrorAction Continue
                 #$resource = Get-AzResource -ResourceGroupName $destResourceGroup -Name $targetResource
         
                 # Define the condition for the alert
@@ -126,6 +86,7 @@ try{
             }
 
             "microsoft.insights/activitylogalerts" {#Get the resource you want to monitor and Create the activity log alerts
+                 Write-Output "Working on activitylogalerts alert rule: $($rule.name)" 
 
                 # Get the actiongroup
                 $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup} -ErrorAction Continue
@@ -146,12 +107,13 @@ try{
             }
 
             "microsoft.insights/scheduledqueryrules" {#Get the resource you want to monitor and Create the scheduled query rules
-              
+              Write-Output "Working on scheduledqueryrules alert rule: $($rule.name)" 
                 # Get the actiongroup
                 $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup} -ErrorAction Continue
                 $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue
-                $targetResource = $rule.properties.scopes
-                $resource = Get-AzResource -TargetResourceId $targetResource -ErrorAction Continue
+                $targetResource = $rule.properties.scopes | ConvertTo-Json -Depth 100 -Compress
+                $targetResourceformat = $targetResource -replace '"', ''
+                $resource = Get-AzResource -ResourceId $targetResourceformat -ErrorAction Continue
 
                 # Create the Scheduled Query Rule
                 $subscriptionId=(Get-AzContext).Subscription.Id
@@ -172,7 +134,7 @@ try{
                 -ResourceGroupName $destResourceGroup `
                 -Location $targetRegion `
                 -DisplayName $rule.name `
-                -Scope $resource `
+                -Scope $resource.ResourceId `
                 -Severity 4 `
                 -WindowSize ([System.TimeSpan]::New(0,10,0)) `
                 -EvaluationFrequency ([System.TimeSpan]::New(0,5,0)) `
@@ -181,7 +143,8 @@ try{
             }
 
             "microsoft.alertsmanagement/smartdetectoralertrules"{#Get the resource you want to monitor and Create the smartdetector alert rules
-            
+              Write-Output "Working on smartdetectoralertrules alert rule: $($rule.name)" 
+
             #Get action groups
             $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup}
             $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue
