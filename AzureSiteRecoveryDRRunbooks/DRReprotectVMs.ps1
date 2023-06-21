@@ -51,7 +51,7 @@ try{
             $vault = Get-AzRecoveryServicesVault -Name $recoveryservicesname -ResourceGroupName $VM.ResourceGroupName
 
             # Set the vault context
-            Set-AzRecoveryServicesAsrVaultSettings  -Vault $vault
+            Set-AzRecoveryServicesAsrVaultSettings -Vault $vault
 
             # Get the Replication Protected Item
             # Get the ASR Fabric and select one based on a condition
