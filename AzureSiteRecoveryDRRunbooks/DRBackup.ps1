@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: Werner Rall
-        LASTEDIT: 20230517
+        LASTEDIT: 20230621
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
 param (
@@ -12,11 +12,11 @@ param (
 [Object]$RecoveryPlanContext
 )
 
-#"Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
+Write-Output "Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
 #Log in with the Managed Identity
 try
 {
-    "Logging in to Azure..."
+    Write-Output "Logging in to Azure..."
     Connect-AzAccount -Identity
 }
 catch {
@@ -25,9 +25,11 @@ catch {
 }
 
 #Decyfer RecoveryPlan Context
+Write-Output "Getting Recovery Plan context"
 $VMinfo = $RecoveryPlanContext.VmMap | Get-Member | Where-Object MemberType -EQ NoteProperty | Select-Object -ExpandProperty Name
 $vmMap = $RecoveryPlanContext.VmMap
 
+Write-Output "for Each VM trying to enable Backup on the VMs"
 try{
 foreach($VMID in $VMinfo)
 {
@@ -38,14 +40,17 @@ foreach($VMID in $VMinfo)
         Write-output "The current Server name is ", $VM.RoleName
 
         # Ensure Backup gets enabled
+        Write-Output "Get Az Recovery Services Vault"
         $vault = Get-AzRecoveryServicesVault -ResourceGroupName $VM.ResourceGroupName | Set-AzRecoveryServicesVaultContext
+        $vault
+        Write-Output "Get Az Recovery Services Backup Protection Policy"
         $policy = Get-AzRecoveryServicesBackupProtectionPolicy -Name "DefaultPolicy"
 
+        Write-Output "Enable Backup on the VMs"
         Enable-AzRecoveryServicesBackupProtection `
             -ResourceGroupName $VM.ResourceGroupName `
             -Name $VM.RoleName `
-            -Policy $policy `
-            -WhatIf
+            -Policy $policy
         }
         else {
             Write-Error "Something went wrong when we tried to enable backup on $VM"

@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: Werner Rall
-        LASTEDIT: 20230302
+        LASTEDIT: 20230621
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
 param (
@@ -12,12 +12,12 @@ param (
 [Object]$RecoveryPlanContext
 )
 
-"Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
+Write-Output "Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
 
 #Log in with the Managed Identity
 try
 {
-    "Logging in to Azure..."
+    Write-Output "Logging in to Azure..."
     Connect-AzAccount -Identity
 }
 catch {
@@ -26,15 +26,20 @@ catch {
 }
 
 #Get all ARM resources from all resource groups
+Write-Output "Getting source and destination resource groups..."
 $SourceResourceGroup = Get-AZResourcegroup -Name "#TODO"
 $DestinationResourceGroup = Get-AZResourcegroup -Name "#TODO"
 
+Write-Output "Getting all NSGs from source and destination resource groups..."
 $sourceNetworkSecurityGroup = "#TODO"
 $destinationNetworkSecurityGroup = "#TODO"
 
 #Check inbound port rules if NSGs are on Vnets
+Write-Output "Get all Source Security Rules"
 $sourceSecRules = Get-AzNetworkSecurityGroup -Name $sourceNetworkSecurityGroup  -ResourceGroupName ($SourceResourceGroup).ResourceGroupName
+Write-Output "Get all Destination Security Rules"
 $destinationSecRules = Get-AzNetworkSecurityGroup -Name $destinationNetworkSecurityGroup  -ResourceGroupName ($DestinationResourceGroup).ResourceGroupName
+Write-Output "Comparing Security Rules"
 $comp = Compare-Object -ReferenceObject $destinationSecRules.SecurityRules -DifferenceObject $sourceSecRules.SecurityRules -Property Name, Protocol, SourcePortRange, DestinationPortRange, Access, Priority, Direction, ProvisioningState
 
 try {
@@ -60,4 +65,11 @@ try {
     }
 } catch {
     Write-Output "An error occurred: $($_.Exception.Message)"
+}
+
+$ipAddress = "192.168.207.1"
+if ($ipAddress -match "\b(2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.((2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){2}(2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9][0-9]|[0-9])\b") {
+    Write-Output "Match found: $ipAddress"
+} else {
+    Write-Output "No match found"
 }

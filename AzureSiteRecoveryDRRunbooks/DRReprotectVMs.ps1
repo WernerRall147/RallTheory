@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: Werner Rall
-        LASTEDIT: 20230605
+        LASTEDIT: 20230621
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
 param (
@@ -19,12 +19,12 @@ param (
 [string]$fabricName = "#TODO Your Recovery Services Name for example 'asr-a2a-default-southcentralus'"
 )
 
-"Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
+Write-Output "Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
 
 #Log in with the Managed Identity
 try
 {
-    "Logging in to Azure..."
+    Write-Output "Logging in to Azure..."
     Connect-AzAccount -Identity
 }
 catch {
