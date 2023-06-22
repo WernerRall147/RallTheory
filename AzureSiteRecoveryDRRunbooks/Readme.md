@@ -8,8 +8,10 @@ For the below scripts to work with a Recovery Plan we need the below resources i
 - Storage Account for Diagnostic settings
 - Destination NSG attached to the Failover region Virtual Network Subnet
 - Add Az.AlertsManagement module to AutomationAccount
-- Add Az.Accounts module to AutomationAccount
+- Add Az.Accounts module 2.12.3 or higher to AutomationAccount
 - Add Az.ResourceGraph module to AutomationAccount
+- Add Az.Monitor  module to AutomationAccount
+
 
 # Using the runbooks
 Import all the below runbooks into your Failover Region Automation Account and update all the variables labeled #TODO
