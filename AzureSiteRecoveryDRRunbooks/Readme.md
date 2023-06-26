@@ -3,19 +3,19 @@
 # Pre Requisites
 To complete a DR with Azure Site Recovery we need like-for-like resources in Primary and Failover Regions
 For the below scripts to work with a Recovery Plan we need the below resources in our Failover region
-- Log Analytics Workspace
-- Azure Automation Account with Managed Identity that has contributor access in Primary and Failover Region
-- Storage Account for Diagnostic settings
-- Destination NSG attached to the Failover region Virtual Network Subnet
-- Add Az.AlertsManagement module to AutomationAccount
-- Add Az.Accounts module 2.12.3 or higher to AutomationAccount
-- Add Az.ResourceGraph module to AutomationAccount
-- Add Az.Monitor  module to AutomationAccount
-
+1. Log Analytics Workspace
+1. Azure Automation Account with Managed Identity that has contributor access in Primary and Failover Region
+1. Storage Account for Diagnostic settings
+1. Destination NSG attached to the Failover region Virtual Network Subnet
+1. Add Az.AlertsManagement module to AutomationAccount
+1. Add Az.Accounts module 2.12.3 or higher to AutomationAccount
+1. Add Az.ResourceGraph module to AutomationAccount
+1. Add Az.Monitor  module to AutomationAccount
+1. [Recommended] Run the [createAutomationAccountVariables](createAutomationAccountVariables.ps1) script locally to automatically create the required variables in your automation account
 
 # Using the runbooks
-Import all the below runbooks into your Failover Region Automation Account and update all the variables labeled #TODO
-Some runbooks can be used in the Recovery Plan but some has to be run outside the recovery plan as helper scripts. 
+Import all the below runbooks into your Failover Region Automation Account and update all the variables labeled #TODO (Important: If you completed step 9 you can skip the #TODO Updates)
+Some runbooks can be used inside the Recovery Plan but some has to be run outside the recovery plan as helper scripts. 
 
 # DRNSGSync runbook is so that your source NSG Rules sync with the Destination NSG Rules
 1. Check inbound port rules if NSGs are on Vnets - Run this runbook seperately
@@ -29,7 +29,7 @@ Some runbooks can be used in the Recovery Plan but some has to be run outside th
 3.  Ensure Insights get enabled - Run in Recovery Plan
 4.  Create Service Health Alerts for DR Resource Group - Run in Recovery Plan
 
-Please replace all the #TODO  in the scripts with your required variables
+Please replace all the #TODO  in the scripts with your required variables (Important: If you completed step 9 in Pre Requisites you can skip the #TODO Updates)
 
 ---------------------------------------------------------------------------------------------
 # Script Descriptions

@@ -188,3 +188,5 @@ Write-Output "Cycle through the resource groups to find owners and contributors"
     $output = "Service Health Alerts have been created for your " + $_.Name + " subscription"
     $output   
  }
+
+ Write-Output "The script has completed with or without errors."

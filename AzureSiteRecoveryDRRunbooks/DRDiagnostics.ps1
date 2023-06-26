@@ -9,11 +9,12 @@
 #>
 param (
 [parameter(Mandatory=$false)]
-[Object]$RecoveryPlanContext
+[Object]$RecoveryPlanContext,
+[parameter(Mandatory=$false)]
+[Object]$diagnosticsStorageAccountName
 )
 
 Write-Output "Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
-
 #Log in with the Managed Identity
 try
 {
@@ -24,6 +25,10 @@ catch {
     Write-Error -Message $_.Exception
     throw $_.Exception
 }
+
+Write-Output "Getting variables from Automation Account Store"
+$diagnosticsStorageAccountName = Get-AutomationVariable -Name 'diagnosticsStorageAccountName'
+
 
 #Decyfer RecoveryPlan Context
 $VMinfo = $RecoveryPlanContext.VmMap | Get-Member | Where-Object MemberType -EQ NoteProperty | Select-Object -ExpandProperty Name
@@ -324,7 +329,7 @@ $diagnosticsconfigfile = @"
   #Get all ARM resources from DR
    # $DestinationResourceGroup = Get-AZResourcegroup -Name $VM.ResourceGroupName
     $DestinationResources = Get-AzVM -ResourceGroupName $VM.ResourceGroupName
-    $DestinationStorageAccountName = (Get-AzStorageAccount -ResourceGroupName $VM.ResourceGroupName -Name "#TODO").StorageAccountName
+    $DestinationStorageAccountName = (Get-AzStorageAccount -ResourceGroupName $VM.ResourceGroupName -Name $diagnosticsStorageAccountName).StorageAccountName
     $StorageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $VM.ResourceGroupName -Name $DestinationStorageAccountName).Value[0]
 
 # Ensure Diagnostics Settings are enabled
@@ -354,3 +359,5 @@ $diagnosticsconfigfile = @"
 catch {
     Write-Output "An error occurred: $($_.Exception.Message)"
 }
+
+Write-Output "The script has completed with or without errors."

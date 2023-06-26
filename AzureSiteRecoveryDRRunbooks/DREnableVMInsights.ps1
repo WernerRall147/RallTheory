@@ -137,7 +137,13 @@ $supportedHealthRegions = @(
     "West Central US", "westcentralus",
     "West Europe", "westeurope"
 )
-#
+# VARIABLES
+$WorkspaceId = Get-AutomationVariable -Name 'WorkspaceId'
+$WorkspaceKey = Get-AutomationVariable -Name 'WorkspaceKey'
+$SubscriptionId = Get-AutomationVariable -Name 'SubscriptionId'
+$ResourceGroup = Get-AutomationVariable -Name 'DRResourceGroup'
+$WorkspaceRegion = Get-AutomationVariable -Name 'WorkspaceRegion'
+
 # FUNCTIONS
 #
 function Get-VMExtension {
@@ -583,3 +589,5 @@ Write-Output("`nVM Scale Set needs update: (" + $OnboardingStatus.VMScaleSetNeed
 $OnboardingStatus.VMScaleSetNeedsUpdate  | ForEach-Object { Write-Output ($_) }
 Write-Output("`nFailed: (" + $OnboardingStatus.Failed.Count + ")")
 $OnboardingStatus.Failed | ForEach-Object { Write-Output ($_) }
+
+Write-Output "The script has completed with or without errors."

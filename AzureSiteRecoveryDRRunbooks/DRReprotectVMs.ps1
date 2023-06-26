@@ -14,11 +14,9 @@ param (
 [parameter(Mandatory=$false)]
 [string]$recoveryservicesname = "#TODO Your_Recovery_Services_Vault_Name",
 
-#get the fabric by running Get-AzRecoveryServicesAsrfabric which is needed for below scripts
 [parameter(Mandatory=$false)]
 [string]$fabricName = "#TODO Your Recovery Services Name for example 'asr-a2a-default-southcentralus'"
 )
-
 Write-Output "Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
 
 #Log in with the Managed Identity
@@ -32,6 +30,9 @@ catch {
     throw $_.Exception
 }
 
+Write-Output "Getting variables from Automation Account Store"
+$recoveryservicesname = Get-AutomationVariable -Name 'recoveryservicesname'
+$fabricName = Get-AutomationVariable -Name 'fabricName'
 
 #Decyfer RecoveryPlan Context
 $VMinfo = $RecoveryPlanContext.VmMap | Get-Member | Where-Object MemberType -EQ NoteProperty | Select-Object -ExpandProperty Name
@@ -72,3 +73,5 @@ try{
         Write-Error -Message $_.Exception
         throw $_.Exception
     }
+
+    Write-Output "The script has completed with or without errors."

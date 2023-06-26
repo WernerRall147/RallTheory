@@ -13,13 +13,13 @@ param (
 [Object]$RecoveryPlanContext, 
 
 [parameter(Mandatory=$false)]
-[string]$destResourceGroup = "#TODO Destination Resource group for alerts",
+[string]$DRResourceGroup = "#TODO Destination Resource group for alerts",
 
 [parameter(Mandatory=$false)]
 [string]$SubscriptionId = "#TODO Your Subscription ID",
 
 [parameter(Mandatory=$false)]
-[string]$laworkspace = "#TODO Your current log analytics workspace name",
+[string]$WorkspaceName = "#TODO Your current log analytics workspace name",
 
 [parameter(Mandatory=$false)]
 [string]$actionGroup = "#TODO Your current actiongroup name",
@@ -39,6 +39,14 @@ catch {
     Write-Error -Message $_.Exception
     throw $_.Exception
 }
+
+Write-Output "Getting variables from Automation Account Store"
+$DRResourceGroup = Get-AutomationVariable -Name 'DRResourceGroup'
+$SubscriptionId = Get-AutomationVariable -Name 'SubscriptionId'
+$WorkspaceName = Get-AutomationVariable -Name 'WorkspaceName'
+$actionGroup = Get-AutomationVariable -Name 'actionGroup'
+$targetRegion = Get-AutomationVariable -Name 'targetRegion'
+
 
 #ResourceGraphQuery for all alerts per subscription. This will query the production subscription
 Write-Output "Querying all alerts in the production subscription..."
@@ -66,7 +74,7 @@ try{
               $targetResource = $rule.properties.scopes | ConvertTo-Json -Depth 100 -Compress
               $targetResourceformat = $targetResource -replace '"', ''
                 $resource = Get-AzResource -ResourceId $targetResourceformat -ErrorAction Continue
-                #$resource = Get-AzResource -ResourceGroupName $destResourceGroup -Name $targetResource
+                #$resource = Get-AzResource -ResourceGroupName $DRResourceGroup -Name $targetResource
         
                 # Define the condition for the alert
                 #$condition = $rule.Properties.criteria | ConvertFrom-Json .................... $allAlerts.properties.criteria.allOf
@@ -80,7 +88,7 @@ try{
                 $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue 
         
                 # Create the alert rule
-                Add-AzMetricAlertRuleV2 -Name $rule.name -ResourceGroupName "$destResourceGroup" -WindowSize 00:05:00 `
+                Add-AzMetricAlertRuleV2 -Name $rule.name -ResourceGroupName "$DRResourceGroup" -WindowSize 00:05:00 `
                 -Frequency 00:05:00 -TargetResourceId $resource.Id -Condition $condition -Severity $rule.Properties.severity `
                 -ActionGroupId $actG.Id -ErrorAction Continue
             }
@@ -101,9 +109,9 @@ try{
                 }
 
                 #Create the alert rule
-                #New-AzActivityLogAlert -Name $AlertName -ResourceGroupName $destResourceGroup -Action $actiongroupobj -Condition @($condition1,$condition2,$condition3) -Location global -Scope $scope
-                #New-AzActivityLogAlert -Name $rule.Name -ResourceGroupName $destResourceGroup -Action $actiongroupobj -Condition $rule.properties.condition.allOf -Location global -Scope $scope
-                New-AzActivityLogAlert -Name $rule.Name -ResourceGroupName $destResourceGroup -Action $actiongroupobj -Condition $conditionArray -Location global -Scope $scope -ErrorAction Continue      
+                #New-AzActivityLogAlert -Name $AlertName -ResourceGroupName $DRResourceGroup -Action $actiongroupobj -Condition @($condition1,$condition2,$condition3) -Location global -Scope $scope
+                #New-AzActivityLogAlert -Name $rule.Name -ResourceGroupName $DRResourceGroup -Action $actiongroupobj -Condition $rule.properties.condition.allOf -Location global -Scope $scope
+                New-AzActivityLogAlert -Name $rule.Name -ResourceGroupName $DRResourceGroup -Action $actiongroupobj -Condition $conditionArray -Location global -Scope $scope -ErrorAction Continue      
             }
 
             "microsoft.insights/scheduledqueryrules" {#Get the resource you want to monitor and Create the scheduled query rules
@@ -131,7 +139,7 @@ try{
                 
                 New-AzScheduledQueryRule `
                 -Name $rule.Name `
-                -ResourceGroupName $destResourceGroup `
+                -ResourceGroupName $DRResourceGroup `
                 -Location $targetRegion `
                 -DisplayName $rule.name `
                 -Scope $resource.ResourceId `
@@ -205,7 +213,7 @@ try{
             Set-Content -Path $bicepFilePath -Value $bicepFile -ErrorAction Continue
             
             #Deploy using Bicep as there are no powershell modules available
-            New-AzResourceGroupDeployment -ResourceGroupName $destResourceGroup -TemplateFile .\smartdetectoralertrules.json -ErrorAction Continue 
+            New-AzResourceGroupDeployment -ResourceGroupName $DRResourceGroup -TemplateFile .\smartdetectoralertrules.json -ErrorAction Continue 
             
             }
 
@@ -217,3 +225,4 @@ try{
     throw $_.Exception
 }
 
+Write-Output "The script has completed with or without errors."

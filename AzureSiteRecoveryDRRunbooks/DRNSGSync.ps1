@@ -9,11 +9,18 @@
 #>
 param (
 [parameter(Mandatory=$false)]
-[Object]$RecoveryPlanContext
+[Object]$RecoveryPlanContext, 
+[parameter(Mandatory=$false)]
+[string]$DRResourceGroup = "#TODO Destination Resource group for alerts",
+[parameter(Mandatory=$false)]
+[string]$SourceResourceGroup = "#TODO Source Resource group for alerts",
+[parameter(Mandatory=$false)]
+[string]$DRNetworkSecurityGroup = "#TODO Destination Network Security Group for rules",
+[parameter(Mandatory=$false)]
+[string]$SourceNetworkSecurityGroup = "#TODO Source Network Security Group for rules"
 )
 
 Write-Output "Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
-
 #Log in with the Managed Identity
 try
 {
@@ -25,20 +32,18 @@ catch {
     throw $_.Exception
 }
 
-#Get all ARM resources from all resource groups
-Write-Output "Getting source and destination resource groups..."
-$SourceResourceGroup = Get-AZResourcegroup -Name "#TODO"
-$DestinationResourceGroup = Get-AZResourcegroup -Name "#TODO"
+Write-Output "Getting variables from Automation Account Store"
+$DRResourceGroup = Get-AutomationVariable -Name 'DRResourceGroup'
+$SourceResourceGroup = Get-AutomationVariable -Name 'SourceResourceGroup'
+$DRNetworkSecurityGroup = Get-AutomationVariable -Name 'destinationNetworkSecurityGroup'
+$SourceNetworkSecurityGroup = Get-AutomationVariable -Name 'SourceNetworkSecurityGroup'
 
-Write-Output "Getting all NSGs from source and destination resource groups..."
-$sourceNetworkSecurityGroup = "#TODO"
-$destinationNetworkSecurityGroup = "#TODO"
 
 #Check inbound port rules if NSGs are on Vnets
 Write-Output "Get all Source Security Rules"
-$sourceSecRules = Get-AzNetworkSecurityGroup -Name $sourceNetworkSecurityGroup  -ResourceGroupName ($SourceResourceGroup).ResourceGroupName
+$sourceSecRules = Get-AzNetworkSecurityGroup -Name $SourceNetworkSecurityGroup  -ResourceGroupName ($SourceResourceGroup).ResourceGroupName
 Write-Output "Get all Destination Security Rules"
-$destinationSecRules = Get-AzNetworkSecurityGroup -Name $destinationNetworkSecurityGroup  -ResourceGroupName ($DestinationResourceGroup).ResourceGroupName
+$destinationSecRules = Get-AzNetworkSecurityGroup -Name $destinationNetworkSecurityGroup  -ResourceGroupName ($DRResourceGroup).ResourceGroupName
 Write-Output "Comparing Security Rules"
 $comp = Compare-Object -ReferenceObject $destinationSecRules.SecurityRules -DifferenceObject $sourceSecRules.SecurityRules -Property Name, Protocol, SourcePortRange, DestinationPortRange, Access, Priority, Direction, ProvisioningState
 
@@ -48,7 +53,7 @@ try {
     } else {
         Write-Output "The rules do not match, trying to repair"
         foreach ($secRule in $sourceSecRules.SecurityRules) {
-            $nsg = Get-AzNetworkSecurityGroup -Name ($destinationSecRules).Name -ResourceGroupName ($DestinationResourceGroup).ResourceGroupName
+            $nsg = Get-AzNetworkSecurityGroup -Name ($destinationSecRules).Name -ResourceGroupName ($DRResourceGroup).ResourceGroupName
             $ruleConfig = @{
                 Name = $secRule.Name
                 Access = $secRule.Access
@@ -66,3 +71,5 @@ try {
 } catch {
     Write-Output "An error occurred: $($_.Exception.Message)"
 }
+
+Write-Output "The script has completed with or without errors."
