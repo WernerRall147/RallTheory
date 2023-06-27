@@ -1,0 +1,105 @@
+/*
+@TargetNode='localhost'
+@GeneratedBy=weral
+@GenerationDate=06/27/2023 19:27:29
+@GenerationHost=ZA-WERAL1777
+*/
+
+instance of MSFT_RegistryResource as $MSFT_RegistryResource1ref
+{
+SourceInfo = "C:\\Users\\weral\\Git\\RallTheory\\WindowsUpdateDSC\\WindowsUpdate.ps1::7::9::Registry";
+ Ensure = "Absent";
+ Key = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU";
+ ValueData = {
+    "0"
+};
+ ValueType = "Dword";
+ ModuleName = "PsDesiredStateConfiguration";
+ ValueName = "UseWUServer";
+ ResourceID = "[Registry]WindowsUpdateAUWUServer";
+
+ModuleVersion = "1.0";
+ ConfigurationName = "WindowsUpdate";
+};
+instance of MSFT_RegistryResource as $MSFT_RegistryResource2ref
+{
+SourceInfo = "C:\\Users\\weral\\Git\\RallTheory\\WindowsUpdateDSC\\WindowsUpdate.ps1::15::9::Registry";
+ Ensure = "Absent";
+ Key = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU";
+ ValueData = {
+    "0"
+};
+ ValueType = "Dword";
+ ModuleName = "PsDesiredStateConfiguration";
+ ValueName = "WUStatusServer ";
+ ResourceID = "[Registry]WindowsUpdateAUWUStatusServer";
+
+ModuleVersion = "1.0";
+ ConfigurationName = "WindowsUpdate";
+};
+instance of MSFT_RegistryResource as $MSFT_RegistryResource3ref
+{
+SourceInfo = "C:\\Users\\weral\\Git\\RallTheory\\WindowsUpdateDSC\\WindowsUpdate.ps1::23::9::Registry";
+ Ensure = "Present";
+ Key = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU";
+ ValueData = {
+    "4"
+};
+ ValueType = "Dword";
+ ModuleName = "PsDesiredStateConfiguration";
+ ValueName = "AUOptions";
+ ResourceID = "[Registry]WindowsUpdateAUOptions";
+
+ModuleVersion = "1.0";
+ ConfigurationName = "WindowsUpdate";
+};
+instance of MSFT_RegistryResource as $MSFT_RegistryResource4ref
+{
+SourceInfo = "C:\\Users\\weral\\Git\\RallTheory\\WindowsUpdateDSC\\WindowsUpdate.ps1::31::9::Registry";
+ Ensure = "Present";
+ Key = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU";
+ ValueData = {
+    "0"
+};
+ ValueType = "Dword";
+ ModuleName = "PsDesiredStateConfiguration";
+ ValueName = "NoAutoUpdate";
+ ResourceID = "[Registry]WindowsUpdateNoAU";
+
+ModuleVersion = "1.0";
+ ConfigurationName = "WindowsUpdate";
+};
+instance of MSFT_RegistryResource as $MSFT_RegistryResource5ref
+{
+SourceInfo = "C:\\Users\\weral\\Git\\RallTheory\\WindowsUpdateDSC\\WindowsUpdate.ps1::39::9::Registry";
+ Ensure = "Present";
+ Key = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU";
+ ValueData = {
+    "1"
+};
+ ValueType = "Dword";
+ ModuleName = "PsDesiredStateConfiguration";
+ ValueName = "NoAutoRebootWithLoggedOnUsers";
+ ResourceID = "[Registry]WindowsUpdateNoAutoRebootWithLoggedOnUsers";
+
+ModuleVersion = "1.0";
+ ConfigurationName = "WindowsUpdate";
+};
+instance of OMI_ConfigurationDocument
+
+                    {
+ Version="2.0.0";
+
+                        MinimumCompatibleVersion = "1.0.0";
+
+                        CompatibleVersionAdditionalProperties= {"Omi_BaseResource:ConfigurationName"};
+
+                        Author="weral";
+
+                        GenerationDate="06/27/2023 19:27:29";
+
+                        GenerationHost="ZA-WERAL1777";
+
+                        Name="WindowsUpdate";
+
+                    };
