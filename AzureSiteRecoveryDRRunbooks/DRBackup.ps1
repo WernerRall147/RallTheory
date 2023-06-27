@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: Werner Rall
-        LASTEDIT: 20230621
+        LASTEDIT: 20230627
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
 param (
@@ -62,4 +62,4 @@ catch {
     throw $_.Exception
 }
 
-
+Write-Output "The script has completed with or without errors."
