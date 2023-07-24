@@ -3,7 +3,7 @@
         "roleName": "Update Center Admin (Custom)",
         "description": "Allows access to manage Azure Update Management Center and its resources",
         "assignableScopes": [
-           "/subscriptions/dc9fee21-5a40-4ea9-a1b8-674f359f6af9"
+           "/subscriptions/xxxxxxxxxx"
         ],
         "permissions": [
             {
