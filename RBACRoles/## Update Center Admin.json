@@ -1,0 +1,26 @@
+{
+    "properties": {
+        "roleName": "Update Center Admin (Custom)",
+        "description": "Allows access to manage Azure Update Management Center and its resources",
+        "assignableScopes": [
+           "/subscriptions/dc9fee21-5a40-4ea9-a1b8-674f359f6af9"
+        ],
+        "permissions": [
+            {
+                "actions": [
+                    "Microsoft.Compute/virtualMachines/installPatches/action",
+                    "Microsoft.Compute/virtualMachines/assessPatches/action",	
+                    "Microsoft.HybridCompute/machines/installPatches/action",	
+                    "Microsoft.HybridCompute/machines/assessPatches/action",
+                    "Microsoft.Maintenance/maintenanceConfigurations/write",
+                    "Microsoft.Maintenance/configurationAssignments/write",
+                    "Microsoft.Maintenance/updates/read",
+                    "Microsoft.Maintenance/applyUpdates/read"
+                ],
+                "notActions": [],
+                "dataActions": [],
+                "notDataActions": []
+            }
+        ]
+      }
+   }
