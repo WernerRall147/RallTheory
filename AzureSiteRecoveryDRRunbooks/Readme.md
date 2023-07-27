@@ -32,9 +32,9 @@ Some runbooks can be used inside the Recovery Plan but some has to be run outsid
 Please replace all the #TODO  in the scripts with your required variables (Important: If you completed step 9 in Pre Requisites you can skip the #TODO Updates)
 
 ---------------------------------------------------------------------------------------------
-# Script Descriptions
+# Script Descriptions and Manual Alternatives
 
-[DRBackup](/AzureSiteRecoveryDRRunbooks/DRBackup.ps1)
+## [DRBackup](/AzureSiteRecoveryDRRunbooks/DRBackup.ps1)
 
 This PowerShell script performs tasks that might be used in an Azure Site Recovery Disaster Recovery (DR) scenario. Azure Site Recovery allows your organization to have a disaster recovery plan in place for your Azure resources. This script is designed to be used as part of an Azure Automation Runbook, a collection of routine tasks that are run as needed or on a schedule.
 
@@ -55,9 +55,14 @@ If any exceptions occur during the execution of the script, these are caught and
 
 Remember to replace -WhatIf with actual execution command when you're ready to execute the script in production.
 
+> **_NOTE:_**  As this is for DR Scenarios we need to also ensure the manual steps are included below. If your script does not complete successfully and you need to manually achieve DRBackup please follow the below link. 
+
+## [Manually Back Up VM Using the Portal](https://learn.microsoft.com/en-us/azure/backup/quick-backup-vm-portal)
+
+
 ---------------------------------------------------------------------------------------------
 
-[DRCopyAlerts](/AzureSiteRecoveryDRRunbooks/DRCopyAlerts.ps1)
+## [DRCopyAlerts](/AzureSiteRecoveryDRRunbooks/DRCopyAlerts.ps1)
 
 This PowerShell script appears to be part of a larger automation framework for managing Azure Site Recovery, a disaster recovery service by Microsoft Azure. It's designed to automate various disaster recovery (DR) tasks. Here's a breakdown of what it does:
 
@@ -81,9 +86,13 @@ For smart detector alert rules (microsoft.alertsmanagement/smartdetectoralertrul
 
 Overall, the purpose of the script is to replicate Azure alert rules from one context (e.g., a production environment) to another (e.g., a disaster recovery environment). This helps ensure that alerts are monitored consistently across both environments, enhancing disaster recovery procedures.
 
+> **_NOTE:_**  As this is for DR Scenarios we need to also ensure the manual steps are included below. If your script does not complete successfully and you need to manually achieve DRCopyAlerts please follow the below link..
+
+## [Create or edit an alert rule in the Azure portal](https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-create-new-alert-rule?tabs=metric)
+
 ---------------------------------------------------------------------------------------------
 
-[DRDiagnostics](/AzureSiteRecoveryDRRunbooks/DRDiagnostics.ps1)
+## [DRDiagnostics](/AzureSiteRecoveryDRRunbooks/DRDiagnostics.ps1)
 
 This PowerShell script automates the setup of Azure Site Recovery (ASR) for a Disaster Recovery (DR) scenario. It operates on virtual machines (VMs) within a specific Azure Resource Group.
 
@@ -101,8 +110,12 @@ Below are the key functionalities of the script:
 
 The script can throw errors in situations such as when it can't authenticate to Azure, when it can't retrieve VM information, or when it can't set the Diagnostics Settings. Any exceptions are caught and their messages are written to the output.
 
+> **_NOTE:_**  As this is for DR Scenarios we need to also ensure the manual steps are included below. If your script does not complete successfully and you need to manually achieve DRDiagnostics please follow the below link.
+
+## [Install and configure the Azure Diagnostics extension for Windows in the Azure portal](https://learn.microsoft.com/en-us/azure/azure-monitor/agents/diagnostics-extension-windows-install)
+
 ---------------------------------------------------------------------------------------------
-[DRNSGSync](/AzureSiteRecoveryDRRunbooks/DRNSGSync.ps1)
+## [DRNSGSync](/AzureSiteRecoveryDRRunbooks/DRNSGSync.ps1)
 
 The PowerShell script provided here is designed to help manage network security during an Azure Site Recovery Disaster Recovery (DR) scenario.
 
@@ -132,9 +145,12 @@ Here's a breakdown of what this PowerShell script does:
 
 The main purpose of this script is to ensure that network security settings (specifically, security rules) are consistent between two different resource groups within an Azure environment, particularly for disaster recovery scenarios. This is helpful to ensure the DR site has the same security settings as the original site to maintain network security and compliance.
 
+> **_NOTE:_**  As this is for DR Scenarios we need to also ensure the manual steps are included below. If your script does not complete successfully and you need to manually achieve DRNSGSync please follow the below link.
+
+## [Create, change, or delete a network security group in the Azure portal](https://learn.microsoft.com/en-us/azure/virtual-network/manage-network-security-group?tabs=network-security-group-portal)
 
 ---------------------------------------------------------------------------------------------
-[DRReprotectVMs](/AzureSiteRecoveryDRRunbooks/DRReprotectVMs.ps1)
+## [DRReprotectVMs](/AzureSiteRecoveryDRRunbooks/DRReprotectVMs.ps1)
 
 The provided script is designed for Azure Site Recovery (ASR) during a disaster recovery scenario. It is an automation script for enabling re-protection and replication of virtual machines (VMs) in Azure after a disaster recovery event.
 
@@ -161,9 +177,13 @@ It then starts reprotecting the VM, which means it enables replication back from
 
 So, in summary, this script is used in the context of disaster recovery to re-enable protection and replication for each virtual machine in a recovery plan after a failover has occurred. This prepares the system to handle another potential disaster.
 
+> **_NOTE:_**  As this is for DR Scenarios we need to also ensure the manual steps are included below. If your script does not complete successfully and you need to manually achieve DRReprotectVMs please follow the below link.
+
+## [Reprotect failed over Azure VMs to the primary region in the Azure portal](https://learn.microsoft.com/en-us/azure/site-recovery/azure-to-azure-how-to-reprotect)
+
 ---------------------------------------------------------------------------------------------
 
-[DRServiceHealthAlerts](/AzureSiteRecoveryDRRunbooks/DRServiceHealthAlerts.ps1)
+## [DRServiceHealthAlerts](/AzureSiteRecoveryDRRunbooks/DRServiceHealthAlerts.ps1)
 
 This PowerShell script performs several tasks related to Azure Site Recovery (ASR) during a disaster recovery scenario. Here is a summary of its activities:
 
@@ -186,5 +206,10 @@ This template will create an action group with an email receiver (the contributo
 1. Output: Finally, the script provides an output stating that Service Health Alerts have been created for the subscription.
 
 In summary, this script creates Azure service health alerts for each VM in a recovery plan context, and it assigns the alert notifications to contributors and owners of each VM's resource group. These alerts notify the appropriate people about "ServiceHealth" events related to their resource groups, which might indicate issues or incidents affecting the resources in those groups.
+
+> **_NOTE:_**  As this is for DR Scenarios we need to also ensure the manual steps are included below. If your script does not complete successfully and you need to manually achieve DRServiceHealthAlerts please follow the below link.
+
+## [Configure Resource Health alerts in the Azure portal](https://learn.microsoft.com/en-us/azure/service-health/resource-health-alert-monitor-guide)
+
 ---------------------------------------------------------------------------------------------
 
