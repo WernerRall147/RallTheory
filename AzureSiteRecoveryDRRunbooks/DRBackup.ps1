@@ -28,6 +28,7 @@ catch {
 Write-Output "Getting Recovery Plan context"
 $VMinfo = $RecoveryPlanContext.VmMap | Get-Member | Where-Object MemberType -EQ NoteProperty | Select-Object -ExpandProperty Name
 $vmMap = $RecoveryPlanContext.VmMap
+$DRResourceGroup = Get-AutomationVariable -Name 'DRResourceGroup'
 
 Write-Output "for Each VM trying to enable Backup on the VMs"
 try{
@@ -41,14 +42,14 @@ foreach($VMID in $VMinfo)
 
         # Ensure Backup gets enabled
         Write-Output "Get Az Recovery Services Vault"
-        $vault = Get-AzRecoveryServicesVault -ResourceGroupName $VM.ResourceGroupName | Set-AzRecoveryServicesVaultContext
+        $vault = Get-AzRecoveryServicesVault -ResourceGroupName $DRResourceGroup | Set-AzRecoveryServicesVaultContext
         $vault
         Write-Output "Get Az Recovery Services Backup Protection Policy"
         $policy = Get-AzRecoveryServicesBackupProtectionPolicy -Name "DefaultPolicy"
 
         Write-Output "Enable Backup on the VMs"
         Enable-AzRecoveryServicesBackupProtection `
-            -ResourceGroupName $VM.ResourceGroupName `
+            -ResourceGroupName $DRResourceGroup `
             -Name $VM.RoleName `
             -Policy $policy
         }
