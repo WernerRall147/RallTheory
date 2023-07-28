@@ -51,7 +51,7 @@ $targetRegion = Get-AutomationVariable -Name 'targetRegion'
 Write-Output "Querying all alerts in the production subscription..."
 $allAlerts = Search-AzGraph -Query ' 
 resources
-| where type in~ ("microsoft.insights/metricalerts","microsoft.insights/scheduledqueryrules") and ["kind"] !in~ ("LogToMetric","LogToApplicationInsights")
+| where subscriptionId == "$SubscriptionId" and type in~ ("microsoft.insights/metricalerts","microsoft.insights/scheduledqueryrules") and ["kind"] !in~ ("LogToMetric","LogToApplicationInsights")
 | extend severity = strcat("Sev", properties["severity"])
 | extend enabled = tobool(properties["enabled"])
 | where enabled in~ ("true")
