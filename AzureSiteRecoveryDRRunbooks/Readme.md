@@ -55,6 +55,10 @@ If any exceptions occur during the execution of the script, these are caught and
 
 Remember to replace -WhatIf with actual execution command when you're ready to execute the script in production.
 
+> **_NOTE:_**  As this is for DR Scenarios there may be alternative solutions we can use. If you would like to enable an Azure Policy to achieve the above please find a link to the Built-In Policy below. 
+
+## [Back up Vm using Azure Policy](https://learn.microsoft.com/en-us/azure/backup/backup-azure-auto-enable-backup)
+
 > **_NOTE:_**  As this is for DR Scenarios we need to also ensure the manual steps are included below. If your script does not complete successfully and you need to manually achieve DRBackup please follow the below link. 
 
 ## [Manually Back Up VM Using the Portal](https://learn.microsoft.com/en-us/azure/backup/quick-backup-vm-portal)
@@ -109,6 +113,10 @@ Below are the key functionalities of the script:
 1. Diagnostics Settings: It checks whether each VM in the Disaster Recovery (DR) site has Diagnostics Settings enabled. If not, it updates the placeholders in the Diagnostics Configuration file with the specific resource ID, storage account name, and storage account key. It then sets the Diagnostics Settings using the updated Diagnostics Configuration file.
 
 The script can throw errors in situations such as when it can't authenticate to Azure, when it can't retrieve VM information, or when it can't set the Diagnostics Settings. Any exceptions are caught and their messages are written to the output.
+
+> **_NOTE:_**  As this is for DR Scenarios there may be alternative solutions we can use. If you would like to enable an Azure Policy to achieve the above please find a link to the Built-In Policy below. 
+
+## [Create diagnostic settings at scale using Azure Policies and Initiatives](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings-policy)
 
 > **_NOTE:_**  As this is for DR Scenarios we need to also ensure the manual steps are included below. If your script does not complete successfully and you need to manually achieve DRDiagnostics please follow the below link.
 
