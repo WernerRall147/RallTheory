@@ -47,7 +47,6 @@ $WorkspaceName = Get-AutomationVariable -Name 'WorkspaceName'
 $actionGroup = Get-AutomationVariable -Name 'actionGroup'
 $targetRegion = Get-AutomationVariable -Name 'targetRegion'
 
-
 #ResourceGraphQuery for all alerts per subscription. This will query the production subscription
 Write-Output "Querying all alerts in the production subscription..."
 $allAlerts = Search-AzGraph -Query ' 
@@ -74,7 +73,6 @@ try{
               $targetResource = $rule.properties.scopes | ConvertTo-Json -Depth 100 -Compress
               $targetResourceformat = $targetResource -replace '"', ''
                 $resource = Get-AzResource -ResourceId $targetResourceformat -ErrorAction Continue
-                #$resource = Get-AzResource -ResourceGroupName $DRResourceGroup -Name $targetResource
         
                 # Define the condition for the alert
                 #$condition = $rule.Properties.criteria | ConvertFrom-Json .................... $allAlerts.properties.criteria.allOf
@@ -158,8 +156,14 @@ try{
             $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue
 
             #Generate Bicep template for Smart Detector Alert Rules
+            #Generate variables for Bicep Here-String
+
             # Your Bicep file
             $schema = '$schema' 
+            $smartdetectoralertrulesnameBVAR = $rule.name
+            $actgidBVAR = $actG.Id
+            $scopesBVAR = $rule.properties.scope
+          
             $bicepFile = @"
             {
                 "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -169,15 +173,15 @@ try{
                 "parameters": {
                   "smartdetectoralertrulesname": {
                     "type": "string",
-                    "defaultValue": "$rule.name"
+                    "defaultValue": "$smartdetectoralertrulesnameBVAR"
                   },
                   "actgid": {
                     "type": "string",
-                    "defaultValue": "$actG.Id"
+                    "defaultValue": "$actgidBVAR"
                   },
                   "scopes": {
                     "type": "string",
-                    "defaultValue": "$rule.properties.scope"
+                    "defaultValue": "$scopesBVAR"
                   }
                 },
                 "resources": [
@@ -201,7 +205,7 @@ try{
                       "scope": [
                         "[parameters('scopes')]"
                       ],
-                      "severity": "3",
+                      "severity": "Sev3",
                       "state": "enabled"
                     }
                   }
@@ -213,7 +217,7 @@ try{
             Set-Content -Path $bicepFilePath -Value $bicepFile -ErrorAction Continue
             
             #Deploy using Bicep as there are no powershell modules available
-            New-AzResourceGroupDeployment -ResourceGroupName $DRResourceGroup -TemplateFile .\smartdetectoralertrules.json -ErrorAction Continue 
+            New-AzResourceGroupDeployment -ResourceGroupName $DRResourceGroup -TemplateFile .\smartdetectoralertrules.json -TemplateParameterObject $templateParams -ErrorAction Continue 
             
             }
 
