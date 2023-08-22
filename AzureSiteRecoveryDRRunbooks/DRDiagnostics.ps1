@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: Werner Rall
-        LASTEDIT: 20230627
+        LASTEDIT: 20230822
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
 param (
@@ -335,8 +335,7 @@ $diagnosticsconfigfile = @"
 # Ensure Diagnostics Settings are enabled
     try {
     foreach ($drres in $DestinationResources) {
-      Write-Output "Checking Diagnostics Settings" 
-      $DiagSettings = Get-AzVMDiagnosticsExtension -ResourceGroupName $VM.ResourceGroupName -VMName ($drres).Name
+      Write-Output "Checking Diagnostics Settings" ($DiagSettings = Get-AzVMDiagnosticsExtension -ResourceGroupName $VM.ResourceGroupName -VMName ($drres).Name)
         if ($null -eq $DiagSettings) {
             $diagnosticsconfig_path = "$env:SystemDrive\temp\DiagnosticsConfiguration.json"
             $diagnosticsconfigfile | Out-File -FilePath $diagnosticsconfig_path
@@ -349,8 +348,8 @@ $diagnosticsconfigfile = @"
             $diagnosticsconfig_update3 = (Get-Content $diagnosticsconfig_path).Replace("(TODOUpdateStKey)",$StorageAccountKey) | Set-Content $diagnosticsconfig_path
             $diagnosticsconfig_update3
 
-            Write-Output "Enabling Diagnostic Settings"
-            Set-AzVMDiagnosticsExtension -ResourceGroupName $VM.ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path -storageAccountName $DestinationStorageAccountName -StorageAccountKey $StorageAccountKey
+           
+            Write-Output "Enabling Diagnostic Settings" (Set-AzVMDiagnosticsExtension -ResourceGroupName $VM.ResourceGroupName -VMName ($drres).Name -DiagnosticsConfigurationPath $diagnosticsconfig_path -storageAccountName $DestinationStorageAccountName -StorageAccountKey $StorageAccountKey)
             }else {
                 Write-Output "Diagnostic Settings Correct"
             }

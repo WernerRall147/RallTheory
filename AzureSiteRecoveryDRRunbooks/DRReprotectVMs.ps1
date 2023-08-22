@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: Werner Rall
-        LASTEDIT: 20230627
+        LASTEDIT: 20230822
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
 param (
@@ -49,19 +49,19 @@ try{
     
             # Ensure Reprotection and Replication get enabled         
             # Get the recovery services vault
-            $vault = Get-AzRecoveryServicesVault -Name $recoveryservicesname -ResourceGroupName $VM.ResourceGroupName
+            Write-Output (vault = Get-AzRecoveryServicesVault -Name $recoveryservicesname -ResourceGroupName $VM.ResourceGroupName)
 
             # Set the vault context
-            Set-AzRecoveryServicesAsrVaultSettings -Vault $vault
+            Write-Output (Set-AzRecoveryServicesAsrVaultSettings -Vault $vault)
 
             # Get the Replication Protected Item
             # Get the ASR Fabric and select one based on a condition
-            $fabric = Get-AzRecoveryServicesAsrFabric -Name $fabricName
-            $protectionContainer = Get-AzRecoveryServicesAsrProtectionContainer -Fabric $fabric
-            $replicatedItem = Get-AzRecoveryServicesAsrReplicationProtectedItem -ProtectionContainer $protectionContainer
+            Write-Output ($fabric = Get-AzRecoveryServicesAsrFabric -Name $fabricName)
+            Write-Output ($protectionContainer = Get-AzRecoveryServicesAsrProtectionContainer -Fabric $fabric)
+            Write-Output ($replicatedItem = Get-AzRecoveryServicesAsrReplicationProtectedItem -ProtectionContainer $protectionContainer)
 
             # Start reprotecting the VM
-            Start-AzRecoveryServicesAsrReprotect -ReplicationProtectedItem $replicatedItem
+            Write-Output (Start-AzRecoveryServicesAsrReprotect -ReplicationProtectedItem $replicatedItem)
 
             }
             else {

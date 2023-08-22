@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: Werner Rall
-        LASTEDIT: 20230627
+        LASTEDIT: 20230822
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
 param (
@@ -40,12 +40,10 @@ $SourceNetworkSecurityGroup = Get-AutomationVariable -Name 'SourceNetworkSecurit
 
 
 #Check inbound port rules if NSGs are on Vnets
-Write-Output "Get all Source Security Rules"
-$sourceSecRules = Get-AzNetworkSecurityGroup -Name $SourceNetworkSecurityGroup  -ResourceGroupName ($SourceResourceGroup).ResourceGroupName
-Write-Output "Get all Destination Security Rules"
-$destinationSecRules = Get-AzNetworkSecurityGroup -Name $destinationNetworkSecurityGroup  -ResourceGroupName ($DRResourceGroup).ResourceGroupName
+Write-Output "Get all Source Security Rules"($sourceSecRules = Get-AzNetworkSecurityGroup -Name $SourceNetworkSecurityGroup  -ResourceGroupName ($SourceResourceGroup).ResourceGroupName)
+Write-Output "Get all Destination Security Rules"($destinationSecRules = Get-AzNetworkSecurityGroup -Name $destinationNetworkSecurityGroup  -ResourceGroupName ($DRResourceGroup).ResourceGroupName)
 Write-Output "Comparing Security Rules"
-$comp = Compare-Object -ReferenceObject $destinationSecRules.SecurityRules -DifferenceObject $sourceSecRules.SecurityRules -Property Name, Protocol, SourcePortRange, DestinationPortRange, Access, Priority, Direction, ProvisioningState
+Write-Output ($comp = Compare-Object -ReferenceObject $destinationSecRules.SecurityRules -DifferenceObject $sourceSecRules.SecurityRules -Property Name, Protocol, SourcePortRange, DestinationPortRange, Access, Priority, Direction, ProvisioningState)
 
 try {
     if ($null -eq $comp) {
@@ -65,7 +63,7 @@ try {
                 DestinationAddressPrefix = $secRule.DestinationAddressPrefix
                 DestinationPortRange = $secRule.DestinationPortRange
             }
-            $nsg | Add-AzNetworkSecurityRuleConfig @ruleConfig | Set-AzNetworkSecurityGroup
+            Write-Output ($nsg | Add-AzNetworkSecurityRuleConfig @ruleConfig | Set-AzNetworkSecurityGroup)
         }
     }
 } catch {

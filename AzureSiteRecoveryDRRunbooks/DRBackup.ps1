@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: Werner Rall
-        LASTEDIT: 20230627
+        LASTEDIT: 20230822
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
 param (
@@ -41,17 +41,10 @@ foreach($VMID in $VMinfo)
         Write-output "The current Server name is ", $VM.RoleName
 
         # Ensure Backup gets enabled
-        Write-Output "Get Az Recovery Services Vault"
-        $vault = Get-AzRecoveryServicesVault -ResourceGroupName $DRResourceGroup | Set-AzRecoveryServicesVaultContext
-        $vault
-        Write-Output "Get Az Recovery Services Backup Protection Policy"
-        $policy = Get-AzRecoveryServicesBackupProtectionPolicy -Name "DefaultPolicy"
-
-        Write-Output "Enable Backup on the VMs"
-        Enable-AzRecoveryServicesBackupProtection `
-            -ResourceGroupName $DRResourceGroup `
-            -Name $VM.RoleName `
-            -Policy $policy
+        Write-Output "Get Az Recovery Services Vault"($vault = Get-AzRecoveryServicesVault -ResourceGroupName $DRResourceGroup | Set-AzRecoveryServicesVaultContext)
+        Write-Output $vault
+        Write-Output "Get Az Recovery Services Backup Protection Policy"($policy = Get-AzRecoveryServicesBackupProtectionPolicy -Name "DefaultPolicy")
+        Write-Output "Enable Backup on the VMs" (Enable-AzRecoveryServicesBackupProtection -ResourceGroupName $DRResourceGroup -Name $VM.RoleName -Policy $policy)
         }
         else {
             Write-Error "Something went wrong when we tried to enable backup on $VM"

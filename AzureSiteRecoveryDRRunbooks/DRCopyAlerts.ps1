@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: Werner Rall
-        LASTEDIT: 20230728
+        LASTEDIT: 20230822
         https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-runbook-automation
 #>
 
@@ -70,9 +70,9 @@ try{
         switch ($rule.type) {
             "microsoft.insights/metricalerts" {# Get the resource you want to monitor and Create the metric alert rule
               Write-Output "Working on metric alert rule: $($rule.name)" 
-              $targetResource = $rule.properties.scopes | ConvertTo-Json -Depth 100 -Compress
-              $targetResourceformat = $targetResource -replace '"', ''
-                $resource = Get-AzResource -ResourceId $targetResourceformat -ErrorAction Continue
+              Write-Output ($targetResource = $rule.properties.scopes | ConvertTo-Json -Depth 100 -Compress)
+              Write-Output ($targetResourceformat = $targetResource -replace '"', '')
+              Write-Output ($resource = Get-AzResource -ResourceId $targetResourceformat -ErrorAction Continue)
         
                 # Define the condition for the alert
                 #$condition = $rule.Properties.criteria | ConvertFrom-Json .................... $allAlerts.properties.criteria.allOf
@@ -82,49 +82,46 @@ try{
                 -TimeAggregation $rule.properties.criteria.allOf.timeAggregation -ErrorAction Continue
         
                 # Get the actiongroup
-                $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup}
-                $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue 
+                Write-Output ($ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup})
+                Write-Output ($actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue )
         
                 # Create the alert rule
-                Add-AzMetricAlertRuleV2 -Name $rule.name -ResourceGroupName "$DRResourceGroup" -WindowSize 00:05:00 `
-                -Frequency 00:05:00 -TargetResourceId $resource.Id -Condition $condition -Severity $rule.Properties.severity `
-                -ActionGroupId $actG.Id -ErrorAction Continue
+                Write-Output (Add-AzMetricAlertRuleV2 -Name $rule.name -ResourceGroupName "$DRResourceGroup" -WindowSize 00:05:00 -Frequency 00:05:00 -TargetResourceId $resource.Id -Condition $condition -Severity $rule.Properties.severity -ActionGroupId $actG.Id -ErrorAction Continue)
             }
 
             "microsoft.insights/activitylogalerts" {#Get the resource you want to monitor and Create the activity log alerts
                  Write-Output "Working on activitylogalerts alert rule: $($rule.name)" 
 
                 # Get the actiongroup
-                $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup} -ErrorAction Continue
-                $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue
+                Write-Output ($ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup} -ErrorAction Continue)
+                Write-Output ($actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue)
                 $scope = "subscriptions/"+(Get-AzContext).Subscription.ID
-                $actiongroupobj = New-AzActivityLogAlertActionGroupObject -Id $actG.Id -ErrorAction Continue
+                Write-Output ($actiongroupobj = New-AzActivityLogAlertActionGroupObject -Id $actG.Id -ErrorAction Continue)
 
                 $conditionArray = @()
                 foreach ($condition in $rule.properties.condition.allOf) {
-                $conditionObject = New-AzActivityLogAlertAlertRuleAnyOfOrLeafConditionObject -Equal $condition.equals -Field $condition.field -ErrorAction Continue
+                  Write-Output ($conditionObject = New-AzActivityLogAlertAlertRuleAnyOfOrLeafConditionObject -Equal $condition.equals -Field $condition.field -ErrorAction Continue)
                 $conditionArray += $conditionObject
                 }
 
                 #Create the alert rule
                 #New-AzActivityLogAlert -Name $AlertName -ResourceGroupName $DRResourceGroup -Action $actiongroupobj -Condition @($condition1,$condition2,$condition3) -Location global -Scope $scope
                 #New-AzActivityLogAlert -Name $rule.Name -ResourceGroupName $DRResourceGroup -Action $actiongroupobj -Condition $rule.properties.condition.allOf -Location global -Scope $scope
-                New-AzActivityLogAlert -Name $rule.Name -ResourceGroupName $DRResourceGroup -Action $actiongroupobj -Condition $conditionArray -Location global -Scope $scope -ErrorAction Continue      
+                Write-Output (New-AzActivityLogAlert -Name $rule.Name -ResourceGroupName $DRResourceGroup -Action $actiongroupobj -Condition $conditionArray -Location global -Scope $scope -ErrorAction Continue)
             }
 
             "microsoft.insights/scheduledqueryrules" {#Get the resource you want to monitor and Create the scheduled query rules
               Write-Output "Working on scheduledqueryrules alert rule: $($rule.name)" 
                 # Get the actiongroup
-                $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup} -ErrorAction Continue
-                $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue
-                $targetResource = $rule.properties.scopes | ConvertTo-Json -Depth 100 -Compress
-                $targetResourceformat = $targetResource -replace '"', ''
-                $resource = Get-AzResource -ResourceId $targetResourceformat -ErrorAction Continue
+                Write-Output ($ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup} -ErrorAction Continue)
+                Write-Output ($actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue)
+                Write-Output ($targetResource = $rule.properties.scopes | ConvertTo-Json -Depth 100 -Compress)
+                Write-Output ($targetResourceformat = $targetResource -replace '"', '')
+                Write-Output ($resource = Get-AzResource -ResourceId $targetResourceformat -ErrorAction Continue)
 
                 # Create the Scheduled Query Rule
                 $subscriptionId=(Get-AzContext).Subscription.Id
-                $dimension = New-AzScheduledQueryRuleDimensionObject -Name Computer `
-                -Operator Include -Value *
+                Write-Output ($dimension = New-AzScheduledQueryRuleDimensionObject -Name Computer -Operator Include -Value *)
 
                 $cond = New-AzScheduledQueryRuleConditionObject -Dimension $dimension `
                  -Query "Perf | where ObjectName == `"Processor`" and CounterName == `"% Processor Time`" | summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 5m), Computer" `
@@ -152,11 +149,8 @@ try{
               Write-Output "Working on smartdetectoralertrules alert rule: $($rule.name)" 
 
             #Get action groups
-            $ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup}
-            $actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue
-
-            #Generate Bicep template for Smart Detector Alert Rules
-            #Generate variables for Bicep Here-String
+            Write-Output ($ActionGroupArray = Get-AzActionGroup | Where-Object {$_.Name -eq $actionGroup})
+            Write-Output ($actG = Get-AzActionGroup -ResourceGroupName $ActionGroupArray.ResourceGroupName -Name $actionGroup -ErrorAction Continue)
 
             # Your Bicep file
             $schema = '$schema' 
@@ -213,11 +207,11 @@ try{
               }
 "@
             # Write the Bicep file to disk
-            $bicepFilePath = '.\smartdetectoralertrules.json'
-            Set-Content -Path $bicepFilePath -Value $bicepFile -ErrorAction Continue
+            Write-Output ($bicepFilePath = '.\smartdetectoralertrules.json')
+            Write-Output (Set-Content -Path $bicepFilePath -Value $bicepFile -ErrorAction Continue)
             
             #Deploy using Bicep as there are no powershell modules available
-            New-AzResourceGroupDeployment -ResourceGroupName $DRResourceGroup -TemplateFile .\smartdetectoralertrules.json -TemplateParameterObject $templateParams -ErrorAction Continue 
+            Write-Output (New-AzResourceGroupDeployment -ResourceGroupName $DRResourceGroup -TemplateFile .\smartdetectoralertrules.json -TemplateParameterObject $templateParams -Mode Incremental -ErrorAction Continue)
             
             }
 
