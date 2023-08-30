@@ -30,7 +30,7 @@ param (
 
 Write-Output "Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail..."
 #Log in with the Managed Identity
-Write-Output "Logging in to Azure..."`(
+Write-Output "Logging in to Azure..."
 try{
     Connect-AzAccount -Identity
 }
@@ -38,7 +38,6 @@ catch {
     Write-Error -Message $_.Exception
     throw $_.Exception
 }
-`)
 
 #Decyfer RecoveryPlan Context
 Write-Output "Getting variables from Automation Account Store"
