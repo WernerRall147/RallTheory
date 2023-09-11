@@ -1,11 +1,8 @@
 #Normally Fabric has a format of something like this 'asr-a2a-default-eastus'
-
-Write-Host "Enter the name of the Recovery Services Vault" -ForegroundColor Yellow -BackgroundColor Black
-$VaultName = Read-Host
+$VaultName = Read-Host -Prompt "Enter the name of the Recovery Services Vault"
 $vault = Get-AzRecoveryServicesVault -Name $VaultName
 Set-AzRecoveryServicesAsrVaultContext -Vault $vault
-Write-Host "Enter the name of the Fabric, Fabric has a format of something like this 'asr-a2a-default-eastus'" -ForegroundColor Yellow -BackgroundColor Black
-$fabricName = Read-Host
+$fabricName = Read-Host -Prompt "Enter the name of the Fabric, Fabric has a format of something like this 'asr-a2a-default-eastus'"
 $fabric = Get-AzRecoveryServicesAsrFabric -Name $fabricName
 $container = Get-AzRecoveryServicesAsrProtectionContainer -Fabric $fabric
 $pi = Get-AzRecoveryServicesAsrReplicationProtectedItem -ProtectionContainer $container
@@ -25,6 +22,6 @@ $SourceVMName = ($p.RecoveryAzureVMName).ToString()
 $FailoverVMName = ($p.TfoAzureVMName).ToString()
 $StaticNICIP = ($p.NicDetailsList.IpConfigs.StaticIPAddress).ToString()
 $table2.Rows.Add("$SourceVMName", "$FailoverVMName", "$StaticNICIP")
-
-Write-Output $table2
 }
+
+Write-Output $table2 | Format-Table -AutoSize
