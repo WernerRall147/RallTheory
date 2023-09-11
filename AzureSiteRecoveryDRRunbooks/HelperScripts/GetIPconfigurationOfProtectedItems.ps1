@@ -1,3 +1,6 @@
+#connect to Azure
+Connect-AzAccount -UseDeviceAuthentication
+
 #Normally Fabric has a format of something like this 'asr-a2a-default-eastus'
 $VaultName = Read-Host -Prompt "Enter the name of the Recovery Services Vault"
 $vault = Get-AzRecoveryServicesVault -Name $VaultName
