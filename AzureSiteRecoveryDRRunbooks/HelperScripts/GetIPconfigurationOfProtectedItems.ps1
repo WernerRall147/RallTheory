@@ -1,9 +1,12 @@
 #Normally Fabric has a format of something like this 'asr-a2a-default-eastus'
 
-$VaultName = '#TODO'
+Write-Host "Enter the name of the Recovery Services Vault" -ForegroundColor Yellow -BackgroundColor Black
+$VaultName = Read-Host
 $vault = Get-AzRecoveryServicesVault -Name $VaultName
 Set-AzRecoveryServicesAsrVaultContext -Vault $vault
-$fabric = Get-AzRecoveryServicesAsrFabric -Name "#TODO"
+Write-Host "Enter the name of the Fabric, Fabric has a format of something like this 'asr-a2a-default-eastus'" -ForegroundColor Yellow -BackgroundColor Black
+$fabricName = Read-Host
+$fabric = Get-AzRecoveryServicesAsrFabric -Name $fabricName
 $container = Get-AzRecoveryServicesAsrProtectionContainer -Fabric $fabric
 $pi = Get-AzRecoveryServicesAsrReplicationProtectedItem -ProtectionContainer $container
 
