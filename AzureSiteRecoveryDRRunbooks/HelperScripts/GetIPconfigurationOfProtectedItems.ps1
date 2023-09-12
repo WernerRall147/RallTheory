@@ -16,6 +16,7 @@ $table2 = New-Object System.Data.DataTable
 $table2.Columns.Add("SourceVMName", [string])
 $table2.Columns.Add("FailoverVMName", [string])
 $table2.Columns.Add("StaticNICIP", [string])
+$table2.Columns.Add("FailoverNICIP", [string])
 
 # Output the primary IP failover information
 Foreach($p in $pi){
@@ -24,7 +25,8 @@ Foreach($p in $pi){
 $SourceVMName = ($p.RecoveryAzureVMName).ToString()
 $FailoverVMName = ($p.TfoAzureVMName).ToString()
 $StaticNICIP = ($p.NicDetailsList.IpConfigs.StaticIPAddress).ToString()
-$table2.Rows.Add("$SourceVMName", "$FailoverVMName", "$StaticNICIP")
+$FailoverNICIP = ($p.TfoNicDetailsList.IpConfigs.StaticIPAddress).ToString()
+$table2.Rows.Add("$SourceVMName", "$FailoverVMName", "$StaticNICIP", "$FailoverNICIP")
 }
 
 Write-Output $table2 | Format-Table -AutoSize
