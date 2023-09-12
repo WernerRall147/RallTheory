@@ -25,7 +25,7 @@ Foreach($p in $pi){
 $SourceVMName = ($p.RecoveryAzureVMName).ToString()
 $FailoverVMName = ($p.TfoAzureVMName).ToString()
 $StaticNICIP = ($p.NicDetailsList.IpConfigs.StaticIPAddress).ToString()
-$FailoverNICIP = ($p.TfoNicDetailsList.IpConfigs.StaticIPAddress).ToString()
+$FailoverNICIP = ($p.NicDetailsList.IpConfigs.RecoveryIPAddressType).ToString()
 $table2.Rows.Add("$SourceVMName", "$FailoverVMName", "$StaticNICIP", "$FailoverNICIP")
 }
 
