@@ -1,0 +1,6 @@
+Resources
+| join kind=leftouter (ResourceContainers | where type=='microsoft.resources/subscriptions' | project SubName=name, subscriptionId) on subscriptionId
+| where type == 'microsoft.network/virtualnetworks'
+| extend vnet_name = name
+| mv-expand subnets = properties.subnets
+| project vnet_name, subnet_name=subnets.name, SubName
