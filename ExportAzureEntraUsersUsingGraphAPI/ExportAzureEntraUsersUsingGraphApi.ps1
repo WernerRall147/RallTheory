@@ -5,9 +5,9 @@
 # 3. Use the access tokens to make authorized requests to the Microsoft Graph API.
 
 # Define your credentials
-$clientID = "<Your-Client-ID>"
-$clientSecret = "<Your-Client-Secret>"
-$tenantID = "<Your-Tenant-ID>"
+$clientID = "#TODO"
+$clientSecret = "#TODO"
+$tenantID = "#TODO"
 
 # Define the resource URL
 $resource = "https://graph.microsoft.com"
@@ -38,4 +38,5 @@ $apiURL = "https://graph.microsoft.com/beta/users"
 $response = Invoke-RestMethod -Method Get -Uri $apiURL -Headers $header
 
 # Output the response
-$response
+$gen = $response.value | convertto-csv -NoTypeInformation  
+$gen | Out-File -FilePath C:\Temp\AzureEntraUsers.csv
