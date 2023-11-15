@@ -24,7 +24,7 @@
     },
     "WindowsOSVersion": {
       "type": "string",
-      "defaultValue": "2016-Datacenter",
+      "defaultValue": "2022-Datacenter",
       "allowedValues": [
         "2012-Datacenter",
         "2012-R2-Datacenter",
@@ -124,7 +124,7 @@
       "name": "mitbc-onprem",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [],
       "tags": {
         "displayName": "mitbc-onprem"
@@ -150,7 +150,7 @@
       "name": "[variables('mitbcstorageName')]",
       "type": "Microsoft.Storage/storageAccounts",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-01-01",
+      "apiVersion": "2022-09-01",
       "sku": {
         "name": "[parameters('mitbcstorageType')]"
       },
@@ -165,7 +165,7 @@
       "name": "[variables('AADC-NicName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('AADC-PublicIPName'))]",
@@ -205,7 +205,7 @@
       "name": "[variables('HV-NicName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('HV-PublicIPName'))]",
@@ -245,7 +245,7 @@
       "name": "[variables('AD-NicName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('AD-PublicIPName'))]",
@@ -281,7 +281,7 @@
       "name": "[variables('FILE-NicName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('FILE-PublicIPName'))]",
@@ -321,7 +321,7 @@
       "name": "[variables('WEB-NicName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('WEB-PublicIPName'))]",
@@ -361,7 +361,7 @@
       "name": "[variables('SCCM-NicName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', 'mitbc-onprem')]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('SCCM-PublicIPName'))]",
@@ -401,7 +401,7 @@
       "name": "[variables('AADC-PublicIPName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [],
       "tags": {
         "displayName": "[concat(variables('AADC-VMName'), 'PublicIP')]"
@@ -418,7 +418,7 @@
       "name": "[variables('HV-PublicIPName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [],
       "tags": {
         "displayName": "[concat(variables('HV-VMName'), 'PublicIP')]"
@@ -436,7 +436,7 @@
       "name": "[variables('AD-PublicIPName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [],
       "tags": {
         "displayName": "[concat(variables('AD-VMName'), 'PublicIP')]"
@@ -453,7 +453,7 @@
       "name": "[variables('FILE-PublicIPName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [],
       "tags": {
         "displayName": "[concat(variables('FILE-VMName'), 'PublicIP')]"
@@ -470,7 +470,7 @@
       "name": "[variables('WEB-PublicIPName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [],
       "tags": {
         "displayName": "[concat(variables('WEB-VMName'), 'PublicIP')]"
@@ -487,7 +487,7 @@
       "name": "[variables('SCCM-PublicIPName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2022-07-01",
       "dependsOn": [],
       "tags": {
         "displayName": "[concat(variables('SCCM-VMName'), 'PublicIP')]"
@@ -501,7 +501,7 @@
     },
 
     {
-      "apiVersion": "2017-03-01",
+      "apiVersion": "2022-07-01",
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "OnPrem-NSG",
       "location": "[resourceGroup().location]",
@@ -532,7 +532,7 @@
       "name": "[variables('WEB-VMName')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2019-07-01",
+      "apiVersion": "2022-11-01",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
         "[resourceId('Microsoft.Network/networkInterfaces', variables('WEB-NicName'))]"
@@ -560,7 +560,7 @@
           "osDisk": {
             "name": "[concat(variables('WEB-VMName'), 'OSDisk')]",
             "vhd": {
-              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('WEB-VMName'), 'OSDisk.vhd')]"
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2022-09-01').primaryEndpoints.blob, 'vhds/', variables('WEB-VMName'), 'OSDisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -581,7 +581,7 @@
           "location": "[resourceGroup().location]",
           "apiVersion": "2015-06-15",
           "dependsOn":  [
-			"[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
+			    "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
             "[concat('Microsoft.Compute/virtualMachines/', variables('WEB-VMName'))]"
           ],
           "tags": {
@@ -611,12 +611,11 @@
         }
       ]
     },
-
     {
       "name": "[variables('AADC-VMName')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2019-07-01",
+      "apiVersion": "2022-11-01",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
         "[resourceId('Microsoft.Network/networkInterfaces', variables('AADC-NicName'))]"
@@ -644,7 +643,7 @@
           "osDisk": {
             "name": "[concat(variables('AADC-VMName'), 'OSDisk')]",
             "vhd": {
-              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('AADC-VMName'), 'OSDisk.vhd')]"
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2022-09-01').primaryEndpoints.blob, 'vhds/', variables('AADC-VMName'), 'OSDisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -665,7 +664,7 @@
           "location": "[resourceGroup().location]",
           "apiVersion": "2015-06-15",
           "dependsOn":  [
-			"[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
+			    "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
             "[concat('Microsoft.Compute/virtualMachines/', variables('AADC-VMName'))]"
           ],
           "tags": {
@@ -700,7 +699,7 @@
       "name": "[variables('HV-VMName')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2019-07-01",
+      "apiVersion": "2022-11-01",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
         "[resourceId('Microsoft.Network/networkInterfaces', variables('HV-NicName'))]"
@@ -728,7 +727,7 @@
           "osDisk": {
             "name": "[concat(variables('HV-VMName'), 'OSDisk')]",
             "vhd": {
-              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('HV-VMName'), 'OSDisk.vhd')]"
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2022-09-01').primaryEndpoints.blob, 'vhds/', variables('HV-VMName'), 'OSDisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -743,13 +742,13 @@
         }
       },
       "resources": [
-        {
+       {
           "name": "HV-DSC",
           "type":"extensions",
           "location": "[resourceGroup().location]",
           "apiVersion": "2015-06-15",
           "dependsOn":  [
-			"[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
+			    "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('AD-VMName'), 'AD-DSC')]",
             "[concat('Microsoft.Compute/virtualMachines/', variables('HV-VMName'))]"
           ],
           "tags": {
@@ -777,14 +776,14 @@
             "protectedSettings": {}
           }
         }
-      ]
+      ]   
     },
 	
     {
       "name": "[variables('AD-VMName')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2019-07-01",
+      "apiVersion": "2022-11-01",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
         "[resourceId('Microsoft.Network/networkInterfaces', variables('AD-NicName'))]"
@@ -813,7 +812,7 @@
             {
               "name": "[concat(variables('AD-VMName'), 'DataDisk')]",
               "vhd": {
-                "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('AD-VMName'), 'DataDisk.vhd')]"
+                "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2022-09-01').primaryEndpoints.blob, 'vhds/', variables('AD-VMName'), 'DataDisk.vhd')]"
               },
               "diskSizeGB": "40",
               "lun": 0,
@@ -824,7 +823,7 @@
           "osDisk": {
             "name": "[concat(variables('AD-VMName'), 'OSDisk')]",
             "vhd": {
-              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('AD-VMName'), 'OSDisk.vhd')]"
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2022-09-01').primaryEndpoints.blob, 'vhds/', variables('AD-VMName'), 'OSDisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -882,7 +881,7 @@
       "name": "[variables('FILE-VMName')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2019-07-01",
+      "apiVersion": "2022-11-01",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
         "[resourceId('Microsoft.Network/networkInterfaces', variables('FILE-NicName'))]"
@@ -910,7 +909,7 @@
           "osDisk": {
             "name": "[concat(variables('FILE-VMName'), 'OSDisk')]",
             "vhd": {
-              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('FILE-VMName'), 'OSDisk.vhd')]"
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2022-09-01').primaryEndpoints.blob, 'vhds/', variables('FILE-VMName'), 'OSDisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -966,7 +965,7 @@
       "name": "[variables('SCCM-VMName')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2019-07-01",
+      "apiVersion": "2022-11-01",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName'))]",
         "[resourceId('Microsoft.Network/networkInterfaces', variables('SCCM-NicName'))]"
@@ -994,7 +993,7 @@
           "osDisk": {
             "name": "[concat(variables('SCCM-VMName'), 'OSDisk')]",
             "vhd": {
-              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2016-01-01').primaryEndpoints.blob, 'vhds/', variables('SCCM-VMName'), 'OSDisk.vhd')]"
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('mitbcstorageName')), '2022-09-01').primaryEndpoints.blob, 'vhds/', variables('SCCM-VMName'), 'OSDisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
