@@ -1,0 +1,141 @@
+//Need to find a way for Resource Graph to lookup the latest OS Versions in these lists
+//Supported Windows,Linux, Custom Images from https://learn.microsoft.com/en-us/azure/update-manager/support-matrix?tabs=azurevm%2Cazurevm-os 
+datatable(Col1:string, Col2:string) [
+"Microsoft Windows Server","1709",
+"Microsoft Windows Server","1803",
+"Microsoft Windows Server","1809",
+"Microsoft Windows Server","2012",
+"Microsoft Windows Server","2016",
+"Microsoft Windows Server","2019",
+"Microsoft Windows Server","2022",
+"Microsoft Windows Server HPC Pack","2012",
+"Microsoft Windows Server HPC Pack","2016",
+"Microsoft Windows Server HPC Pack","2019",
+"Microsoft SQL Server","2008",
+"Microsoft SQL Server","2012",
+"Microsoft SQL Server","2014",
+"Microsoft SQL Server","2016",
+"Microsoft SQL Server","2017",
+"Microsoft SQL Server","2019",
+"Microsoft SQL Server","2022",
+"Microsoft Visual Studio","ws2012r2",
+"Microsoft Visual Studio","ws2016",
+"Microsoft Visual Studio","ws2019",
+"Microsoft Visual Studio","ws2022",
+"Microsoft Azure Site Recovery","Windows 2012",
+"Microsoft BizTalk Server","2016",
+"Microsoft BizTalk Server","2020",
+"Microsoft DynamicsAx", "ax7",
+"Microsoft Power BI","2016",
+"Microsoft Power BI","2017",
+"Microsoft Power BI","2019",
+"Microsoft Power BI","2022",
+"Microsoft SharePoint","sp*",
+"Canonical","Ubuntu 16.04",
+"Canonical","Ubuntu 18.04",
+"Canonical","Ubuntu 20.04",
+"Canonical","Ubuntu 22.04",
+"Red Hat","RHEL 7",
+"Red Hat","RHEL 8",
+"Red Hat","RHEL 9",
+"OpenLogic","CentOS 7",
+"SUSE 12","sles",
+"SUSE 12","sles-byos",
+"SUSE 12","sap",
+"SUSE 12","sap-byos",
+"SUSE 12","sapcal",
+"SUSE 12","sles-standard",
+"SUSE 15","basic",
+"SUSE 15","hpc",
+"SUSE 15","opensuse",
+"SUSE 15","sles",
+"SUSE 15","sap",
+"SUSE 15","sapcal",
+"Oracle Linux","7*",
+"Oracle Linux","ol7*",
+"Oracle Linux","ol8*",
+"Oracle Linux","ol9*",
+"Oracle Database","21",
+"Oracle Database","19-0904",
+"Oracle Database","18.*",
+"Windows Server 2022",,
+"Windows Server 2019",,
+"Windows Server 2016",,
+"Windows Server 2012 R2",,
+"Windows Server 2012",,
+"Windows Server 2008 R2 (RTM and SP1 Standard)",,
+"CentOS 7",,
+"CentOS 8",,
+"Oracle Linux 7.x",, 
+"Oracle Linux 8x",,
+"Red Hat Enterprise 7",,
+"Red Hat Enterprise 8",,
+"Red Hat Enterprise 9",,
+"SUSE Linux Enterprise Server 12.x",, 
+"SUSE Linux Enterprise Server 15.0",,
+"SUSE Linux Enterprise Server 15.1",,
+"SUSE Linux Enterprise Server 15.2",,
+"SUSE Linux Enterprise Server 15.3",,
+"SUSE Linux Enterprise Server 15.4",,
+"Ubuntu 16.04 LTS",,
+"Ubuntu 18.04 LTS",,
+"Ubuntu 20.04 LTS",,
+"Ubuntu 22.04 LTS",
+]
+| serialize
+
+//Unsupported Operating Systems
+datatable(Col1:string, Col2:string, Col3:string) [
+"OpenLogic","CentOS","8*",
+"OpenLogic","centos-hpc","*",
+"Oracle","Oracle-Linux","8",        
+"Oracle","Oracle-Linux","8-ci",
+"Oracle","Oracle-Linux","81",
+"Oracle","Oracle-Linux","81-gen2",
+"Oracle","Oracle-Linux","ol82",
+"Oracle","Oracle-Linux","ol8_2-gen2",
+"Oracle","Oracle-Linux","ol82-gen2",
+"Oracle","Oracle-Linux","ol83-lvm",
+"Oracle","Oracle-Linux","ol83-lvm-gen2",
+"Oracle","Oracle-Linux","ol84-lvm",
+"Oracle","Oracle-Linux","ol84-lvm-gen2",
+"Oracle","Oracle-Linux","81-ci",
+"Red Hat","RHEL","74-gen2",
+"Red Hat","RHEL-HANA","7.4",
+"Red Hat","RHEL-HANA","7.5",
+"Red Hat","RHEL-HANA","7.6",
+"Red Hat","RHEL-HANA","8.1",
+"Red Hat","RHEL-HANA","81_gen2",
+"Red Hat","RHEL-SAP","7.4",
+"Red Hat","RHEL-SAP","7.5",
+"Red Hat","RHEL-SAP","7.7",
+"Red Hat","RHEL-SAP-HANA","7.5",
+"Microsoft SQL Server","SQL 2019-SLES*","*",
+"Microsoft SQL Server","SQL 2019-RHEL7","*",
+"Microsoft SQL Server","SQL 2017-RHEL7","*",
+"Microsoft","microsoft-ads",".",
+"SUSE","sles-sap-15-*-byos","gen","*"
+| serialize
+]
+
+//Query from Update Manager
+resources 
+| extend osType = coalesce(tostring(properties.osName), tostring(properties.osType), tostring(properties.storageProfile.osDisk.osType)), tostring(properties.storageProfile.imageReference.publisher), tostring(properties.storageProfile.imageReference.sku), tostring(properties.storageProfile.imageReference.offer), tostring(properties.storageProfile.imageReference.exactVersion)
+| summarize
+azureLinux = countif(type =~ "microsoft.compute/virtualmachines" and  osType =~ "Linux"),
+arcLinux = countif(type =~ "microsoft.hybridcompute/machines" and osType =~ "Linux"),
+azureWindows = countif(type =~ "microsoft.compute/virtualmachines" and  osType =~ "Windows"),
+arcWindows = countif(type =~ "microsoft.hybridcompute/machines" and osType =~ "Windows")
+| project machinePack = pack("Azure virtual machines-Linux", azureLinux, "Arc enabled servers-Linux", arcLinux, "Azure virtual machines-Windows", azureWindows, "Arc enabled servers-Windows", arcWindows)
+| mv-expand machinePack
+| extend machine = tostring(bag_keys(machinePack)[0])
+| extend count_ = tolong(machinePack[machine])
+| project machine, count_ 
+
+
+//Query from MS colleague
+resources 
+| extend osType = coalesce(tostring(properties.osName), tostring(properties.osType), tostring(properties.storageProfile.osDisk.osType))
+| extend ExactVersion = parse_json(properties.storageProfile.imageReference.exactVersion)
+| where type =~ "microsoft.compute/virtualmachines" //and osType =~ "Windows"
+//| extend supported = case(ExactVersion > 14393, "Yes", "No")
