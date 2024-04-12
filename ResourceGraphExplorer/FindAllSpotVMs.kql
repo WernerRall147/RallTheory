@@ -1,0 +1,9 @@
+resources
+| where type == 'microsoft.compute/virtualmachines'
+| where properties has 'evictionPolicy'
+| project
+    resourceGroup,
+    vmName = name,
+    vmSize = tostring(properties.hardwareProfile.vmSize),
+    osType = tostring(properties.storageProfile.osDisk.osType),
+    evictionPolicy = tostring(properties.extended.instanceView.powerState.code)
