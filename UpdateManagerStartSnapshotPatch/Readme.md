@@ -13,8 +13,3 @@ Now that Azure Update Manager is the most supported way to patch your Azure VMs 
 - Create webhooks for our runbooks
 - We need to set up and Event Grid System Topic
 - We need to set up a subscription to the topic and call the webhook as an endpoint
-
-
-
-
-
