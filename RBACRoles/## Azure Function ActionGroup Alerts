@@ -1,0 +1,23 @@
+{
+    "properties": {
+        "roleName": "Azure Functions ActionGroups Alerts",
+        "description": "Allows access to manage Azure Functions, ActionGroups and Alerts",
+        "assignableScopes": [
+           "/subscriptions/xxxxxxxxxx/resourceGroups/xxxxxxx"
+        ],
+        "permissions": [
+            {
+                "actions": [
+                    "Microsoft.Insights/createNotifications/*",
+                    "Microsoft.Insights/eventtypes/values/read",
+                    "Microsoft.Insights/actionGroups/*",
+                    "Microsoft.Web/sites/functions/read",
+                    "Microsoft.Web/sites/functions/write"
+                ],
+                "notActions": [],
+                "dataActions": [],
+                "notDataActions": []
+            }
+        ]
+      }
+   }
