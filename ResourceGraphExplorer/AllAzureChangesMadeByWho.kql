@@ -1,0 +1,8 @@
+resourcechanges
+| extend changeTime = todatetime(properties.changeAttributes.timestamp), 
+targetResourceId = tostring(properties.targetResourceId),
+changeType = tostring(properties.changeType), changedBy = tostring(properties.changeAttributes.changedBy),
+changedByType = properties.changeAttributes.changedByType, targetResourceType = properties.targetResourceType,
+clientType = tostring(properties.changeAttributes.clientType)
+| where changeTime > ago(7d)
+    | project changeType, changedBy, changedByType, clientType, targetResourceType, properties
