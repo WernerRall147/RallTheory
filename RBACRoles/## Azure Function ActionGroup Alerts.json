@@ -8,18 +8,19 @@
         "permissions": [
             {
                 "actions": [
+                    "Microsoft.AlertsManagement/alerts/read",
+                    "Microsoft.AlertsManagement/smartDetectorAlertRules/read",
+                    "Microsoft.Insights/actionGroups/*",
+                    "Microsoft.Insights/components/*",
                     "Microsoft.Insights/createNotifications/*",
                     "Microsoft.Insights/eventtypes/values/read",
-                    "Microsoft.Insights/actionGroups/*",
+                    "Microsoft.Resources/subscriptions/resourceGroups/read",
                     "Microsoft.Web/serverfarms/*",
+                    "Microsoft.Web/sites/functions/execute",
                     "Microsoft.Web/sites/functions/read",
                     "Microsoft.Web/sites/functions/write",
-                    "Microsoft.Resources/subscriptions/resourceGroups/read",
                     "Microsoft.Web/sites/read",
-                    "Microsoft.Web/sites/write",
-                    "Microsoft.Insights/components/*",
-                    "Microsoft.AlertsManagement/smartDetectorAlertRules/read",
-                    "Microsoft.AlertsManagement/alerts/read"
+                    "Microsoft.Web/sites/write"
                 ],
                 "notActions": [],
                 "dataActions": [],
