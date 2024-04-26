@@ -1,0 +1,10 @@
+let
+    GetBillingAccountData = (billingAccountId as text) =>
+    let
+        url = "https://management.azure.com/providers/Microsoft.Billing/billingAccounts/" & billingAccountId & "/providers/Microsoft.Consumption/marketplaces?api-version=2023-05-01",
+        Source = Json.Document(Web.Contents(url)),
+        Data = Source[records] // Adjust this path based on the actual structure of your JSON response
+    in
+        Data
+in
+    GetBillingAccountData

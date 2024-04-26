@@ -1,0 +1,18 @@
+let
+    FetchDataForPeriod2 = (billingAccountId as text, billingPeriod as text) =>
+    let
+        // Url = "https://management.azure.com/providers/Microsoft.Billing/billingAccounts/" & billingAccountId & "/billingPeriods/" & billingPeriod & "/providers/Microsoft.Consumption/balances?api-version=2023-05-01",
+        Url = "https://management.azure.com/providers/Microsoft.Billing/billingAccounts/" & billingAccountId & "/providers/Microsoft.Billing/billingPeriods/" & billingPeriod & "/providers/Microsoft.Consumption/usagedetails?",
+        Source = Json.Document(Web.Contents(Url)),
+        Properties = Source[properties],
+        // Convert the properties record to a table directly since it contains scalar values
+        TableFromProperties2 = Table.FromRecords({Properties}),
+        // Add a column for the billingAccountId to the table
+        FinalTableWithAccount2 = Table.AddColumn(TableFromProperties2, "BillingAccountId", each billingAccountId, type text),
+        FinalTableWithPeriod = Table.AddColumn(FinalTableWithAccount2, "billingPeriod", each billingPeriod, type text),
+        ConvertedToDate2 = Table.TransformColumns(FinalTableWithPeriod, {"billingPeriod", each Date.FromText(Text.Start(_, 4) & "-" & Text.End(_, 2) & "-01"), type date}),
+        ConvertedToNumber2 = Table.TransformColumnTypes(ConvertedToDate2, {"totalUsage", type number})
+    in
+        ConvertedToNumber2
+in
+    FetchDataForPeriod2

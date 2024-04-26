@@ -1,0 +1,14 @@
+let
+    FetchACODataForBillingAccount = (billingAccountId as text) =>
+    let
+        Url = "https://management.azure.com/providers/Microsoft.Billing/billingAccounts/" & billingAccountId & "/providers/Microsoft.Consumption/lots?api-version=2023-05-01",
+        Source = Json.Document(Web.Contents(Url)),
+        Properties = Source[properties],
+        // Convert the properties record to a table directly since it contains scalar values
+        TableFromProperties = Table.FromRecords({Properties}),
+        // Add a column for the billingAccountId to the table
+        FinalTableWithAccount = Table.AddColumn(TableFromProperties, "BillingAccountId", each billingAccountId, type text)
+    in
+        FinalTableWithAccount
+in
+    FetchACODataForBillingAccount

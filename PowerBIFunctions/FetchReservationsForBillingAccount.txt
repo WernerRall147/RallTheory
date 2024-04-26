@@ -1,0 +1,13 @@
+let
+    FetchReservationsForBillingAccount = (billingAccountId as text) =>
+    let
+        Url = "https://management.azure.com/providers/Microsoft.Billing/billingAccounts/" & billingAccountId & "/providers/Microsoft.Consumption/reservationTransactions?$filter=properties/eventDate+ge+2022-09-01+AND+properties/eventDate+le+2028-10-30&api-version=2023-05-01",
+        Source = Json.Document(Web.Contents(Url)),
+        #"Converted to Table" = Record.ToTable(Source),
+        #"Expanded Value" = Table.ExpandListColumn(#"Converted to Table", "Value"),
+        #"Expanded Record" = Table.ExpandRecordColumn(#"Expanded Value", "Value", {"id", "name", "type", "tags", "properties"}, {"id", "name", "type", "tags", "properties"}),
+        #"Expanded properties" = Table.ExpandRecordColumn(#"Expanded Record", "properties", {"eventDate", "reservationOrderId", "description", "eventType", "quantity", "amount", "currency", "reservationOrderName", "purchasingEnrollment", "armSkuName", "term", "region", "purchasingSubscriptionGuid", "purchasingSubscriptionName", "accountName", "accountOwnerEmail", "departmentName", "costCenter", "currentEnrollment", "billingFrequency", "billingMonth", "monetaryCommitment", "overage"}, {"eventDate", "reservationOrderId", "description", "eventType", "quantity", "amount", "currency", "reservationOrderName", "purchasingEnrollment", "armSkuName", "term", "region", "purchasingSubscriptionGuid", "purchasingSubscriptionName", "accountName", "accountOwnerEmail", "departmentName", "costCenter", "currentEnrollment", "billingFrequency", "billingMonth", "monetaryCommitment", "overage"})
+    in
+        #"Expanded properties"
+in
+    FetchReservationsForBillingAccount

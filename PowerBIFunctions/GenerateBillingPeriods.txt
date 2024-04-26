@@ -1,0 +1,32 @@
+let
+    GenerateBillingPeriods = (billingAccountId as text, billingAccounts as table) =>
+    let
+        // Lookup the start date for the given billingAccountId
+        StartDateRecord = Table.SelectRows(billingAccounts, each [name] = billingAccountId),
+        StartDate = if Table.RowCount(StartDateRecord) > 0 then Date.From(StartDateRecord{0}[startDate]) else null,
+
+        // Proceed only if StartDate is not null
+        BillingPeriods = if StartDate <> null then
+            let
+                // Convert the start date to the first of the month for consistency
+                StartOfMonth = #date(Date.Year(StartDate), Date.Month(StartDate), 1),
+                // Calculate the end date, considering the current date minus two days
+                CurrentDateMinusTwo = Date.AddDays(DateTime.Date(DateTime.LocalNow()), -2),
+                EndOfMonth = #date(Date.Year(CurrentDateMinusTwo), Date.Month(CurrentDateMinusTwo), 1),
+
+                // Calculate the number of months between StartOfMonth and EndOfMonth
+                NumberOfMonths = (Date.Year(EndOfMonth) - Date.Year(StartOfMonth)) * 12 + (Date.Month(EndOfMonth) - Date.Month(StartOfMonth)) + 1,
+
+                // Generate a list of dates from start to end, one per month
+                ListOfMonths = List.Dates(StartOfMonth, NumberOfMonths, #duration(31, 0, 0, 0)),
+
+                // Transform this list into a list of billing period strings in 'YYYYMM' format
+                ListOfBillingPeriods = List.Transform(ListOfMonths, each Text.From(Date.Year(_)) & Text.PadStart(Text.From(Date.Month(_)), 2, "0"))
+            in
+                ListOfBillingPeriods
+        else
+            {} // Return an empty list if StartDate is null
+    in
+        BillingPeriods
+in
+    GenerateBillingPeriods
