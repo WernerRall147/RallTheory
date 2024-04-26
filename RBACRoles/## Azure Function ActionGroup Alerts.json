@@ -17,8 +17,7 @@
                     "Microsoft.Resources/subscriptions/resourceGroups/read",
                     "Microsoft.Web/serverfarms/*",
                     "Microsoft.Web/sites/functions/*",
-                    "Microsoft.Web/sites/read",
-                    "Microsoft.Web/sites/write"
+                    "Microsoft.Web/sites/*"
                 ],
                 "notActions": [],
                 "dataActions": [],
