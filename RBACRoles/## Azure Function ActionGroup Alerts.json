@@ -16,9 +16,7 @@
                     "Microsoft.Insights/eventtypes/values/read",
                     "Microsoft.Resources/subscriptions/resourceGroups/read",
                     "Microsoft.Web/serverfarms/*",
-                    "Microsoft.Web/sites/functions/execute",
-                    "Microsoft.Web/sites/functions/read",
-                    "Microsoft.Web/sites/functions/write",
+                    "Microsoft.Web/sites/functions/*",
                     "Microsoft.Web/sites/read",
                     "Microsoft.Web/sites/write"
                 ],
