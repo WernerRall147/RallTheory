@@ -1,17 +1,22 @@
 let
+    CurrentMonth = Text.From(Date.Year(DateTime.LocalNow())) & Text.PadStart(Text.From(Date.Month(DateTime.LocalNow())), 2, "0"),
     FetchDataForPeriod = (billingAccountId as text, billingPeriod as text) =>
     let
         Url = "https://management.azure.com/providers/Microsoft.Billing/billingAccounts/" & billingAccountId & "/billingPeriods/" & billingPeriod & "/providers/Microsoft.Consumption/balances?api-version=2023-05-01",
-        Source = Json.Document(Web.Contents(Url)),
-        Properties = Source[properties],
-        // Convert the properties record to a table directly since it contains scalar values
-        TableFromProperties = Table.FromRecords({Properties}),
-        // Add a column for the billingAccountId to the table
-        FinalTableWithAccount = Table.AddColumn(TableFromProperties, "BillingAccountId", each billingAccountId, type text),
-        FinalTableWithPeriod = Table.AddColumn(FinalTableWithAccount, "billingPeriod", each billingPeriod, type text),
-        ConvertedToDate = Table.TransformColumns(FinalTableWithPeriod, {"billingPeriod", each Date.FromText(Text.Start(_, 4) & "-" & Text.End(_, 2) & "-01"), type date}),
-        ConvertedToNumber = Table.TransformColumnTypes(ConvertedToDate, {"totalUsage", type number})
+        Source = try if billingPeriod < CurrentMonth then Json.Document(Web.Contents(Url)) else null otherwise null,
+        Result = if Source is null then #table(type table [BillingAccountId=text, billingPeriod=text, totalUsage=number], {}) else
+        let
+            Properties = Source[properties],
+            // Convert the properties record to a table directly since it contains scalar values
+            TableFromProperties = Table.FromRecords({Properties}),
+            // Add a column for the billingAccountId to the table
+            FinalTableWithAccount = Table.AddColumn(TableFromProperties, "BillingAccountId", each billingAccountId, type text),
+            FinalTableWithPeriod = Table.AddColumn(FinalTableWithAccount, "billingPeriod", each billingPeriod, type text),
+            ConvertedToDate = Table.TransformColumns(FinalTableWithPeriod, {"billingPeriod", each Date.FromText(Text.Start(_, 4) & "-" & Text.End(_, 2) & "-01"), type date}),
+            ConvertedToNumber = Table.TransformColumnTypes(ConvertedToDate, {"totalUsage", type number})
+        in
+            ConvertedToNumber
     in
-        ConvertedToNumber
+        Result
 in
     FetchDataForPeriod
