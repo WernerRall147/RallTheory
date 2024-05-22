@@ -74,6 +74,46 @@ foreach ($user in $users) {
 # Convert the array to a CSV format
 $csvContent = $licenseAssignments | ConvertTo-Csv -NoTypeInformation
 
+# Convert the CSV content to JSON
+$jsonContent = $csvContent | ConvertFrom-Csv | ConvertTo-Json
+
+# Define the Log Analytics Workspace ID and Key
+$workspaceId = "#TODO"
+$sharedKey = "#TODO"
+
+# Define the Log Analytics Data Collector API endpoint
+$logAnalyticsApiEndpoint = "https://$workspaceId.ods.opinsights.azure.com/api/logs?api-version=2016-04-01"
+
+# Get the current date and time
+$localTime = Get-Date
+
+# Convert the local time to UTC
+$utcTime = $localTime.ToUniversalTime()
+
+# Format the UTC time in RFC1123 pattern
+$date = Get-Date $utcTime -Format r
+
+# Create the signature for the API request
+$stringToHash = "POST`n" + $jsonContent.Length + "`napplication/json`n" + "x-ms-date:" + $date + "`n/api/logs"
+$bytesToHash = [Text.Encoding]::UTF8.GetBytes($stringToHash)
+$keyBytes = [Convert]::FromBase64String($sharedKey)
+$sha256 = New-Object System.Security.Cryptography.HMACSHA256
+$sha256.Key = $keyBytes
+$calculatedHash = $sha256.ComputeHash($bytesToHash)
+$encodedHash = [Convert]::ToBase64String($calculatedHash)
+$authorization = 'SharedKey {0}:{1}' -f $workspaceId,$encodedHash
+
+# Create the headers for the API request
+$headers = @{
+    "Authorization" = $authorization
+    "Log-Type" = "LicenseAssignments"
+    "x-ms-date" = $date
+    "time-generated-field" = "Date"
+}
+
+# Send the data to Log Analytics
+Invoke-WebRequest -Method POST -Uri $logAnalyticsApiEndpoint -ContentType "application/json" -Headers $headers -Body $jsonContent
+
 # Define the email parameters
 $from = "#TODO your-email@domain.com"   # Replace with your email address
 $to = "#TODO your-email@domain.com"     # Replace with your email address
