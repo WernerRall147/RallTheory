@@ -1,5 +1,8 @@
 using namespace System.Net
 
+# Input bindings are passed in via param block.
+param($Request, $TriggerMetadata)
+
 # Import required modules
 try {
     Write-Output "Importing required modules..."
@@ -11,9 +14,6 @@ try {
     Write-Error "Failed to import required modules. Please ensure Az.Accounts and Az.Compute are installed."
     exit
 }
-
-# Input bindings are passed in via param block.
-param($Request, $TriggerMetadata)
 
 # Write to the Azure Functions log stream.
 Write-Output "PowerShell HTTP trigger function processed a request."
@@ -66,6 +66,8 @@ $body = "This HTTP triggered function executed successfully. Pass a name in the 
 if ($name) {
     $body = "Hello, $name. This HTTP triggered function executed successfully."
 }
+
+Write-Output "End of Script"
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
