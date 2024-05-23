@@ -1,0 +1,11 @@
+LicenseAssignments_CL
+| distinct GroupId_g, GroupName_s, SkuPartNumber_s
+| where GroupName_s != "N/A"
+| join kind=inner (
+    AuditLogs
+    | where Result == 'success'
+    | where OperationName has_any('Remove member from group', 'Add member to group')
+    | where Category has_any('GroupManagement')
+    | project TimeGenerated, OperationName, AADOperationType, userPrincipalName = tostring(TargetResources[0].userPrincipalName), GroupId = tostring(TargetResources[1].id), UserId = tostring(TargetResources[0].id)
+) on $left.GroupId_g == $right.GroupId
+| project TimeGenerated, OperationName, AADOperationType, userPrincipalName, UserId, GroupId_g, GroupName_s, SkuPartNumber_s

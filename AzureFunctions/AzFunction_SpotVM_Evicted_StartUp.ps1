@@ -4,7 +4,7 @@ using namespace System.Net
 param($Request, $TriggerMetadata)
 
 # Write to the Azure Functions log stream.
-Write-Host "PowerShell HTTP trigger function processed a request."
+Write-Output "PowerShell HTTP trigger function processed a request."
 
 # Interact with query parameters or the body of the request.
 $name = $Request.Query.Name
@@ -12,8 +12,10 @@ if (-not $name) {
     $name = $Request.Body.Name
 }
 
+
 try {
     # Authenticate using managed identity or other secure methods (avoid interactive login)
+    Write-Output "Trying to Connect using the Managed Identity"
     Connect-AzAccount -Identity 
 
     # Retrieve the list of subscriptions
@@ -28,6 +30,7 @@ try {
         # Process the spot VMs (e.g., log, return data, etc.)
         foreach ($vm in $spotVms) {
             Write-Host "Spot VM: $($vm.Name) in resource group: $($vm.ResourceGroupName) is $($vm.PowerState)"
+            Write-Output "Spot VM: $($vm.Name) in resource group: $($vm.ResourceGroupName) is $($vm.PowerState)"
             $vm | Where-Object { $_.PowerState -eq 'VM deallocated' } | ForEach-Object {Start-AzVM -ResourceGroupName $_.ResourceGroupName -Name $_.Name -ErrorAction Stop}
     
         }
