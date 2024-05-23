@@ -50,9 +50,12 @@ try {
         foreach ($vm in $spotVms) {
             Write-Host "Spot VM: $($vm.Name) in resource group: $($vm.ResourceGroupName) is $($vm.PowerState)"
             Write-Output "Spot VM: $($vm.Name) in resource group: $($vm.ResourceGroupName) is $($vm.PowerState)"
-            $vm | Where-Object { $_.PowerState -eq 'VM deallocated' } | ForEach-Object {Start-AzVM -ResourceGroupName $_.ResourceGroupName -Name $_.Name -ErrorAction Stop}
-            Write-Output "Started the Spot VM: $($vm.Name) in resource group: $($vm.ResourceGroupName)"
-    
+            try {
+                $vm | Where-Object { $_.PowerState -eq 'VM deallocated' } | ForEach-Object {Start-AzVM -ResourceGroupName $_.ResourceGroupName -Name $_.Name -ErrorAction Stop}
+                Write-Output "Started the Spot VM: $($vm.Name) in resource group: $($vm.ResourceGroupName)"
+            } catch {
+                Write-Error -Message $_.Exception
+            }
         }
     }
 }
