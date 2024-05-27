@@ -1,0 +1,13 @@
+let endTime = now();
+let startTime = endTime - 7d;
+AuditLogs
+| where TimeGenerated between (startTime .. endTime)
+| where Result == 'success'
+| where OperationName has_any('Remove member from group', 'Add member to group')
+| where Category has_any('GroupManagement')
+| extend InitiatedByUser = todynamic(InitiatedBy)
+| extend UserDisplayName = InitiatedByUser.user.displayName,
+         UserId = InitiatedByUser.user.id,
+         UserPrincipalName = InitiatedByUser.user.userPrincipalName,
+         UserIpAddress = InitiatedByUser.user.ipAddress
+| project TimeGenerated, OperationName, AADOperationType, UserId, UserPrincipalName, UserIpAddress
