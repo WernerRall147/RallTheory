@@ -1,9 +1,26 @@
-# Import the module
-Import-Module Microsoft.Graph
+<#
+.SYNOPSIS
+This script retrieves license assignments for Azure users and sends an email with the license assignments as a CSV attachment.
 
+.DESCRIPTION
+The script connects to the Microsoft Graph API to retrieve license information for Azure users. It then maps the SKU IDs to friendly names using a CSV file downloaded from a specified URL. The script retrieves the assigned licenses for each user and determines whether the assignment was made directly or through a group. The script saves the license assignments as a CSV file and converts it to JSON format. It then sends the JSON data to a Log Analytics workspace for logging purposes. Finally, the script sends an email with the license assignments as a CSV attachment.
+
+.PARAMETER None
+
+.EXAMPLE
+.\LicensewithGroupsAssignments.ps1
+Runs the script to retrieve license assignments and send an email with the license assignments as a CSV attachment.
+
+.NOTES
+- This script requires the AzureADPreview module to be installed.
+- The script requires the user to have appropriate permissions to access the Microsoft Graph API and send emails.
+#>
+
+Write-Output "Connecting to Microsoft Graph..."
 # Connect to Microsoft Graph
-Connect-MgGraph -Scopes "User.Read.All", "Directory.Read.All", "Mail.Send", "Group.Read.All"
+Connect-MgGraph -Identity
 
+Write-Output "Defining a function to get SKU mappings..."
 # Define a function to get SKU mappings
 function Get-SkuMappings {
     $skus = Get-MgSubscribedSku
@@ -14,9 +31,11 @@ function Get-SkuMappings {
     return $skuMapping
 }
 
+Write-Output "Getting the SKU mappings..."
 # Get the SKU mappings
 $skuMapping = Get-SkuMappings
 
+Write-Output "Downloading the license table..."
 # Create a hash table of the license names
 $licenseTableURL = 'https://download.microsoft.com/download/e/3/e/e3e9faf2-f28b-490a-9ada-c6089a1fc5b0/Product%20names%20and%20service%20plan%20identifiers%20for%20licensing.csv'
 # We download the file as a string, convert it to CSV, and select the needed properties
@@ -24,18 +43,22 @@ $licenseTable = (Invoke-WebRequest -Uri $licenseTableURL).ToString() | ConvertFr
 $licenseTableHash = @{}
 $licenseTable | foreach { $licenseTableHash[$_.GUID] = $_.'???Product_Display_Name' }
 
+Write-Output "Getting all licensed users..."
 # Get all licensed users
 $users = Get-MgUser -Filter 'assignedLicenses/$count ne 0' -ConsistencyLevel eventual -CountVariable licensedUserCount -All `
 -Property AssignedLicenses,LicenseAssignmentStates,UserPrincipalName,DisplayName,AssignedLicenses,UsageLocation,Department,Mail,CompanyName,AccountEnabled,userType,onPremisesSyncEnabled,Id `
 | Select-Object UserPrincipalName,DisplayName,AssignedLicenses,UsageLocation,Department,Mail,CompanyName,AccountEnabled,userType,onPremisesSyncEnabled,Id -ExpandProperty LicenseAssignmentStates `
 | Select-Object UserPrincipalName, DisplayName, AssignedByGroup, Error, SkuId, Id
 
+Write-Output "Initializing an empty array to store license assignments..."
 # Initialize an empty array to store license assignments
 $licenseAssignments = @()
 
+Write-Output "Getting all groups that have assigned licenses..."
 # Get all groups that have assigned licenses
 $licenseGroups = Get-MgGroup -Filter "assignedLicenses/any()" -Select *
 
+Write-Output "Looping through each user and getting their assigned licenses..."
 # Loop through each user and get their assigned licenses
 foreach ($user in $users) {
     $userLicenses = Get-MgUserLicenseDetail -UserId $user.Id
@@ -71,28 +94,36 @@ foreach ($user in $users) {
     }
 }
 
+Write-Output "Converting the array to CSV format..."
 # Convert the array to a CSV format
 $csvContent = $licenseAssignments | ConvertTo-Csv -NoTypeInformation
 
+Write-Output "Converting the CSV content to JSON..."
 # Convert the CSV content to JSON
 $jsonContent = $csvContent | ConvertFrom-Csv | ConvertTo-Json
 
+Write-Output "Defining the Log Analytics Workspace ID and Key..."
 # Define the Log Analytics Workspace ID and Key
-$workspaceId = "#TODO"
-$sharedKey = "#TODO"
+$workspaceId = "dd374334-def4-4dd3-b7fb-c26ec7c09e07"
+$sharedKey = "Tkw2KGj+Yrz8dY2FbsUyMXOWKoraBZ8vhcnC8OXn6fLEkCf+xcKCAjLyCHppXTxC+jISuF7y7Kbf1E+hZZxWwg=="
 
+Write-Output "Defining the Log Analytics Data Collector API endpoint..."
 # Define the Log Analytics Data Collector API endpoint
 $logAnalyticsApiEndpoint = "https://$workspaceId.ods.opinsights.azure.com/api/logs?api-version=2016-04-01"
 
+Write-Output "Getting the current date and time..."
 # Get the current date and time
 $localTime = Get-Date
 
+Write-Output "Converting the local time to UTC..."
 # Convert the local time to UTC
 $utcTime = $localTime.ToUniversalTime()
 
+Write-Output "Formatting the UTC time in RFC1123 pattern..."
 # Format the UTC time in RFC1123 pattern
 $date = Get-Date $utcTime -Format r
 
+Write-Output "Creating the signature for the API request..."
 # Create the signature for the API request
 $stringToHash = "POST`n" + $jsonContent.Length + "`napplication/json`n" + "x-ms-date:" + $date + "`n/api/logs"
 $bytesToHash = [Text.Encoding]::UTF8.GetBytes($stringToHash)
@@ -103,6 +134,7 @@ $calculatedHash = $sha256.ComputeHash($bytesToHash)
 $encodedHash = [Convert]::ToBase64String($calculatedHash)
 $authorization = 'SharedKey {0}:{1}' -f $workspaceId,$encodedHash
 
+Write-Output "Creating the headers for the API request..."
 # Create the headers for the API request
 $headers = @{
     "Authorization" = $authorization
@@ -111,51 +143,51 @@ $headers = @{
     "time-generated-field" = "Date"
 }
 
+Write-Output "Sending the data to Log Analytics..."
 # Send the data to Log Analytics
-Invoke-WebRequest -Method POST -Uri $logAnalyticsApiEndpoint -ContentType "application/json" -Headers $headers -Body $jsonContent
+#TODO Invoke-WebRequest -Method POST -Uri $logAnalyticsApiEndpoint -ContentType "application/json" -Headers $headers -Body $jsonContent
 
+Write-Output "Defining the email parameters..."
 # Define the email parameters
-$from = "#TODO your-email@domain.com"   # Replace with your email address
-$to = "#TODO your-email@domain.com"     # Replace with your email address
+$from = "admin@ralltheory.onmicrosoft.com"   # Replace with your email address
+$to = "admin@ralltheory.onmicrosoft.com"     # Replace with your email address
 $subject = "Azure License Assignments"
 $body = "Please find the attached CSV file with the Azure license assignments."
-$attachmentPath = "#TODO C:\path\to\licenseAssignments.csv" # Path to save the CSV file
 
-# Save the CSV content to a file
-$csvContent | Out-File -FilePath $attachmentPath -Encoding UTF8
+# Convert CSV content to a base64 string
+$csvContentBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($csvContent))
 
-# Read the CSV file content
-$fileContent = [System.IO.File]::ReadAllBytes($attachmentPath)
-$fileBase64 = [System.Convert]::ToBase64String($fileContent)
-
-# Create the email message
 $emailMessage = @{
-    Message = @{
-        Subject = $subject
-        Body = @{
-            ContentType = "Text"
-            Content = $body
+    message = @{
+        subject = $subject
+        body = @{
+            contentType = "Text"
+            content = $body
         }
-        ToRecipients = @(
+        toRecipients = @(
             @{
-                EmailAddress = @{
-                    Address = $to
+                emailAddress = @{
+                    address = $to
                 }
             }
         )
-        Attachments = @(
+        attachments = @(
             @{
                 '@odata.type' = "#microsoft.graph.fileAttachment"
-                Name = "licenseAssignments.csv"
-                ContentBytes = $fileBase64
+                name = "licenseAssignments.csv"
+                contentBytes = $csvContentBase64
             }
         )
     }
-    SaveToSentItems = "true"
+    saveToSentItems = $true
 }
 
-# Send the email
-Send-MgUserMail -UserId $from -BodyParameter $emailMessage
+# Convert the PowerShell object to JSON
+$emailMessageJson = $emailMessage | ConvertTo-Json -Depth 10
 
-# Output a message indicating the email has been sent
+Write-Output "Sending the email..."
+# Send the email
+Send-MgUserMail -UserId $from -BodyParameter $emailMessageJson
+
+
 Write-Output "Email sent successfully with the license assignments."

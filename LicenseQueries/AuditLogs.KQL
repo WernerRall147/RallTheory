@@ -1,0 +1,4 @@
+AuditLogs
+|where TimeGenerated > ago(14d)
+| where OperationName has_any('Remove member from group','Add member to group') and Category has_any ('GroupManagement') //and CorrelationId contains "eaaa2bd9-a332-4700-afca-0b3ce843daee"
+| project TimeGenerated, OperationName, AADOperationType, TargetuserPrincipalName=TargetResources[0].userPrincipalName, GroupId=TargetResources[1].id, TargetUserId=TargetResources[0].id, TargetGroup=coalesce(TargetResources[0].modifiedProperties[1].oldValue, TargetResources[0].modifiedProperties[1].newValue), Initiated = coalesce(InitiatedBy.user.userPrincipalName, InitiatedBy.app.displayName)
