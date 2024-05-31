@@ -104,8 +104,8 @@ $jsonContent = $csvContent | ConvertFrom-Csv | ConvertTo-Json
 
 Write-Output "Defining the Log Analytics Workspace ID and Key..."
 # Define the Log Analytics Workspace ID and Key
-$workspaceId = "dd374334-def4-4dd3-b7fb-c26ec7c09e07"
-$sharedKey = "Tkw2KGj+Yrz8dY2FbsUyMXOWKoraBZ8vhcnC8OXn6fLEkCf+xcKCAjLyCHppXTxC+jISuF7y7Kbf1E+hZZxWwg=="
+$workspaceId = "#TODO"
+$sharedKey = "#TODO"
 
 Write-Output "Defining the Log Analytics Data Collector API endpoint..."
 # Define the Log Analytics Data Collector API endpoint

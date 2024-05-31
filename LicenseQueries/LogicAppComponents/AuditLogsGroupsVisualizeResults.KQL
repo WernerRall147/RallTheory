@@ -1,0 +1,14 @@
+AuditLogs
+| where ActivityDateTime > ago(1d)
+| where OperationName has_any('Remove member from group','Add member to group') and Category has_any ('GroupManagement')
+| project TimeGenerated, OperationName, AADOperationType, TargetuserPrincipalName=TargetResources[0].userPrincipalName, GroupId=TargetResources[1].id, TargetUserId=TargetResources[0].id, TargetGroup=coalesce(TargetResources[0].modifiedProperties[1].oldValue, TargetResources[0].modifiedProperties[1].newValue), Initiator= coalesce(InitiatedBy.user.userPrincipalName, InitiatedBy.app.displayName)
+|  where GroupId in (#TODO add your group ids#)
+| extend TargetGroup = replace_string(tostring(TargetGroup), '"', "")
+| summarize Count=count() by OperationName, tostring(TargetGroup)
+| project TargetGroup,OperationName,Count
+| render barchart 
+    with ( title="Group Changes",
+    ytitle= "Operation Count",
+    xtitle = "GroupName",
+    legend =hidden
+    )
