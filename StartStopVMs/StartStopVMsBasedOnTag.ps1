@@ -16,7 +16,7 @@
         If $true, the script will only simulate the actions without making any changes.
  
     .EXAMPLE
-        .\Manage-VMPowerState.ps1 -TagName "AutoShutdownSchedule" -ManagementGroupId "MngEnv" -Simulate $true
+        .\StartStopVMsBasedOnTag.ps1 -TagName "AutoShutdownSchedule" -ManagementGroupId "MngEnv" -Simulate $true
  
 #>
  
