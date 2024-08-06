@@ -19,7 +19,6 @@
         .\StartStopVMsBasedOnTag.ps1 -TagName "AutoShutdownSchedule" -ManagementGroupId "MngEnv" -Simulate $true
  
 #>
- 
 param (
     [parameter(Mandatory = $true)]
     [string]$TagName,
@@ -32,7 +31,39 @@ param (
 )
  
 $VERSION = "1.0.0"
- 
+
+## Authentication
+Write-Output ""
+Write-Output "------------------------ Authentication ------------------------"
+Write-Output "Logging into Azure ..."
+
+try
+{
+    # Ensures you do not inherit an AzContext in your runbook
+    $null = Disable-AzContextAutosave -Scope Process
+
+	$null= Connect-AzAccount -Identity
+    Write-Output "Successfully logged into Azure." 
+    $AzureContext = Set-AzContext -SubscriptionId $SubscriptionId    
+
+} 
+catch
+{
+    
+        Write-Error -Message $_.Exception
+        throw $_.Exception
+    
+}
+
+
+## End of authentication
+
+## Getting all virtual machines
+Write-Output ""
+Write-Output ""
+Write-Output "---------------------------- Status ----------------------------"
+Write-Output "Getting all virtual machines from all resource groups ..."
+
 # Function to retrieve all subscriptions under a management group
 function Get-SubscriptionsUnderManagementGroup {
     param (
