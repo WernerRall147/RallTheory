@@ -1,14 +1,15 @@
 <#
 .SYNOPSIS
-    Checks whether users in Azure AD have a manager, and retrieves the manager's DisplayName.
+    Checks whether users in Azure AD have a manager, retrieves the manager's DisplayName,
+    and also includes the user's UPN and Mail.
 
 .DESCRIPTION
     1) Connect to Microsoft Graph.
-    2) Fetch all users (Id & DisplayName).
+    2) Fetch all users (Id, DisplayName, UserPrincipalName, Mail).
     3) For each user:
        - Check if they have a manager (Get-MgUserManager).
        - If yes, retrieve the manager’s user object (Get-MgUser) to get the manager’s DisplayName.
-    4) Print out the user’s DisplayName, HasManager, and ManagerName.
+    4) Print out the user’s DisplayName, UPN, Mail, HasManager, and ManagerName.
 
 .NOTES
     Author: [Your Name]
@@ -26,9 +27,9 @@ Connect-MgGraph -Scopes "User.Read.All" -NoWelcome
 $totalScriptStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 $sectionStopwatch     = [System.Diagnostics.Stopwatch]::StartNew()
 
-# 2. Fetch all users (explicitly request Id & DisplayName to ensure we have what we need)
+# 2. Fetch all users (explicitly request multiple properties: Id, DisplayName, UPN, Mail)
 Write-Host "Fetching all users from Azure AD..." -ForegroundColor Cyan
-$allUsers = Get-MgUser -All:$true -Property "Id","DisplayName"
+$allUsers = Get-MgUser -All:$true -Property "Id","DisplayName","UserPrincipalName","Mail"
 
 $sectionStopwatch.Stop()
 Write-Host ("[Fetch Users] Time Elapsed: {0} seconds." -f ($sectionStopwatch.Elapsed.TotalSeconds)) -ForegroundColor Yellow
@@ -74,6 +75,8 @@ foreach ($user in $allUsers) {
     # Collect results
     $results += [PSCustomObject]@{
         UserDisplayName = $user.DisplayName
+        UserUPN         = $user.UserPrincipalName
+        UserMail        = $user.Mail
         HasManager      = $hasManager
         ManagerName     = $managerName
     }
@@ -84,7 +87,7 @@ Write-Host ("[Check Managers] Time Elapsed: {0} seconds." -f ($sectionStopwatch.
 
 # 4. Output results
 Write-Host "Summary of results:" -ForegroundColor Cyan
-$results | Format-Table UserDisplayName, HasManager, ManagerName
+$results | Format-Table UserDisplayName, UserUPN, UserMail, HasManager, ManagerName
 
 # 5. Stop total script stopwatch
 $totalScriptStopwatch.Stop()
@@ -93,4 +96,4 @@ Write-Host ("[Total Script Time] Elapsed: {0} seconds." -f ($totalScriptStopwatc
 Write-Host "Script completed." -ForegroundColor Green
 # ------------------------ Script End ------------------------
 
-$results | Export-Csv -Path .\UserManagerReport.csv -NoTypeInformation
+$results | Export-Csv -Path .\UsersManagers.csv -NoTypeInformation
